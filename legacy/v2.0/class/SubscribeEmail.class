@@ -1,0 +1,183 @@
+<?php
+
+include_once ('../class/DB.class');
+include_once ('../class/Log.class');
+
+class SubscribeEmail
+{
+    var $person ;
+    var $diary_name ;
+    var $debug ;
+
+    // Constructor
+    function SubscribeEmail ( $p_person, $p_diary_name)
+    {
+      if ( only_alphanumeric($p_person) )
+         $this->person = $p_person;
+
+# Removing the diary_entry - so doesn't get set in the db.
+#      if ( only_alphanumeric($p_diary_name) )
+#         $this->diary_name = $p_diary_name;
+    }
+
+
+    function notify_subscribers($subject, $message, $email)
+    {
+      # Send to 'email' only if it's set
+
+      if ( $email!="" && !check_email($email) )
+      {
+        $log = new Log(1);
+        $log->add("In SubscribeEmail->notify_subscribers","Email ($email) not valid");
+        return -1;
+      }
+
+      $result = $this->get_emails(0, " order by email "); 
+      $count = 0;
+    
+     if ( $result)
+     {
+        while ( $row = mysql_fetch_array($result))
+        {
+          if ( $email == "" )
+          {
+            mail($row[email], $subject, $message, "From: admin@yearaway.com");
+            #print "<p> MAIL DISABLED !!!! : mail($row[email], $subject, $message, 'From: ".$this->person."@yearaway.com')</p>";
+            $count++;
+          }
+          elseif( $email == $row[email] )
+          {
+            mail($row[email], $subject, $message, "From: admin@yearaway.com");
+            #print "<p> MAIL DISABLED !!!! : mail($row[email], $subject, $message, 'From: ".$this->person."@yearaway.com')</p>";
+            $count++;
+          }
+        }
+
+        return ($count);
+     }
+     else
+     {
+       return -1;
+     }
+    }
+
+
+    function delete_emails ( $email )
+    {
+       $email = ltrim(ltrim($email));
+       if ( !check_email( $email ) || $this->person=="" )
+       {
+         $log = new Log(1);
+         $log->add("In SubscribeEmail->delete_emails","Email ($email) not valid or person (".$this->person.") not set");
+         return 0;
+       }
+
+       $qry = "delete from subscribe_email ".
+              "where !STRCMP(user_name, '$this->person') ".
+              "and !STRCMP(email, '$email') ";
+
+       if ( $this->diary_name != "" )
+         $qry .= "and !STRCMP(diary_name, '$this->diary_name') ";
+
+       ya_connect();
+       $result = mysql_query($qry);
+
+       if ( $result )
+          return 1;
+       else
+          return 0;
+    }
+
+    function num_of_emails()
+    {
+      if ( $this->person=="")
+      {
+         $log = new Log(1);
+         $log->add("In SubscribeEmail->num_of_emails","Person (".$this->person.") or diary_name (".$this->diary_name.") not set");
+         return 0;
+      }
+
+      $qry = "select count(email) as num_of_emails from subscribe_email ".
+              "where !STRCMP(user_name, '$this->person') ";
+
+       if ( $this->diary_name != "" )
+         $qry .= "and !STRCMP(diary_name, '$this->diary_name') ";
+
+      ya_connect();
+      $this->trace($qry);
+      $result = mysql_query($qry);
+
+      if ( $result )
+        return 1;
+      else
+        return 0;
+    }
+
+    function add_email ( $email )
+    {
+      $email = rtrim(ltrim($email)); 
+      if ( !check_email( $email ) || $this->person=="" )
+      {
+         $log = new Log(1);
+         $log->add("In SubscribeEmail->num_of_emails","Person (".$this->person.") or diary_name (".$this->diary_name.") not set or email ($email) not valid.");
+         return 0;
+      }
+ 
+      $this->delete_emails( $email );
+
+      $qry =    "insert into subscribe_email " .
+        "( user_name, diary_name, email, time_stamp ) ".
+        "values " .
+        "( '$this->person', '$this->diary_name', '$email', NOW() )" ;
+
+      ya_connect();
+      $this->trace($qry);
+      $result = mysql_query($qry);
+
+      if ( $result )
+        return 1;
+      else
+        return 0;
+    }
+
+
+    function get_emails ( $limit, $sort )
+    {
+      if ( !is_numeric($limit) || $this->person=="")
+      {
+         $log = new Log(1);
+         $log->add("In SubscribeEmail->get_emails","Person (".$this->person.") or limit ($limit) not valid.");
+         return 0;
+      }
+
+      $qry = "select email, date_format(time_stamp,'%D %M %Y') as date_added ".
+             "from subscribe_email ".
+             "where !STRCMP(user_name, '$this->person') ";
+
+      if ( $this->diary_name != "" )
+         $qry .= "and !STRCMP(diary_name, '$this->diary_name') ";
+
+      if ( sort != "" )
+         $qry .= " ".$sort." ";
+      else
+         $qry .= "order by time_stamp ";
+
+      if ( $limit > 0 )
+         $qry .= " limit $limit ";
+
+      ya_connect();
+      $this->trace($qry);
+      $result = mysql_query($qry);
+      return ($result);
+    }
+
+    function trace ($text)
+    {
+      if ($this->debug == 1)
+      {
+        print "<P>$text</P>";
+      }
+    }
+
+}
+?>

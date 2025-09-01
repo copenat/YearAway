@@ -1,0 +1,105 @@
+<?php
+
+include_once("../class/DB.class");
+
+
+// Log class
+class Log
+{
+    var $debug;
+    var $address;
+
+    #
+    # Status: 1 - Open
+    #         2 - Closed
+    #
+
+    // Constructor
+    function Log($x)
+    {
+       $this->address="sue_and_nathan@hotmail.com";
+    }
+
+
+    function status_text( $status )
+    {
+      if ( $status == 1 )
+        return "Open";
+      if ( $status == 2 )
+        return "Closed";
+    }
+
+  
+    function add($title,$desc)
+    {
+        $qry = "insert into log ".
+               "(timestamp, title, description, status, comment ) ".
+               "values ".
+               "(NOW(),'$title','$desc', 1, NULL)";
+
+        ya_connect();
+
+        $this->trace($qry);
+ 
+        $this->email($this->address, $title, $desc);
+
+        $result = mysql_query($qry);
+
+        return ($result);
+    }
+
+    function set_status($timestamp,$title,$status)
+    {
+        $qry = "update log set status = $status ".
+               "where timestamp = '$timestamp' ".
+               "and !STRCMP(title, '$title') ";
+  
+        ya_connect();
+        $this->trace($qry);
+
+        $result = mysql_query($qry);
+
+        return ($result);
+    }
+
+
+    function get($status)
+    {
+       $qry = "select date_format(timestamp,'%D %M %Y') as timestamp_disp, ".
+                     "timestamp as full_timestamp, ".
+                     "date_format(timestamp,'%Y%m%d') as timestamp, ".
+                     "title, description, comment, status ".
+              "from log ";
+
+       if ( $status != 0 )
+       {
+          $qry .= "where status = $status ";
+       }
+       $qry .= " order by status, full_timestamp desc";
+
+       ya_connect();
+
+       $this->trace($qry);
+
+       $result = mysql_query($qry);
+
+       return ($result);
+    }
+
+
+    function email($address,$subject,$message)
+    {
+        mail($address, $subject, $message, "From: change@yearaway.com");
+    }
+
+
+    function trace ($text)
+    {
+        if ($this->debug == 1)
+        {
+            print "<P>$text</P>";
+        }
+    }
+}
+
+?>

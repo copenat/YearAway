@@ -1,0 +1,8 @@
+body {background: white; font-family: Sans-Serif; color: black; font-size: medium}
+A:link {color: black}
+A:visited {color: black}
+A:active {color: black}
+.small {font-size: small}
+.medium {font-size: medium}
+.large {font-size:large}
+.bold {font-wieght:900}

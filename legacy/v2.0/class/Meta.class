@@ -1,0 +1,34 @@
+<?php
+    
+function printMeta()
+{
+   print "<head>\n";
+   print "<title>YearAway.com</title>\n";
+   print "<meta name=\"description\" ";
+   print "      content=\"The diaries of travellers of the world.\">";
+
+   print "<meta name=\"keywords\" ";
+   print " content=\"year away,yearaway,travelblog,blog,OE,big oe,travelogue,travel,travelling,travel diaries,trip,holiday,travel diary,diary\">";
+
+   print "<link rel=\"stylesheet\" href=\"../utils/yearaway_screen.css\" screen=\"screen\" type=\"text/css\">";
+
+   print "</head>\n";
+}
+
+function printerfriendly_printMeta()
+{
+   print "<head>\n";
+   print "<title>YearAway.com</title>\n";
+
+   print "<meta name=\"description\" ";
+   print "      content=\"The diaries of travellers of the world.\">";
+
+   print "<meta name=\"keywords\" ";
+   print " content=\"year away,yearaway,travelblog,blog,OE,big oe,travelogue,travel,travelling,travel diaries,trip,holiday,travel diary,diary\">";
+
+   print "<link rel=\"stylesheet\" href=\"../utils/yearaway_printer.css\" screen=\"screen\" type=\"text/css\">";
+
+   print "</head>\n";
+}
+
+?>

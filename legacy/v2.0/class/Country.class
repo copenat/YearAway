@@ -1,0 +1,172 @@
+<?php
+
+include_once("../class/Continent.class");
+include_once("../class/Log.class");
+
+class Country
+{
+    var $id;
+    var $name;
+    var $description;
+    var $continent_id;
+    var $cost1;
+    var $cost2;
+    var $cost3;
+    var $cost4;
+    var $cost5;
+    var $map_ref;
+    var $got_details = 0;
+
+    var $cities = array();
+    var $got_cities = 0;
+
+    var $capital_city;
+
+    
+    function Country( $p_id )
+    {
+       $this->id = $p_id;
+    }
+
+
+    function get_cities()
+    {
+        /* Return an array of objects of type city */
+        if ( ! $this->got_cities )
+        {
+           ya_connect();
+
+           $qry = "select id,name ".
+                  "from city ".
+                  "where !STRCMP(country_id, '".$this->id."') ".
+                  "order by name ";
+
+           $result = mysql_query($qry);
+
+           while ( $row = mysql_fetch_array($result))
+           {
+              $x[$row[id]] = $row[name];
+           }
+           mysql_free_result( $result );
+
+           $this->got_cities = 1;
+           $this->cities = $x;
+        }
+
+        return $this->cities;
+    }
+    
+
+
+    function get_id()
+    {
+       return $this->id;
+    }
+
+    function get_name()
+    {
+       $this->get_details();
+       return $this->name;
+    }
+
+    function get_description()
+    {
+       $this->get_details();
+       return $this->description;
+    }
+
+    function get_continent()
+    {
+       $this->get_details();
+       return $this->continent_id;
+    }
+
+    function update_description($desc)
+    {
+       $qry = "update country set description='$desc' ".
+              "where !STRCMP(id, '".$this->id."') ";
+       $result = mysql_query($qry);
+       return $result;
+    }
+
+    function get_map()
+    {
+       $this->get_details();
+
+       if ( !isset($this->map_ref) )
+       {
+          $c_id = $this->get_continent();
+
+          $c = new Continent( $c_id );
+          $this->map_ref = $c->get_map();
+
+          $log = new Log (1);
+          $log->add($this->get_name()." map missing", 
+            "Map was requested but was not available. Resorted to using the continent map (".$this->map_ref.")");
+       }
+
+       return $this->map_ref;
+    }
+
+
+    function get_capital_city()
+    {
+       if ( $this->capital_city = "" )
+       {
+          ya_connect();
+
+          $qry = "select id ".
+                  "from city ".
+                  "where !STRCMP(country_id, '".$this->id."') ".
+                  " and !STRCMP(capital, 'Y') ";
+
+          $result = mysql_query($qry);
+
+          while ( $row = mysql_fetch_array($result))
+          {
+             $this->capital_city = $id;
+          }
+          mysql_free_result( $result );
+
+       }
+       return $this->capital_city;
+    }
+    
+
+    function get_details()
+    {
+       if ( ! $this->got_details )
+       {
+          if ( $this->id=="" || !valid_country_id($this->id) )
+            return;
+
+          ya_connect();
+
+          $qry = "select name,description,continent_id,".
+                         "cost1,cost2,cost3,cost4,cost5,map_ref ".
+                  "from country ".
+                  "where !STRCMP(id, '".$this->id."') ".
+                  "order by name ";
+          $result = mysql_query($qry);
+
+          while ( $row = mysql_fetch_array($result))
+          {
+             $this->name = $row[name];
+             $this->description = $row[description];
+             $this->continent_id = $row[continent_id];
+             $this->cost1 = $row[cost1];
+             $this->cost2 = $row[cost2];
+             $this->cost3 = $row[cost3];
+             $this->cost4 = $row[cost4];
+             $this->cost5 = $row[cost5];
+             $this->map_ref = $row[map_ref];
+          }
+          mysql_free_result( $result );
+          $this->got_details = 1;
+       }
+    }
+
+}
+
+
+

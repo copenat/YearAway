@@ -1,0 +1,451 @@
+<?php
+
+include_once('../class/DB.class');
+include_once('../class/TextParse.class');
+
+class DiaryPhotos
+{
+    var $person ;
+    var $diary_name ;
+    var $country; 
+    var $debug ;
+
+    var $small_photo = 175;
+    var $medium_photo = 200;
+    var $large_photo = 450;
+
+
+    // Constructor
+    function DiaryPhotos ( $p_person, $p_diary_name )
+    {
+      if ( only_alphanumeric($p_person) )
+        $this->person = $p_person;
+      if ( only_alphanumeric($p_diary_name) )
+        $this->diary_name = $p_diary_name;
+    }
+
+    function set_person ( $p_person )
+    {
+      if ( only_alphanumeric($p_person) )
+        $this->person = $p_person;
+    }
+
+    function set_diary_name ( $p_diary_name )
+    {
+      if ( only_alphanumeric($p_diary_name) )
+        $this->diary_name = $p_diary_name;
+    }
+
+    function resize_photo ($size,$full_filename)
+    {
+       $im_size = GetImageSize($full_filename);
+       list($foo,$width,$bar,$height) = explode("\"",$im_size[3]);
+
+       if ( ($height / $width) <= 1  )
+       {
+         if ( $size == "small" )
+           $new_w = $this->small_photo;
+         elseif( $size == "medium" )
+           $new_w = $this->medium_photo;
+         elseif($size == "large" )
+           $new_w = $this->large_photo;
+
+         $new_h = round($new_w * ( $height / $width ));
+       }
+       else
+       {
+         if ( $size == "small" )
+           $new_h = $this->small_photo;
+         elseif( $size == "medium" )
+           $new_h = $this->medium_photo;
+         elseif($size == "large" )
+           $new_h = 350;
+
+         $new_w = round($new_h * ( $width / $height ));
+
+         if ( $size == "small" )
+           $new_w += 5;
+         elseif( $size == "medium" )
+           $new_w += 10;
+         elseif($size == "large" )
+           $new_w += 20;
+       }
+
+       return ( $new_w." ".$new_h );
+    }
+
+
+    function set_special_feature_photo ($filename)
+    {
+      $qry = "update diary_entry_photos set special_feature=NULL where special_feature=1";
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+
+      $qry =  "update diary_entry_photos set special_feature=1 ".
+              "where !STRCMP(user_name, '$this->person') ".
+              "and !STRCMP(diary_name, '$this->diary_name') ".
+              "and filename=$filename ";
+
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+    }
+
+
+    function get_special_feature_photo ($limit)
+    {
+      if ( !only_numeric( $limit ) )
+      {
+         $limit = 0;
+      }
+
+      $qry =  "select user_name,diary_name, comment,filename,type,photo_order, " .
+              " date_format(start_date,'%e %b %Y') as start_date_disp, ".
+              " date_format(start_date,'%Y%m%d') as start_date ".
+              "from diary_entry_photos " .
+              "where special_feature=1 ";
+
+      if ( $limit > 0 )
+      {
+         $qry .= " limit $limit ";
+      }
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      return ($result);
+    }
+
+
+    function get_photo ($start_date, $fn)
+    {
+      if ( $this->person == "" || $this->diary_name == "" || (!valid_date($start_date) && $start_date!=0) || !only_numeric($fn) )
+        return 0;
+
+      $qry =  "select start_date,comment,filename,type,photo_order " .
+              "from diary_entry_photos " .
+              "where !STRCMP(user_name, '$this->person') ".
+              "and !STRCMP(diary_name, '$this->diary_name') ";
+
+      if ( $start_date )
+        $qry .= "and start_date = '$start_date' ";
+
+      if ( $fn > 0 )
+        $qry .= " and filename = $fn ";
+
+      $qry .= "order by start_date,photo_order ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      return ($result);
+    }
+
+    function get_country_photos ($ctry_id)
+    {
+      if ( !valid_country_id($ctry_id) )
+        return 0;
+
+      $qry =  "select DE.user_name,DE.diary_name,DE.start_date,DEP.comment,DEP.filename,DEP.type " .
+              "from diary_entry DE, diary_entry_photos DEP " .
+              "where DE.user_name = DEP.user_name ".
+              "  and DE.diary_name = DEP.diary_name ".
+              "  and DE.start_date = DEP.start_date ".
+              "  and !STRCMP(DE.country, '$ctry_id') ";
+
+      if ( $this->person != "" )
+        $qry .= " and !STRCMP(DE.user_name, '$this->person') ";
+
+      if ( $this->diary_name != "" )
+        $qry .= " and !STRCMP(DE.diary_name, '$this->diary_name') ";
+
+      $qry .= " order by DEP.user_name,DEP.diary_name,DEP.start_date,DEP.photo_order ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      return ($result);
+    }
+
+
+
+    function get_photo_count ($start_date)
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !valid_date($start_date) )
+        return 0;
+
+      $qry =  "select count(filename) as num_of_photos " .
+              "from diary_entry_photos " .
+              "where !STRCMP(user_name, '$this->person') ".
+              "and !STRCMP(diary_name, '$this->diary_name') ".
+              "and start_date = '$start_date' ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      return ($result);
+    }
+
+    function get_full_filename($filename_num,$type)
+    {
+       if ( !only_numeric($filename_num) )
+         return false;
+
+       $x = $this->get_path().$this->diary_name."_".$filename_num.$type;
+       return $x;
+    }
+
+    function get_filename($filename_num,$type)
+    {
+       if ( !only_numeric($filename_num) )
+         return false;
+
+       $x = $this->diary_name."_".$filename_num.$type;
+       return $x;
+    }
+
+
+    function get_path()
+    {
+      if ( $this->person == "" || $this->diary_name == "" )
+        return false;
+      else
+        return "../photos/".$this->person."/";
+    }
+
+    function create_photo_dir()
+    {
+      $path = $this->get_path();
+      if ( !is_dir( $path ) )
+      {
+        mkdir( $path, 0755 );
+        chmod ( $path, 0777 );
+      }
+    }
+
+    function add_entry ($start_date, $comment, $type)
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !valid_date($start_date) )
+        return 0;
+ 
+      $comment = safeHTML( $comment );
+
+      $filename = $this->get_max_filename($start_date);
+      $filename++;
+
+      $photo_order = $this->get_max_photo_order($start_date);
+      $photo_order+=2;
+
+      $qry =  "insert into diary_entry_photos " .
+              "(user_name,diary_name,start_date,filename,comment,type,photo_order) ".
+              "values('$this->person','$this->diary_name','$start_date',$filename,'$comment','$type',$photo_order) ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      return ($result);
+    }
+
+    function update_photo_order ($start_date, $filename, $new_photo_order)
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !only_numeric($new_photo_order) || $new_photo_order > 100 || $new_photo_order < 0 || !only_numeric($filename) )
+        return 0; 
+
+      $qry = "update diary_entry_photos ".
+             "set photo_order = $new_photo_order ".
+             "where !STRCMP(user_name, '$this->person') ".
+             "and !STRCMP(diary_name, '$this->diary_name') ".
+             "and start_date = '$start_date' ".
+             "and filename = $filename ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      return ($result);
+    }
+
+
+    function update_start_date ($start_date, $filename, $new_start_date)
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !valid_date($start_date) || !valid_date($new_start_date) )
+        return 0;
+
+      $qry = "update diary_entry_photos ".
+             "set start_date = '$new_start_date' ".
+             "where !STRCMP(user_name, '$this->person') ".
+             "and !STRCMP(diary_name, '$this->diary_name') ".
+             "and start_date = '$start_date' ";
+
+      if ( $filename > 0 )
+        $qry .= "and filename = $filename ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      return ($result);
+    }
+
+    function update_comment ($start_date, $comment, $filename)
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !valid_date($start_date) )
+        return 0;
+
+      $qry = "update diary_entry_photos ".
+             "set comment = '$comment' ".
+             "where !STRCMP(user_name, '$this->person') ".
+             "and !STRCMP(diary_name, '$this->diary_name') ".
+             "and start_date = '$start_date' ";
+
+      if ( $filename > 0 )
+        $qry .= "and filename = $filename ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      return ($result);
+    }
+
+
+
+    function delete_entry ($start_date, $filename)
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !valid_date($start_date) )
+        return 0;
+
+      if ( $filename > 0 )
+         unlink( $this->get_full_filename($filename, $this->get_type($start_date, $filename)));
+      else
+      {
+        # get all photos and unlink them!
+        $result = $this->get_photo( $start_date, 0 );
+        if ($result)
+        {
+          while( $row = mysql_fetch_array($result) )
+          {
+            unlink( $this->get_full_filename($row[filename], $row[type]) );
+               #print "deleted photos";
+            #else
+            #   print "couldn't delete ".$row[filename].$row[type];
+          }
+        }
+
+      }
+
+      $qry = "delete from diary_entry_photos ".
+              "where !STRCMP(user_name, '$this->person') ".
+              "and !STRCMP(diary_name, '$this->diary_name') ".
+              "and start_date = '$start_date' ";
+      if ( $filename > 0 )
+        $qry .= "and filename = $filename ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      return ($result);
+    }
+
+
+    function get_type($start_date, $filename)
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !valid_date($start_date) )
+      {
+        return 0;
+      }
+
+      $ret = false;
+
+      $qry =  "select type " .
+              "from diary_entry_photos " .
+              "where !STRCMP(user_name, '$this->person') ".
+              "and !STRCMP(diary_name, '$this->diary_name') ".
+              "and start_date = '$start_date' ".
+              "and filename = $filename ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      if ( $result )
+      {
+        if ( $row = mysql_fetch_array($result) )
+          $ret = $row[type];
+      }
+      return $ret;
+    }
+
+    function get_max_photo_order($start_date)
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !valid_date($start_date) )
+        return 0;
+
+      $filename_num = 0;
+
+      $qry =  "select max(photo_order) as max_photo_order " .
+              "from diary_entry_photos " .
+              "where !STRCMP(user_name, '$this->person') ".
+              "and !STRCMP(diary_name, '$this->diary_name') ".
+              "and start_date = '$start_date' ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      if ( $result )
+      {
+        if ( ($row = mysql_fetch_array($result)) && $row[max_photo_order] > 0 )
+          $filename_num = $row[max_photo_order];
+      }
+      return $filename_num;
+    }
+
+
+    function get_max_filename($start_date)
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !valid_date($start_date) )
+        return 0;
+
+      $filename_num = 0;
+
+      $qry =  "select max(filename) as max_filename " .
+              "from diary_entry_photos " .
+              "where !STRCMP(user_name, '$this->person') ".
+              "and !STRCMP(diary_name, '$this->diary_name') ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      if ( $result )
+      {
+        if ( ($row = mysql_fetch_array($result)) && $row[max_filename] > 0 )
+          $filename_num = $row[max_filename];
+      }
+      #print "<p>max:$filename_num,$row[max_filename]</p>";
+      return $filename_num;
+    }
+
+
+    function gen_filename($start_date,$type)
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !valid_date($start_date) )
+        return 0;
+
+      $filename_num = $this->get_max_filename($start_date);
+      $filename_num++;
+
+      $x = $this->get_filename($filename_num,$type);
+      #print "<p>gen_filename:".$x."</p>";
+      return $x;
+    }
+
+
+
+    function trace ($text,$force)
+    {
+        // Idea of the force is so that an individual piece (ie. SQL) can
+        // be printed out with out all appearing.
+        if ($this->debug == 1 || $force == 1)
+        {
+            print "<P>$text</P>";
+        }
+    }
+}
+
+?>

@@ -1,0 +1,106 @@
+<?php
+
+
+
+class Continent
+{
+    var $countries = array();
+    var $id;
+    var $name;
+    var $description;
+    var $map_ref;
+    var $got_details = 0;
+    var $got_countries = 0;
+    
+
+    function Continent( $p_id )
+    {
+        $this->id = $p_id;
+    }
+
+
+    function get_countries()
+    {
+        /* Return an array of objects of type country */
+        if ( ! $this->got_countries )
+        {
+           ya_connect();
+
+           $qry = "select id, name ".
+                  "from country ".
+                  "where !STRCMP(continent_id, '" . $this->id . "' ) ".
+                  "order by name ";
+           $result = mysql_query($qry);
+
+           while ( $row = mysql_fetch_array($result))
+           {
+               $this->countries[$row[id]] = $row[name];
+           }
+           mysql_free_result( $result );
+   
+           #$this->countries = $x;
+           $this->got_countries = 1;
+        }
+
+        return $this->countries;
+    }
+    
+
+
+    function get_id()
+    {
+       return $this->id;
+    }
+
+    function get_name()
+    {
+       $this->get_details();
+       return $this->name;
+    }
+
+    function get_description()
+    {
+       $this->get_details();
+       return $this->description;
+    }
+
+    function get_map()
+    {
+       $this->get_details();
+       return $this->map_ref;
+    }
+
+
+
+    function get_details()
+    {
+
+       if ( ! $this->got_details )
+       {
+          ya_connect();
+
+          $qry = "select name,description,map_ref ".
+                  "from continent ".
+                  "where !STRCMP(id, '".$this->id."') ".
+                  "order by name ";
+
+          $result = mysql_query($qry);
+
+          while ( $row = mysql_fetch_array($result))
+          {
+             $this->name = $row[name];
+             $this->description = $row[description];
+             $this->map_ref = $row[map_ref];
+          }
+          mysql_free_result( $result );
+          $this->got_details = 1;
+       }
+
+    }
+
+
+
+}
+
+
+

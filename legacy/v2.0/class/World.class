@@ -1,0 +1,66 @@
+<?php
+
+class World
+{
+   var $continents = array();
+   var $got_continents = 0;
+   var $countries = array();
+   var $got_countries = 0;
+
+
+   function get_continents()
+   {
+
+      if ( ! $this->$got_continents )
+      {
+         ya_connect();
+
+         $qry = "select id,name ".
+             "from continent order by name ";
+
+
+         $result = mysql_query($qry);
+         while ( $row = mysql_fetch_array($result))
+         {
+            $this->continents[$row[id]] = $row[name]; 
+
+            #print "World.get_continents $row[id] --> $row[name]<BR>";
+         }
+         mysql_free_result( $result );
+
+         $this->$got_continents = 1;
+      }
+
+
+      return $this->continents;
+   }
+
+
+   function get_countries()
+   {
+
+      if ( ! $this->$got_countries )
+      {
+         ya_connect();
+
+         $qry = "select id, name 
+		from	country
+		order by name ";
+
+         $result = mysql_query($qry);
+
+         while ( $row = mysql_fetch_array($result))
+         {
+            $this->countries[$row[id]] = $row[name];
+            #print "World.get_countries $row[id] --> $row[name]<BR>";
+         }
+         mysql_free_result( $result );
+
+         $this->$got_countries = 1;
+      }
+
+      return ($this->countries);
+   }
+
+}
+?>

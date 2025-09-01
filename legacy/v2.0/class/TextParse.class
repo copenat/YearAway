@@ -1,0 +1,217 @@
+<?php
+
+//   Safe HTML
+// -------------
+//
+// Useful for "cleaning" form input that is to be
+// viewed on a HTML page. Seems fairly safe, just
+// enter the tags you want to allow in the
+// $approvedtags array.
+// Code originally from the PHP port of Slashdot:
+//   http://phplib.netuse.de/
+//
+// I needed this function for a forum I run, but
+// couldn't find it anywhere. So I ended up
+// extracting it from the phpslash code. I think
+// it's useful for others as well, so I've made it
+// available separately. I haven't made serious
+// efforts of understanding the code, but it
+// works!
+//
+//  Gaute Hvoslef Kvalnes <ai98ghk@stud.hib.no>
+//
+// Usage: $text = safeHTML( $text );
+
+function safeHTML($str)
+{
+  $approvedtags = array(
+    "p"=>1,   // 2 means accept all qualifiers: <foo bar>
+    "b"=>1,   // 1 means accept the tag only: <foo>
+    "i"=>1,
+    "a"=>2,
+    "br"=>1
+    );
+
+  $str = stripslashes($str);
+  $str = eregi_replace("<[[:space:]]*([^>]*)[[:space:]]*>","<\\1>",$str);
+  $str = eregi_replace("<a([^>]*)href=\"?([^\"]*)\"?([^>]*)>", "<a href=\"\\2\">", $str);
+  $tmp = "";
+  while (eregi("<([^> ]*)([^>]*)>",$str,$reg))
+  {
+    $i = strpos($str,$reg[0]);
+    $l = strlen($reg[0]);
+    if ($reg[1][0] == "/")
+      $tag = strtolower(substr($reg[1],1));
+    else
+      $tag = strtolower($reg[1]);
+    if ($a = $approvedtags[$tag])
+      if ($reg[1][0] == "/")
+        $tag = "</$tag>";
+      elseif ($a == 1)
+        $tag = "<$tag>";
+      else
+        $tag = "<$tag " . $reg[2] . ">";
+    else
+      $tag = "";
+    $tmp .= substr($str,0,$i) . $tag;
+    $str = substr($str,$i+$l);
+  }
+  $str = $tmp . $str;
+
+  // Squash PHP tags unconditionally
+  $str = ereg_replace("<\?","",$str);
+
+  $str = addslashes($str);
+  return $str;
+}
+
+function check_email ($email)
+{
+    if ( !ereg( "^([0-9,a-z,A-Z]+)([.,_&-]([0-9,a-z,A-Z]+))*[@]([0-9,a-z,A-Z]+)([.,_\ ,-]([0-9,a-z,A-Z]+))*[.]([0-9,a-z,A-Z]){2}([0-9,a-z,A-Z])?$", $email ) )
+      $valid = false;
+    else 
+      $valid = true;
+
+    return ($valid);
+}
+
+function valid_var( $var )
+{
+   $var = str_replace("@","",$var);
+   $var = str_replace(".","",$var);
+   $var = str_replace("_","",$var);
+   $var = str_replace(",","",$var);
+   return $var;
+}
+
+function do_more ( $message, $href )
+{
+   $message = str_replace("\n","",$message);
+   $message = str_replace("<BR>","",$message);
+
+   if ( strlen($message) > 550 )
+   {
+      $msg = substr($message, 0, 550);
+      $len = strrpos($msg, '.');
+      if (($len > 550) || ($len < 1))
+           $len = 500;
+              
+      $message = substr($msg,0,$len + 1);
+      if ( $href != "" )
+        $message .= "&nbsp;<a class=more_link href=\"".$href."\">...More...</a>";
+   }
+
+   return ($message);
+}
+
+function only_alphanumeric( $msg )
+{
+  eregi("([a-z0-9_]+)", $msg, $chk_msg);
+  if ( $msg != $chk_msg[1] ) 
+    return 0;
+  else
+    return 1;
+}
+
+function only_superstring( $msg )
+{ 
+  eregi("([A-Za-z0-9\.-_ ]+)", $msg, $chk_msg);
+  if ( $msg != $chk_msg[1] )
+    return 0;
+  else
+    return 1;
+}
+
+
+function only_numeric( $msg )
+{
+  eregi("([0-9]+)", $msg, $chk_msg);
+  if ( $msg != $chk_msg[1] )
+    return 0;
+  else
+    return 1;
+}
+
+
+function mmm2mm( $month )
+{
+   # changes Jan to 1 etc
+
+   #MMmmmmm 
+}
+
+function mm2mmm( $month )
+{
+   # changes 01 to Jan etc
+
+   $m = array ("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+
+   return $m[$month-1];
+}
+
+function YYYYMMDD_2_displayformat( $date )
+{
+   #display format means 20 Jan 2002
+
+   $_year = substr($date, 0,4);
+   $_month = ((int) substr($date, 4,2));
+   $_day = (int) substr($date, 6,2);
+
+   $display_date = $_day." ".mm2mmm($_month)." ".$_year;
+  
+   return $display_date;
+}
+
+
+function valid_date( $date )
+{
+  eregi("([0-9]{8})", $date, $chk_date);
+  if ( $date != $chk_date[1] )
+    return 0;
+  else
+  {
+     $year = substr($date, 0,4);
+     $month = ((int) substr($date, 4,2));
+     $day = (int) substr($date, 6,2);
+
+     #Check valid date
+     $month_days = array(1=>31,2=>28,3=>31,4=>30,5=>31,6=>30,7=>31,8=>31,9=>30,10=>31,11=>30,12=>31);
+  
+     if ( ( ($year % 4) == 0) || ((($year % 100)!=0) || (($year % 400)==0) ) )
+       $month_days['2']=29;
+
+     if ( $day<=0 || $month<=0 || $year=="0000" || $month>12 || $day > $month_days[$month] )
+       return 0;
+
+     return 1;
+  }
+}
+
+function valid_country_id( $ctry )
+{
+  eregi("([A-Z]{2,3})", $ctry, $chk_ctry);
+  if ( $ctry != $chk_ctry[1] )
+    return 0;
+  else
+    return 1;
+}
+
+function valid_filename( $filename )
+{
+  # alphanumeric plus _ . 
+  eregi("([a-z0-9_.]+)", $filename, $chk_filename);
+  if ( $filename != $chk_filename[1] )
+    return 0;
+  else
+    return 1;
+}
+
+function http2ahref( $text )
+{
+  $text = ereg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]", "<a href=\"\\0\">\\0</a>", $text);  
+  return $text;
+}
+
+?>
+

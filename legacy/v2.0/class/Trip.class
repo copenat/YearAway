@@ -1,0 +1,117 @@
+<?php
+
+include_once("../class/TextParse.class");
+
+// Trip class
+class Trip
+{
+    var $person ;
+    var $diary_name ;
+    var $debug ;
+
+    // Constructor
+    function Trip ( $p_person, $p_diary_name )
+    {
+       if ( only_alphanumeric($p_person) ) 
+          $this->person = $p_person;
+       if ( only_alphanumeric($p_diary_name) )
+          $this->diary_name = $p_diary_name;
+
+       #$this->debug=1;
+    }
+
+    function check_exists()
+    {
+      if ( $this->person == "" )
+        return 0;
+
+      $qry = "select diary_name from trip_details " .
+             "where !STRCMP(user_name, '$this->person') ";
+
+      if ( $this->diary_name != "" )
+         $qry .= " and !STRCMP(diary_name, '$this->diary_name') ";
+
+      ya_connect();
+      $this->trace($qry);
+      $result = mysql_query($qry);
+
+      return ($result);
+    }
+  
+    function add_trip_mesg($p_description)
+    {
+      if ( $this->person == "" || $this->diary_name == "" )
+        return 0;
+
+      $p_description = safeHTML($p_description);
+
+      $qry = "insert into trip_details 
+        (user_name, diary_name, description )
+        values
+        ( '$this->person', '$this->diary_name', 
+          '$p_description')";
+
+      ya_connect();
+      $this->trace($qry);
+      $result = mysql_query($qry);
+
+      return ($result);
+    }
+
+    function get_trip_mesg()
+    {
+      if ( $this->person == "" || $this->diary_name == "" )
+        return 0;
+
+       $qry = "select t.description ".
+              "from trip_details t ".
+              "where !STRCMP(t.user_name, '$this->person') ".
+              "and !STRCMP(t.diary_name, '$this->diary_name') ";
+
+       ya_connect();
+       $this->trace($qry);
+       $result = mysql_query($qry);
+
+       return ($result);
+    }
+
+    function update_trip_mesg( $desc )
+    {
+      if ( $this->person == "" || $this->diary_name == "" )
+        return 0;
+
+      $desc = safeHTML($desc);
+
+      $qry = "update trip_details set description = '$desc'
+              where !STRCMP(user_name, '$this->person') 
+              and !STRCMP(diary_name, '$this->diary_name') ";
+
+      ya_connect();
+      $this->trace($qry);
+      $result = mysql_query($qry);
+
+      return ($result);
+
+    }
+
+    
+    function get_all_trips()
+    {
+      $qry = "select user_name, diary_name, description " .
+             "from trip_details" ;
+
+      ya_connect();
+      $this->trace($qry);
+      $result    =  mysql_query($qry);
+      return ($result);
+    }
+
+
+    function trace ($text)
+    {
+      if ($this->debug == 1)
+        print "<P>$text</P>";
+    }
+}
+
+?>

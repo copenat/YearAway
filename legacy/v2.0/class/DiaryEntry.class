@@ -1,0 +1,471 @@
+<?php
+
+include_once('../class/DB.class');
+include_once('../class/Log.class');
+include_once('../class/TextParse.class');
+include_once('../class/Country.class');
+
+// DiaryEntry class
+class DiaryEntry
+{
+    var $person ;
+    var $diary_name ;
+    var $country; 
+    var $debug ;
+
+//
+// The idea here was for this class to be used for a wrapper for 1 or more diary entries.
+// Initially designed so that with the constructor you provided a person,diary_name.
+// But there is need for became a need for 4 different constructors but php don't do that!
+// So envisaged usage: 1. Provide person, diary_name to constructor (eg $de = new DiaryEntry("nathan","yearaway",""); )
+//                     2. Provide just country to constructor       (eg $de = new DiaryEntry("","","IN"); )
+//                     3. Provide nothing to constructor            (eg $de = new DiaryEntry("","",""); )
+//                     4. Provide person,diary_name,country     (eg $de = new DiaryEntry(("nathan","yearaway","IN"); )
+//
+// Some methods override the data given in the constructor with the args its called with. This enables
+// you to use constructor method 2 (or 3) above and then provide a person and diary_name to get a diary_entry.
+//
+// If php supported overloading of the constructor and method then things would be better.
+//
+// I'm hoping that this should provide all the functionality needed
+//
+
+    // Constructor
+    function DiaryEntry ( $p_person, $p_diary_name, $p_country )
+    {
+      if ( only_alphanumeric($p_person) )
+        $this->person = $p_person;
+      if ( only_alphanumeric($p_diary_name) )
+        $this->diary_name = $p_diary_name;
+      if ( valid_country_id($p_country) )
+        $this->country = $p_country;
+
+      #$this->debug=1;
+    }
+
+
+    function diaries ( $orderby )
+    {
+      if ( $this->person == "" )
+        return 0;
+
+      $qry =  "select distinct diary_name " .
+              "from diary_entry " .
+              "where !STRCMP(user_name, '$this->person') ";
+
+      if ( $orderby != "" )
+         $qry .= $orderby;
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+      return ($result);
+    }
+
+
+    function add_entry ( $start_date, $section, 
+                         $location, $message, $search_tags, $country, 
+                         $count1, $count2, $count3, $status)
+    {
+#      print "<br>ADD_ENTRY1:$start_date,$country,$this->person,$this->diary_name\n";
+      if ( !valid_date($start_date) )
+      {
+#        print "<br>Invalid startdate $startdate\n";
+        return 0;
+      }
+
+      if ( !valid_date($start_date) )
+      {
+#        print "<br>Invalid startdate $startdate\n";
+        return 0;
+      }
+
+      if ( !valid_country_id($country) )
+      {
+#        print "<br>Invalid country $country\n";
+        return 0;
+      }
+
+      if ( $this->person=="" || $this->diary_name==""  )
+      {
+#        print "<br>Both person($person) and diary_name($diary_name) need populating.\n";
+        return 0;
+      }
+
+      $section = safeHTML( $section );
+      $location = safeHTML( $location );
+      $message = safeHTML( $message );
+      $search_tags = safeHTML( $search_tags );
+
+#      print "<br>ADD_ENTRY2:$count1,$count2,$count3,$status\n";
+      if ( !is_numeric($count1) && !is_numeric($count2) && !is_numeric($count3) || !is_numeric($status) )
+        return 0;
+
+      if ( !$this->diary_entry_exists($start_date) )
+      {
+          $qry = "insert into diary_entry 
+                  ( user_name, diary_name, start_date,   
+                  country, location, message, search_tags, 
+                  count1, count2, count3, section, status, emailsent) 
+                  values 
+                  ( '$this->person', '$this->diary_name', '$start_date',  
+                  '$country', '$location', '$message', '$search_tags', 
+                  $count1, $count2, $count3, '$section', $status, 0) " ;
+
+          ya_connect();
+          $this->trace($qry,0);
+          if ( mysql_query($qry) )
+           return 1;
+          else
+           return 0;
+      }
+      else
+      {
+          return 0;
+      }
+    }
+
+
+    function diary_entry_exists($start_date)
+    {
+      if( !valid_date($start_date) )
+         return 0;
+
+      $result = $this->get_entries ("","", "", $start_date,"", 1, "");
+      if ( $result )
+      {
+        $count=0;
+        while ( $row = mysql_fetch_array($result))
+          $count++;
+
+        if ( $count > 0 )
+        {
+          return 1;
+        }
+      }
+      return 0;
+    }
+
+    function change_status( $start_date, $status )
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !valid_date($start_date) || !is_numeric($status) )
+        return 0;
+
+      $qry = "update diary_entry
+              set status        = $status,
+              where !STRCMP(user_name, '$this->person')
+              and !STRCMP(diary_name, '$this->diary_name')
+              and start_date = '$start_date' ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+
+      return ($result);
+    }
+
+    function change_emailsent( $start_date, $emailsent )
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !valid_date($start_date) || !is_numeric($emailsent) )
+        return 0;
+
+      $qry = "update diary_entry
+              set emailsent        = emailsent + $emailsent
+              where !STRCMP(user_name, '$this->person')
+              and !STRCMP(diary_name, '$this->diary_name')
+              and start_date = '$start_date' ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+
+      return ($result);
+    }
+
+    function update_entry ( $start_date, $section,
+                            $location, $text, $search_tags, $country, 
+                            $count1, $count2, $count3)
+    {
+      if ( !valid_date($start_date) || !valid_country_id($country) || $this->person=="" || $this->diary_name==""  )
+        return 0;
+
+      $section = safeHTML( $section );
+      $location = safeHTML( $location );
+      $text = safeHTML( $text );
+      $search_tags = safeHTML( $search_tags );
+
+      if ( !is_numeric($count1) || !is_numeric($count2) || !is_numeric($count3) )
+        return 0;
+
+      if ( $this->diary_entry_exists($start_date) )
+      {
+        $qry = "update diary_entry 
+                set section        = '$section',
+                    location       = '$location', 
+                    message        = '$text', 
+                    country        = '$country',
+                    search_tags    = '$search_tags',
+                    count1         = $count1,
+                    count2         = $count2,
+                    count3         = $count3
+                where !STRCMP(user_name, '$this->person') 
+                and !STRCMP(diary_name, '$this->diary_name') 
+                and start_date = '$start_date' ";
+ 
+        ya_connect();
+        $this->trace($qry,0);
+        $result = mysql_query($qry);
+
+        return ($result);
+      }
+      return 0;
+    }
+
+    function delete_entry ( $start_date )
+    {
+      if ( $this->person == "" || $this->diary_name == "" || !valid_date($start_date) )
+        return 0;
+
+      if ( $this->diary_entry_exists($start_date) )
+      {
+        $qry =  "delete from diary_entry " .
+              "where !STRCMP(user_name, '$this->person') " .
+              "and !STRCMP(diary_name, '$this->diary_name') " .
+              "and start_date = '$start_date' " ;
+
+        ya_connect();
+        $this->trace($qry,0);
+
+        if ( mysql_query($qry) )
+         return 1;
+        else
+         return 0;
+      }
+      return 0;
+    }
+
+
+    function get_entries ($person, $diary_name, $country, $start_date, $location, $limit, $sort)
+    {
+      if ( ($person!="" && !only_alphanumeric($person)) 
+        || ($diary_name!="" && !only_alphanumeric($diary_name))
+        || ($start_date!="" && !valid_date($start_date)) 
+        || ($country!="" && !valid_country_id($country)) 
+        || !is_numeric($limit) )
+        return 0;
+
+      $location = safeHTML( $location );
+
+        $qry = "select d.user_name, d.diary_name,
+                       date_format(d.start_date,'%e %b %Y') as start_date_disp, 
+                       date_format(d.start_date,'%Y%m%d') as start_date, 
+                       d.section,
+                       d.message, d.search_tags, d.location, 
+                       d.count1,d.count2,d.count3,
+                       ifnull(d.status,0) as status,ifnull(d.emailsent,0) as emailsent,
+                       d.country as country_id, c.name as country
+               from diary_entry d, country c 
+               where d.country = c.id ";
+
+        if ( $person != "" )
+           $qry .= "and !STRCMP(d.user_name, '$person') ";
+        elseif ( $this->person != "" )
+           $qry .= "and !STRCMP(d.user_name, '$this->person') ";
+
+        if ( $diary_name != "" )
+           $qry .= "and !STRCMP(d.diary_name, '$diary_name') ";
+        elseif ( $this->diary_name != "" )
+           $qry .= "and !STRCMP(d.diary_name, '$this->diary_name') ";
+
+        if ( $country != "" )
+           $qry .= "and !STRCMP(d.country, '$country') ";
+        elseif ( $this->country != "" )
+           $qry .= "and !STRCMP(d.country, '$this->country') ";
+
+        if ( $start_date != "" )
+           $qry .= "and TO_DAYS(d.start_date) = TO_DAYS('$start_date') ";
+
+        if ( $location != "" )
+           $qry .= "and !STRCMP(d.location, '$location') ";
+
+        if ($sort != "")
+        {
+           if ( $sort == "desc" || $sort == "asc" )
+              $qry .= "order by d.start_date $sort ";
+           else
+              $qry .= "order by $sort ";
+        }
+        else
+           $qry .= "order by d.start_date ";
+
+        if ( $limit > 0 )
+           $qry .= " limit $limit ";
+
+
+        ya_connect();
+        $this->trace($qry,0);
+        $result = mysql_query($qry);
+
+        return ($result);
+    }
+
+
+    function get_country_count ($person,$diary_name,$excluding,$limit,$sort)
+    {
+      if ( ($person!="" && !only_alphanumeric($person))
+        || ($diary_name!="" && !only_alphanumeric($diary_name))
+        || ($start_date!="" && !valid_date($start_date))
+        || ($country!="" && !valid_country_id($country)) 
+        || !is_numeric($limit) || !only_alphanumeric($sort) )
+        return 0;
+
+
+      $qry = "select c.name country_name, 
+                     c.id as country_id,
+                     count(*) as total 
+              from diary_entry d,
+                   country c
+              where d.country = c.id ";
+
+      if ( $person != "" )
+         $qry .= "and !STRCMP(d.user_name, '$person') ";
+      elseif ( $this->person != "" )
+         $qry .= "and !STRCMP(d.user_name, '$this->person') ";
+
+      if ( $diary_name != "" )
+         $qry .= "and !STRCMP(d.diary_name, '$diary_name') ";
+      elseif ( $this->diary_name != "" )
+         $qry .= "and !STRCMP(d.diary_name, '$this->diary_name') ";
+
+      $qry .= " group by c.id ";
+
+      if ( $excluding != "" )
+        $qry .= " having country_id not in ('$excluding') ";
+
+      if ($sort != "")
+        $qry .= $sort;
+      else
+        $qry .= " order by c.name ";
+
+      if ( $limit > 0 )
+        $qry .= " limit $limit ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+
+      return ($result);
+    }
+
+
+    function get_count_totals()
+    {
+      if ( $this->person=="" || $this->diary_name=="" )
+        return 0;
+
+      $qry = "select sum(count1) as count1, ".
+             "       sum(count2) as count2, ".
+             "       sum(count3) as count3 ".
+             "from diary_entry ".
+             "where !STRCMP(d.user_name, '$this->person') ".
+             "  and !STRCMP(d.diary_name, '$this->diary_name') ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+
+      return ($result);
+    }
+
+
+    function get_previous_entries ($start_date, $limit)
+    {
+      if ( $this->person=="" || $this->diary_name=="" || !valid_date($start_date) || !is_numeric($limit) )
+        return 0;
+
+      $qry = "select date_format(d.start_date,'%e %b %Y') as start_date_disp, ".
+                    "date_format(d.start_date,'%Y%m%d') as start_date, ".
+                    "d.message, d.search_tags, d.location, d.section, ".
+                    "d.country as country_id, c.name as country ".
+             "from diary_entry d, country c ".
+             "where d.country = c.id ".
+             "  and TO_DAYS(start_date) < TO_DAYS('$start_date') ".
+             "  and !STRCMP(d.user_name, '".$this->person."') ".
+             "  and !STRCMP(d.diary_name, '".$this->diary_name."') ".
+             "order by start_date desc ";
+
+      if ( $limit > 0 )
+        $qry .= " limit $limit ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+
+      return ($result);
+    } 
+
+
+    function get_next_entries ($start_date,$limit)
+    {
+      if ( $this->person=="" || $this->diary_name=="" || !valid_date($start_date) || !is_numeric($limit) )
+        return 0;
+
+      $qry = "select date_format(d.start_date,'%e %b %Y') as start_date_disp, ".
+                    "date_format(d.start_date,'%Y%m%d') as start_date, ".
+                    "d.message, d.search_tags, d.location, d.section, ".
+                    "d.country as country_id, c.name as country ".
+             "from diary_entry d, country c " .
+             "where d.country = c.id ".
+              " and !STRCMP(d.user_name, '".$this->person."') ".
+              " and !STRCMP(d.diary_name, '".$this->diary_name."') ".
+              " and TO_DAYS(start_date) > TO_DAYS('$start_date') ".
+              "order by start_date asc ";
+
+      if ( $limit > 0 )
+         $qry .= " limit $limit ";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+
+      return ($result);
+    }         
+
+    function get_last_entry()
+    {
+     if ( $this->person=="" )
+        return 0;
+
+       $qry = "select  d.diary_name as diary_name,
+                       date_format(d.start_date,'%e %b %Y') as start_date_disp,
+                       date_format(d.start_date,'%Y%m%d') as start_date, 
+                       d.section,
+                       d.message, d.search_tags, d.location,
+                       d.count1,d.count2,d.count3,
+                       ifnull(d.status,0) as status,ifnull(d.emailsent,0) as emailsent,
+                       d.country as country_id, c.name as country
+               from diary_entry d, country c
+               where d.country = c.id 
+               and !STRCMP(d.user_name, '$this->person') 
+              order by start_date desc limit 1";
+
+      ya_connect();
+      $this->trace($qry,0);
+      $result = mysql_query($qry);
+
+      return ($result);
+    }
+
+    function trace ($text,$force)
+    {
+        // Idea of the force is so that an individual piece (ie. SQL) can
+        // be printed out with out all appearing.
+        if ($this->debug == 1 || $force == 1)
+        {
+            print "<P>$text</P>";
+        }
+    }
+
+}
+
+?>

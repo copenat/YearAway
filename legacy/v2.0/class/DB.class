@@ -1,0 +1,11 @@
+
+<?php
+    
+function ya_connect  ()
+{
+    mysql_connect("localhost", "mwillett", "79spice5"); 
+    mysql_select_db("mwillett"); 
+
+}
+
+?>

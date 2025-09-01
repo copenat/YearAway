@@ -1,0 +1,177 @@
+<?php
+
+class UploadFile
+{
+  var $the_path;
+  var $max_file_size  = "307200"; # in bytes
+  var $image_max_width   = "900";
+  var $image_max_height  = "900";
+  var $registered_types  = array("application/x-gzip-compressed"  => ".tar.gz, .tgz",
+                                 "application/x-zip-compressed"   => ".zip",
+                                 "application/x-tar"              => ".tar",
+                                 "text/plain"                     => ".html, .php, .txt, .inc (etc)",
+                                 "image/bmp"                      => ".bmp, .ico",
+                                 "image/gif"                      => ".gif",
+                                 "image/pjpeg"                    => ".jpg, .jpeg",
+                                 "image/jpeg"                     => ".jpg, .jpeg",
+                                 "application/x-shockwave-flash"  => ".swf",
+                                 "application/msword"             => ".doc",
+                                 "application/vnd.ms-excel"       => ".xls",
+                                 "application/octet-stream"       => ".exe, .fla (etc)"
+                                 ); # these are only a few examples, you can find many more!
+
+  var $upload_types = array( "image/gif"    =>  ".gif",
+                             "image/pjpeg"  =>  ".jpeg",
+                             "image/jpeg"   =>  ".jpeg" );
+
+  var $allowed_types = array("image/gif","image/jpeg","image/pjpeg");
+
+
+# -- Constructor
+
+  function UploadFile($path)
+  {
+    if ( $path != "" )
+      $this->the_path = $path;
+  }
+
+# --
+
+  function form() 
+  {
+    # More of an example form to upoad file - work though!
+    print "\n<form ENCTYPE=\"multipart/form-data\"  action=\"" . $PHP_SELF . "\" method=\"post\">";
+    print "\n<INPUT TYPE=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"" . $this->my_max_file_size . "\">";
+    print "\n<INPUT TYPE=\"hidden\" name=\"task\" value=\"upload\">";
+    print "\n<P>Upload a file";
+    print "\n<BR>NOTE: Max file size is " . ($this->my_max_file_size / 1024) . "KB";
+    print "\n<br><INPUT NAME=\"the_file\" TYPE=\"file\" SIZE=\"35\"><br>";
+    print "\n<input type=\"submit\" Value=\"Upload\">";
+    print "\n</form>";
+
+  } # END form
+
+# --
+
+  function validate_upload($the_file,$the_file_type) 
+  { 
+    $error = false;
+ 
+    if ($the_file == "")  
+    { 
+        $error = "It was not possible to upload your photo. Maybe it was larger than ".($this->max_file_size/1024)."KB";
+    
+    } else { # check if we are allowed to upload this file_type
+        
+        if (!in_array($the_file_type,$this->allowed_types)) 
+        {
+            $error .= "The file that you uploaded was of type $the_file_type. You are
+                       only allowed to upload jpeg or gif files.\n";
+        }
+    
+    }
+    return $error;
+  } # END validate_upload
+
+
+# --
+
+  function upload($tmpfilename,$filename,$filesize,$filetype) 
+  {  
+    $error = $this->validate_upload($tmpfilename,$filetype);
+    if (!$error)  
+    { 
+        if (!@copy($tmpfilename, $this->the_path.$filename)) 
+        {
+            $error="<p>An internal error has prevented the upload of your photo. Please report this to support@yearaway.com with photo attached. We will fix this problem and add the photo for you. We will fix this problem and add the photo for you.</p><p>Sorry for the inconvience.</p>";
+        } 
+
+    }
+    return $error;
+  } 
+
+# --
+
+  function get_file_extension($type)
+  {
+    return ( $this->upload_types[$type] );
+  }
+
+
+# --
+
+  function set_path( $p )
+  {
+     $this->the_path = $p;
+  }
+
+  function get_path()
+  {
+     return $this->the_path;
+  }
+
+# --
+
+  function set_image_max_width( $s )
+  {
+    $this->image_max_width = $s;
+  }
+
+  function get_image_max_width()
+  {
+    return $this->image_max_width;
+  }
+
+
+  function set_image_max_height( $s )
+  {
+    $this->image_max_height = $s;
+  }
+
+  function get_image_max_height()
+  {
+    return $this->image_max_height;
+  }
+
+
+# --
+
+  function set_allowed_types( $s )
+  {
+    $this->allowed_types = $s;
+  }
+
+  function get_allowed_types()
+  {
+    return $this->allowed_types;
+  }
+
+# --
+
+  function set_max_file_size( $s )
+  {
+    $this->max_file_size = $s;
+  }
+
+  function get_max_file_size()
+  {
+    return $this->max_file_size;
+  }
+
+# --
+
+  function list_files()
+  {
+    $handle = dir($this->the_path);
+    print "\n<b>Uploaded files:</b><br>";
+    while ($file = $handle->read()) {
+        if (($file != ".") && ($file != "..")) {
+            print "\n" . $file . "<br>";
+       }
+    }
+    print "<hr>";
+  }
+
+}
+?>
+

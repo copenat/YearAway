@@ -1,0 +1,168 @@
+<?php
+
+include_once("../class/SubscribeEmail.class");
+include_once('../class/DiaryEntry.class');
+include_once('../class/DiaryPhotos.class');
+include_once('../class/TextParse.class');
+
+function yearaway_version()
+{
+   return "v2.0";
+}
+
+function yearaway_email($email,$person,$diary_name,$start_date,$send)
+{
+   $de = new DiaryEntry($person,$diary_name,"");
+   $se = new SubscribeEmail($person, "");
+   $dph = new DiaryPhotos($person, $diary_name);
+
+   $result = $de->get_entries ("","", "", $start_date,"", 1, "");
+
+   if ( $result )
+   {
+      if ($row = mysql_fetch_array($result))
+      {
+        $href = "http://www.yearaway.com/".yearaway_version()."/php/DiaryEntry.php?person=$person&diary_name=$diary_name&start_date=$start_date";
+
+        $dph_result = $dph->get_photo_count($start_date);
+        if ($dph_result)
+        {
+          if ( $dph_row = mysql_fetch_array($dph_result) )
+          { 
+            if ( $dph_row[num_of_photos] == 1 )
+            {
+              $photo_text = $dph_row[num_of_photos]." photo attached";
+            }
+            elseif ( $dph_row[num_of_photos] > 1 )
+            {
+              $photo_text = $dph_row[num_of_photos]." photos attached";
+            }
+          }
+        } 
+
+        $html_mail_message =  "
+<html><head><title>YearAway.com</title></head>
+<body bgcolor=\"#006699\" link=yellow vlink=black alink=red>
+<table>
+<tr>
+  <td colspan=2>
+
+    <table width=100% align=left border=0 valign=top>
+    <tr>
+      <td width=213><a href=\"http://www.yearaway.com/".yearaway_version()."/php/HomePage.php\">
+        <img src=\"http://www.yearaway.com/".yearaway_version()."/graphics/yearaway.gif\" width=213 height=100 border=0 alt=\"YearAway.com HomePage\"></a>
+      </td>
+      <td>
+
+      <table width=100% border=0 valign=top>
+      <tr>
+        <td>&nbsp;</td>
+        <td colspan=3 align=left><b><font face=\"Sans-Serif\" color=white>Change Notification: $person have added a new diary entry to their $diary_name diary.</font></b>
+        </td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td colspan=3 align=left><b><font face=\"Sans-Serif\" color=white>A snippet of which is below:</font></b></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td align=right><font face=\"Sans-Serif\" color=white>Go on...it'll only take 5mins...give it a read!</font></td>
+      </tr>
+      <tr>
+        <td colspan=4>&nbsp;</td>
+      </tr>
+
+      </table>
+
+      </td>
+    </tr>
+    </table>
+
+  </td>
+</tr>
+
+<tr>
+ <td><b><font face=\"Sans-Serif\" color=yellow>
+  <a href=\"$href\">".YYYYMMDD_2_displayformat($start_date)." : $row[location] - $row[country]</a></font>
+  <font face=\"Sans-Serif\" color=white>&nbsp; $row[section]</font></b>
+ </td>
+ <td>
+  <font face=\"Sans-Serif\" color=white>$photo_text</font>
+ </td>
+</tr>
+
+<tr>
+ <td colspan=2>
+  <font face=\"Sans-Serif\" color=white>".do_more($row[message],$href)."</font>
+ </td>
+</tr>
+
+<tr><td colspan=2>&nbsp;</td></tr>
+
+<tr>
+  <td colspan=2>
+    <font face=\"Sans-Serif\" color=white>To unsubscribe to this diary please return this email to us at support@yearaway.com</font>
+  </td>
+</tr>
+
+</table>
+</body>
+</html>"; 
+
+        $text_mail_message = "
+Change Notification: $person have added a new diary entry to their $diary_name diary. A snippet of which is below:
+
+".YYYYMMDD_2_displayformat($start_date)." : $row[location] - $row[country]			$photo_text
+$row[section]
+
+".do_more($row[message],"")."
+
+To read further click on link: $href
+
+To unsubscribe to this diary please return this email to us at support@yearaway.com
+";
+                                                                                      
+
+       $mail_subject = "YearAway.com : $person $diary_name : $row[location] - $row[country] :  $row[section]";
+
+       if ( $send == "SEND" )
+       {
+         $ret=$se->notify_subscribers($mail_subject, $text_mail_message, $email);
+       }
+       else
+       {
+         $ret=$text_mail_message; 
+       }
+       return ( $ret );
+      }   
+
+   }
+
+   return -1;
+}
+
+function yearaway_v1_to_v2_redirection($PHP_SELF,$person,$diary_name,$start_date,$country)
+{
+   $redirect_array = array (
+      "/yearaway/v1.0/php/homepage.php" => "../../v2.0/php/HomePage.php",
+      "/yearaway/v1.0/php/diary_entry.php" => "../../v2.0/php/DiaryEntry.php?person=$person&diary_name=$diary_name&start_date=$start_date",
+      "/yearaway/v1.0/php/country.php" => "../../v2.0/php/Country.php?country=$country",
+
+      "default" => "../../v2.0/php/HomePage.php",
+   );
+
+    $redirection = $redirect_array["$PHP_SELF"];
+
+    if ( $redirection == "" )
+    {
+       $redirection = $redirect_array["default"];
+    }
+
+   return $redirection;
+}
+
+
+?>
+

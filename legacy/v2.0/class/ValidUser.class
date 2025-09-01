@@ -1,0 +1,225 @@
+<?php
+
+include_once ('../class/DB.class');
+include_once ('../class/TextParse.class');
+include_once('../class/Log.class');
+$log = new Log (1);
+
+
+class ValidUser
+{
+   // 0 - no login.
+   // 1 - login via form variables.
+   // 2 - login via session_id.
+   var $login_method = 0;
+
+   var $sid;
+   var $user_name;
+   var $password;
+   var $status_id;
+   var $email;
+   var $forename;
+   var $surname;
+   var $ctryoforig_id;
+   var $age;
+   var $gender;
+
+   function ValidUser( $sid, $form_userid, $form_passwd )
+   {
+      ya_connect();
+
+      if ( $this->validate_formvars($form_userid, $form_passwd) )
+      {
+         $this->login_method = 1;
+
+         $this->store_session_id($sid);
+         $this->get_person_data();
+      }
+
+      elseif ( $this->validate_session_id($sid) )
+      {
+         $this->login_method = 2;
+
+         $this->store_session_id($sid);
+         $this->get_person_data();
+      }
+   }
+
+   function IsValidUser()
+   {
+      return $this->login_method;
+   }
+
+   function GetSessionId()
+   {
+      if ( $this->IsValidUser() )
+         return $this->sid;
+   }
+   function GetUserName()
+   {
+      if ( $this->IsValidUser() )
+         return $this->user_name;
+   }
+   function GetStatusId()
+   {
+      if ( $this->IsValidUser() )
+         return $this->status_id;
+   }
+   function GetEmail()
+   {
+      if ( $this->IsValidUser() )
+         return $this->email;
+   }
+   function GetForeName()
+   {
+      if ( $this->IsValidUser() )
+         return $this->forename;
+   }
+   function GetSurname()
+   {
+      if ( $this->IsValidUser() )
+         return $this->surname;
+   }
+   function GetCountry()
+   {
+      if ( $this->IsValidUser() )
+         return $this->ctryoforig_id;
+   }
+   function GetAge()
+   {
+      if ( $this->IsValidUser() )
+         return $this->age;
+   }
+   function GetGender()
+   {
+      if ( $this->IsValidUser() )
+         return $this->gender;
+   }
+
+
+   function LogOut()
+   {
+      $qry = "update person ".
+             "set time_stamp = Null ".
+             ", sid = Null ".
+             "where !STRCMP(user_name, '$this->user_name') ";
+
+      $result = mysql_query($qry);
+      if ( !$result )
+         $log->add("In ValidUser->LogOut","$qry - ".mysql_error());
+
+      $this->login_method = 0; 
+   }
+
+
+   function store_session_id( $sid )
+   {
+      $qry = "update person ".
+             "set time_stamp = NOW() ".
+             ", sid = '$sid' ".
+             "where !STRCMP(user_name, '$this->user_name') ";
+
+      $result = mysql_query($qry);
+      if ( !$result )
+         $log->add("In ValidUser->store_session_id","$qry - ".mysql_error());
+      else
+         $this->sid = $sid;
+   }
+
+
+   function validate_session_id( $sid )
+   {
+      $ret = 0;
+
+      if ( $sid == "" || !only_alphanumeric($sid) )
+         return $ret;
+
+      $qry = "select user_name ".
+             "from person ".
+             "where !STRCMP(sid,'$sid') ".
+               "and time_stamp > date_sub(NOW(),  INTERVAL 1 HOUR)";
+
+      $result = mysql_query($qry);
+      if ( !$result )
+         $log->add("In ValidUser->validate_session_id","$qry - ".mysql_error());
+      else
+      {
+         if ( $row = mysql_fetch_array($result))
+         {
+            $this->user_name = $row[user_name];
+            $ret = 1;
+         }
+         mysql_free_result( $result );
+      }
+ 
+      return $ret;
+   }
+   
+
+   function validate_formvars( $userid, $passwd )
+   {
+      $ret = 0;
+
+      if ($userid=="" || !only_alphanumeric($userid) || !only_alphanumeric($passwd))
+         return $ret;
+
+      $qry = "select '$userid'".
+             " from person ".
+             "where (!STRCMP(user_name,'$userid') and !STRCMP(password,old_password('$passwd'))) ".
+             "   or (!STRCMP(user_name,'sue_and_nathan') and !STRCMP(password,old_password('$passwd'))) ";
+      
+      $result = mysql_query($qry);
+      if ( !$result )
+         $log->add("In ValidUser->validate_formvars","$qry - ".mysql_error());
+      else
+      {
+         if ( $row = mysql_fetch_array($result) )
+         {
+            if ( $row[user_name] = $userid )
+            {
+               $this->user_name = $row[user_name];
+               $ret = 1;
+            }
+         }
+         mysql_free_result( $result );
+
+      }
+      return $ret;
+   }
+
+
+   function get_person_data()
+   {
+      $ret = 0;
+
+      $qry = "select status_id,email,forename,surname,ctryoforig_id,age,gender".
+             " from person ".
+             "where !STRCMP(user_name,'$this->user_name') ";
+
+
+      $result = mysql_query($qry);
+      if ( !$result )
+         $log->add("In ValidUser->get_person_data","$qry - ".mysql_error());
+      else
+      {
+         if ( $row = mysql_fetch_array($result) )
+         {
+               $ret = 1;
+               $this->status_id = $row[status_id];
+               $this->email = $row[email];
+               $this->forename = $row[forename];
+               $this->surname = $row[surname];
+               $this->ctryoforig_id = $row[ctryoforig_id];
+               $this->age = $row[age];
+               $this->gender = $row[gender];
+         }
+         mysql_free_result( $result );
+
+      }
+      return $ret;
+   }
+
+}
+
+
+?>

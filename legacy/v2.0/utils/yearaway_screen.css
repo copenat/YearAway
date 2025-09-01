@@ -1,0 +1,87 @@
+body {background: #006699; font-family: Sans-Serif; color: white; font-size: medium}
+A:link {color: yellow}
+A:visited {color: black}
+A:active {color: red}
+#A:hover {font-weight:900}
+
+.x-small {font-size: x-small}
+.small {font-size: small}
+.medium {font-size: medium}
+.large {font-size:large}
+.x-large {font-size:x-large}
+.bold {font-weight:900}
+
+.ya_logo {font-size: medium; font-weight:900}
+.diary_text {font-size: medium}
+.diary_text_small {font-size: small}
+.diary_title {font-size: medium; font-weight:900}
+.diary_date {font-size: medium; font-weight:900}
+.diary_country {font-size: medium; font-weight:900}
+.diary_location {font-size:medium; font-weight:900}
+.diary_author {font-size: medium; font-weight:900}
+.diary_name {font-size:medium; font-weight:900}
+.diary_next_title {font-size:medium}
+.diary_next_desc {font-size:small}
+.diary_prev_title {font-size:medium}
+.diary_prev_desc {font-size:small}
+.country_desc {font-size:medium}
+.help_small {font-size:small}
+.diary_entries {font-size:medium}
+.diary_read {font-size:medium }
+.miles {font-size:medium}
+.beds {font-size:medium}
+.visited_country_text {font-size:medium; color:white; font-weight:900}
+.error_msg {font-size:medium; color:red; font-weight:900}
+.hidden_text {font-size:small; color:#006699}
+
+A:link.diary_prev_link,A:link.diary_next_link {color:yellow}
+A:visited.diary_prev_link,A:visited.diary_next_link {color:yellow}
+A:active.diary_prev_link,A:active.diary_next_link {color:red}
+A:hover.diary_prev_link,A:hover.diary_next_link {font-weight:900}
+
+A:link.visited_country_link,A:link.more_link {color:yellow}
+A:visited.visited_country_link,A:visited.more_link {color:yellow}
+A:active.visited_country_link,A:active.more_link {color:red}
+A:hover.visited_country_link,A:hover.more_link {font-weight:900}
+
+.subscribe_text,.login_text,.latest_entry_text {font-size:small}
+
+A:link.edit_link,A:link.delete_link,A:link.email_sent_link,A:link.printerfriendly_link,A:link.diary_author_link,A:link.diary_name_link {color:yellow}
+A:visited.edit_link,A:visited.delete_link,A:visited.email_sent_link,A:visited.printerfriendly_link,A:visited.diary_author_link,A:visited.diary_name_link {color:yellow}
+A.active.edit_link,A.active.delete_link,A:active.email_sent_link,A:active.printerfriendly_link,A:active.diary_author_link,A:active.diary_name_link {color:red}
+
+A:link.latest_entry_link {color:yellow}
+A:visited.latest_entry_link {color:yellow}
+A:active.latest_entry_link {color:yellow}
+
+A:link.new_diary_link,A:link:diary_summary_link {color:yellow}
+A:visited.new_diary_link,A:visited.diary_summary_link {color:yellow}
+A:active.new_diary_link,A:active.diary_summary_link {color:red}
+
+A:link.diary_link {color:yellow; font-size:small}
+A:visited.diary_link {color:yellow; font-size:small}
+A:active.diary_link {color:red; font-size:small}
+
+A:link.photo_num {color:yellow}
+A:visited.photo_num {color:yellow}
+A:active.photo_num {color:yellow}
+A:hover.photo_num {color:yellow; font-weight:900}
+A:link.photo_num_curr {color:black}
+A:visited.photo_num_curr {color:black}
+A:active.photo_num_curr {color:black}
+A:hover.photo_num_curr {color:black; font-weight:900}
+
+A:link.menu_options {color:yellow}
+A:visited.menu_options {color:yellow}
+A:active.menu_options {color:yellow}
+A:hover.menu_options {color:yellow; font-weight:900}
+
+A:link.de_menu_options {color:yellow}
+A:visited.de_menu_options {color:yellow}
+A:active.de_menu_options {color:yellow; font-weight:900}
+A:hover.de_menu_options {color:yellow; font-weight:900}
+
+A:link.de_menu_options_curr {color:yellow}
+A:visited.de_menu_options_curr {color:yellow}
+A:active.de_menu_options_curr {color:yellow}
+A:hover.de_menu_options_curr {color:yellow}

@@ -1,0 +1,101 @@
+<?php
+
+include ('../class/DB.class');
+
+
+class City
+{
+    var $id;
+    var $name;
+    var $description;
+    var $capital;
+    var $country_id;
+    var $map_ref;
+
+    var $got_details = 0;
+
+    
+
+    function City( $p_id )
+    {
+       $this->id = $p_id;
+    }
+
+
+    function get_country
+    {
+       get_details;
+       return $this->country_id;
+    }
+
+    function get_id
+    {
+       get_details;
+       return $this->id;
+    }
+
+    function get_name
+    {
+       get_details;
+       return $this->name;
+    }
+
+    function get_description
+    {
+       get_details;
+       return $this->description;
+    }
+
+    function is_capital
+    {
+       get_details;
+       return $this->capital;
+    } 
+
+    function get_map()
+    {
+       $this->get_details();
+
+       if ( !isset($this->map_ref) )
+       {
+          $ctry_id = $this->get_country();
+
+          $ctry = new Country( $ctry_id );
+          $this->map_ref = $ctry->get_map();
+       }
+
+       return $this->map_ref;
+    }
+
+
+
+    function get_details
+    {
+       if ( !$this->got_details )
+       {
+          ya_connect();
+
+          $qry = "select name,description,country_id,capital,map_ref ".
+                  "from city ".
+                  "where !STRCMP(id,'".$this->id."') ".
+                  "order by name ";
+
+          $result = mysql_query($qry);
+
+          while ( $row = mysql_fetch_array($result))
+          {
+             $this->name = $row[name];
+             $this->description = $row[description];
+             $this->country_id = $row[country_id];
+             $this->capital = $row[capital];
+             $this->map_ref = $row[map_ref];
+          }
+          mysql_free_result( $result );
+          $this->got_details = 1;
+       }
+    }
+
+}
+
+
+

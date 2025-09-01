@@ -1,0 +1,51 @@
+<?php
+
+include_once ('../class/DB.class');
+include_once ('../class/TextParse.class');
+
+class Hit
+{
+    var $person;
+    var $diary_name;
+    var $start_date;
+
+
+    // Constructor
+    function Hit ($person,$diary_name,$start_date)
+    {
+       if ( !only_alphanumeric($person) || !only_alphanumeric($diary_name) || !valid_date($start_date) )
+         return;
+ 
+       ya_connect();
+       $qry = "insert into hits ( time_stamp,user_name,diary_name,start_date ) ".
+              "values ( NOW(), '$person', '$diary_name' , '$start_date' )";
+       $result = mysql_query($qry);
+
+       $this->person = $person;
+       $this->diary_name = $diary_name;
+       $this->start_date = $start_date;
+    }
+
+    function get_count()
+    {
+       $count = 0;
+
+       $qry = "select count(*) as count ".
+              "from hits ".
+              "where !STRCMP(user_name, '$this->person') ".
+              "and !STRCMP(diary_name, '$this->diary_name') ".
+              "and start_date = '$this->start_date' ";
+       ya_connect();
+
+       $result = mysql_query($qry);
+ 
+       if ( $result )
+       {
+          if ( $row = mysql_fetch_array($result))
+             $count = $row[count];      
+       }
+
+       return $count;
+    }
+}
+?>
