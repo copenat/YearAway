@@ -433,5 +433,71 @@
     </div>
     
     <script src="script.js"></script>
+
+        <script>
+        // Country filtering functionality
+        function filterByCountry() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const country = urlParams.get('country');
+            
+            if (country) {
+                // Convert country parameter back to readable format
+                const countryNames = {
+                    'india': 'India',
+                    'australia': 'Australia',
+                    'thailand': 'Thailand',
+                    'malaysia': 'Malaysia',
+                    'vietnam': 'Vietnam',
+                    'indonesia': 'Indonesia',
+                    'japan': 'Japan',
+                    'united-states': 'United States',
+                    'united-kingdom': 'United Kingdom',
+                    'new-zealand': 'New Zealand',
+                    'cambodia': 'Cambodia',
+                    'singapore': 'Singapore',
+                    'czech-republic': 'Czech Republic',
+                    'vanuatu': 'Vanuatu',
+                    'canada': 'Canada'
+                };
+                
+                const countryName = countryNames[country] || country;
+                
+                // Add filter header
+                const mainContent = document.getElementById('main-content');
+                const filterHeader = document.createElement('div');
+                filterHeader.className = 'country-filter-header';
+                filterHeader.innerHTML = `
+                    <div class="filter-info">
+                        <h2>Showing entries from: ${countryName}</h2>
+                        <a href="entries.html" class="clear-filter">← Show all entries</a>
+                    </div>
+                `;
+                mainContent.insertBefore(filterHeader, mainContent.firstChild);
+                
+                // Filter entries by country
+                const entrySummaries = document.querySelectorAll('.entry-summary');
+                let visibleCount = 0;
+                
+                entrySummaries.forEach(entry => {
+                    const meta = entry.querySelector('.meta');
+                    if (meta && meta.textContent.includes(countryName)) {
+                        entry.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        entry.style.display = 'none';
+                    }
+                });
+                
+                // Update filter info with count
+                if (filterHeader.querySelector('h2')) {
+                    filterHeader.querySelector('h2').textContent = `Showing entries from: ${countryName} (${visibleCount} entries)`;
+                }
+            }
+        }
+        
+        // Run filter when page loads
+        document.addEventListener('DOMContentLoaded', filterByCountry);
+        </script>
+        
 </body>
 </html>
