@@ -456,3 +456,103 @@ body {
         transition: transform 0.1s ease;
     }
 }
+
+/* Build info footer */
+.build-info {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: #888;
+}
+
+/* Countries page styles */
+.countries-summary {
+    background: var(--white);
+    border-radius: var(--border-radius-small);
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 20px var(--shadow-light);
+    border-left: 4px solid var(--secondary-color);
+    text-align: center;
+}
+
+.countries-summary p {
+    font-size: 1.1rem;
+    color: var(--text-medium);
+    margin: 0;
+}
+
+.countries-grid {
+    display: grid;
+    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.country-card {
+    background: var(--white);
+    border-radius: var(--border-radius-small);
+    padding: 25px;
+    box-shadow: 0 5px 20px var(--shadow-light);
+    border-left: 4px solid var(--secondary-color);
+    transition: var(--transition);
+}
+
+.country-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px var(--shadow-medium);
+}
+
+.country-name {
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.entry-count {
+    background: var(--secondary-color);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.country-entries h4 {
+    color: var(--text-dark);
+    font-size: 1rem;
+    margin: 0 0 12px 0;
+    font-weight: 600;
+}
+
+.country-entries ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.country-entries li {
+    margin-bottom: 8px;
+}
+
+.country-entries a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.country-entries a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.country-entries em {
+    color: var(--text-medium);
+    font-size: 0.85rem;
+}
