@@ -113,6 +113,8 @@ new-site/
 - **Interactivity**: ES6+ JavaScript, Intersection Observer API
 - **Performance**: Lazy loading, image optimization, service worker
 - **Responsiveness**: CSS Media Queries, mobile-first design
+- **Hosting**: Cloudflare Pages (static site hosting)
+- **Deployment**: GitHub integration with automatic builds
 
 ---
 
@@ -123,11 +125,13 @@ new-site/
 - CSS for styling and responsive design
 - JavaScript for interactivity and dynamic features
 
-### Dynamic Content Options
-- **Markdown Files**: Easy content updates
+### Static Site Approach
+- **Static HTML**: Pre-built HTML files for all content
+- **Markdown Files**: Easy content updates via markdown
 - **JSON Data**: Structured content management
-- **Python Scripts**: Content generation and updates
-- **Git-based Workflow**: Version control for content
+- **Build Process**: Python scripts for content generation and updates
+- **Git-based Workflow**: Version control for content with GitHub
+- **Cloudflare Pages**: Automatic builds and deployments from GitHub
 
 ---
 
@@ -143,7 +147,9 @@ new-site/
 - **Maps**: Google Maps or OpenStreetMap integration
 - **Social Media**: Instagram, Twitter, Facebook feeds
 - **Analytics**: Google Analytics or privacy-focused alternatives
-- **Hosting**: Same hosting environment as current site
+- **Hosting**: Cloudflare Pages (static site hosting)
+- **Deployment**: GitHub integration with automatic builds
+- **CDN**: Cloudflare's global CDN for fast global delivery
 
 ---
 
@@ -154,18 +160,24 @@ new-site/
 - [ ] Core CSS styling and responsive design
 - [ ] Basic navigation and layout
 - [ ] File structure setup
+- [ ] GitHub repository setup
+- [ ] Cloudflare Pages configuration
 
 ### Phase 2: Content & Features
 - [ ] Populate pages with initial content
 - [ ] Implement interactive features
 - [ ] Photo gallery and media handling
 - [ ] Basic functionality testing
+- [ ] Build process automation
+- [ ] GitHub Actions for automated deployment
 
 ### Phase 3: Enhancement
 - [ ] Advanced animations and transitions
 - [ ] Performance optimization
 - [ ] Accessibility improvements
 - [ ] Comprehensive testing and refinement
+- [ ] Cloudflare Pages optimization
+- [ ] Performance monitoring and analytics
 
 ---
 
@@ -188,16 +200,18 @@ new-site/
 ## 🔮 Future Considerations
 
 ### Scalability
-- Content management system integration
-- Blog functionality for regular updates
-- User interaction features
-- Multi-language support
+- **Static Site Generation**: Jekyll, Hugo, or custom Python build system
+- **Content Management**: Markdown-based content with automated builds
+- **Blog Functionality**: Static blog generation for regular updates
+- **User Interaction**: Client-side features (no server required)
+- **Multi-language Support**: Static translations and language switching
 
 ### Advanced Features
-- Real-time location tracking
-- Travel planning tools
-- Community features
-- Integration with travel APIs
+- **Client-side Location**: Browser-based location services
+- **Travel Planning Tools**: Static travel planning resources
+- **Community Features**: Client-side interaction capabilities
+- **API Integration**: Client-side API calls to external services
+- **Offline Support**: Service worker for offline functionality
 
 ---
 
@@ -225,13 +239,41 @@ new-site/
 1. **Finalize specification** based on feedback
 2. **Create detailed content plan** for each page
 3. **Set up development environment** and file structure
-4. **Begin Phase 1 development**
+4. **Configure GitHub repository** and Cloudflare Pages
+5. **Begin Phase 1 development**
 
 ### Questions to Resolve
 - What specific content should go on each page?
 - Are there any particular features that are priorities?
 - What's the timeline for launch?
 - Any specific design preferences or inspirations?
+- Should we use a static site generator (Jekyll/Hugo) or custom Python build system?
+- What's the preferred deployment workflow (GitHub Actions vs Cloudflare Pages auto-build)?
+
+---
+
+## 🌐 Static Site Hosting & Deployment
+
+### Cloudflare Pages Setup
+- **Static Site Hosting**: Cloudflare Pages for fast, global hosting
+- **Automatic Builds**: GitHub integration triggers automatic deployments
+- **Global CDN**: Cloudflare's edge network for worldwide performance
+- **Custom Domain**: yearaway.com/and-now or subdomain configuration
+- **SSL/HTTPS**: Automatic SSL certificate management
+
+### GitHub Integration
+- **Repository Structure**: Organized file structure for easy content management
+- **Branch Strategy**: Main branch for production, develop for staging
+- **Automated Workflows**: GitHub Actions for build and deployment
+- **Content Updates**: Markdown files with automated HTML generation
+- **Version Control**: Full history of all content and design changes
+
+### Build Process
+- **Content Sources**: Markdown files, JSON data, image assets
+- **Build Scripts**: Python scripts for content processing and HTML generation
+- **Asset Optimization**: Image compression, CSS/JS minification
+- **Deployment**: Automatic deployment to Cloudflare Pages on push to main
+- **Rollback**: Easy rollback to previous versions via Git
 
 ---
 
