@@ -1,0 +1,15 @@
+{
+  "name": "yearaway",
+  "version": "1.0.0",
+  "description": "YearAway website with branch-aware development indicators",
+  "scripts": {
+    "build": "python3 build_with_branch_indicator.py",
+    "dev": "python3 build_with_branch_indicator.py"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["travel", "website", "static-site"],
+  "author": "Nathan",
+  "license": "MIT"
+}
