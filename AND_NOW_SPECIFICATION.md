@@ -16,22 +16,18 @@ Create a modern, interactive website accessible from the "And Now" button that r
 ### Main Pages
 - **Home** (`index.html`) - Landing page with overview
 - **Current Adventures** (`adventures.html`) - Ongoing or recent travels
-- **Future Plans** (`plans.html`) - Upcoming trips and dreams
-- **Life Updates** (`updates.html`) - Personal/professional developments
+- **Hints and Tips** (`hints-and-tips.html`) 
 - **Photo Gallery** (`gallery.html`) - Current photos and memories
-- **Contact** (`contact.html`) - Get in touch
 
 ### Navigation Structure
 ```
 YearAway (Main Site)
 ├── Then (that_was_then/) ← Historical archive (2001-2011)
-└── And Now (new-site/) ← Current/future adventures
+└── And Now (new-site/) ← Current adventures
     ├── Home
     ├── Current Adventures
-    ├── Future Plans
-    ├── Life Updates
-    ├── Photo Gallery
-    └── Contact
+    ├── Hints and Tips
+    └── Photo Gallery
 ```
 
 ---
@@ -67,19 +63,20 @@ YearAway (Main Site)
 - Real-time or recent travel updates
 - Interactive maps showing current location
 - Photo galleries of recent trips
+- Travel stories and experiences
+
+### Hints and Tips
 - Travel tips and recommendations
+- Packing guides and checklists
+- Budget planning resources
+- Destination-specific advice
+- Travel hacks and insights
 
-### Future Plans
-- Upcoming trip itineraries
-- Dream destinations bucket list
-- Planning resources and tools
-- Countdown timers for major trips
-
-### Life Updates
-- Personal and professional developments
-- Milestone celebrations
-- Life changes and transitions
-- Reflection pieces
+### Photo Gallery
+- Current photos and memories
+- Organized by trip or destination
+- Interactive photo viewing
+- Photo stories and captions
 
 ---
 
@@ -90,10 +87,8 @@ YearAway (Main Site)
 new-site/
 ├── index.html
 ├── adventures.html
-├── plans.html
-├── updates.html
+├── hints-and-tips.html
 ├── gallery.html
-├── contact.html
 ├── css/
 │   ├── style.css
 │   ├── components.css
@@ -156,7 +151,7 @@ new-site/
 ## 🚀 Development Phases
 
 ### Phase 1: Foundation
-- [ ] Basic HTML structure for all pages
+- [ ] Basic HTML structure for all pages (index, adventures, hints-and-tips, gallery)
 - [ ] Core CSS styling and responsive design
 - [ ] Basic navigation and layout
 - [ ] File structure setup
@@ -227,9 +222,10 @@ new-site/
 ### Content Ideas
 - Current location updates
 - Recent travel photos
-- Future trip planning
-- Life milestone updates
 - Travel tips and recommendations
+- Packing guides and travel hacks
+- Destination-specific advice
+- Travel stories and experiences
 
 ### Technical Ideas
 - Interactive world map
@@ -296,7 +292,7 @@ new-site/
 5. **Begin Phase 1 development**
 
 ### Questions to Resolve
-- What specific content should go on each page?
+- What specific content should go on each page (Home, Adventures, Hints & Tips, Gallery)?
 - Are there any particular features that are priorities?
 - What's the timeline for launch?
 - Any specific design preferences or inspirations?
