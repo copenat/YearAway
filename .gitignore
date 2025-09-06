@@ -50,3 +50,8 @@ node_modules/
 .env
 .env.local
 .env.production
+
+# Debug and test files (optional - uncomment to exclude from git)
+# debug-scripts/
+# *.test.js
+# *.test.py
