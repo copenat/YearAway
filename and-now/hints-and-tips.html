@@ -140,7 +140,55 @@
         </div>
     </footer>
 
+    <!-- Debug Console Output -->
+    <div id="debug-console" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; max-width: 400px; max-height: 200px; overflow: auto; font-size: 12px; border-radius: 5px; z-index: 9999; display: none;">
+        <h4>Debug Console</h4>
+        <div id="debug-logs"></div>
+        <button onclick="this.parentElement.style.display='none'" style="float: right; background: red; color: white; border: none; padding: 2px 5px; cursor: pointer;">×</button>
+    </div>
+
     <!-- JavaScript -->
+    <script>
+        // Debug console capture
+        const debugConsole = document.getElementById('debug-console');
+        const debugLogs = document.getElementById('debug-logs');
+        let logCount = 0;
+        
+        function addDebugLog(message, type = 'log') {
+            debugConsole.style.display = 'block';
+            const div = document.createElement('div');
+            div.style.color = type === 'error' ? '#ff6b6b' : type === 'warn' ? '#ffd93d' : '#6bcf7f';
+            div.innerHTML = `[${++logCount}] ${message}`;
+            debugLogs.appendChild(div);
+            
+            // Keep only last 20 logs
+            if (debugLogs.children.length > 20) {
+                debugLogs.removeChild(debugLogs.firstChild);
+            }
+        }
+        
+        // Override console methods
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addDebugLog(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addDebugLog(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addDebugLog(args.join(' '), 'warn');
+        };
+        
+        console.log('🔧 Debug console active');
+    </script>
     <script src="js/simple-auth-system.js"></script>
     <script src="js/main.js"></script>
     <script src="js/tips-manager.js"></script>
