@@ -8,7 +8,7 @@ tips:
     tags: [flights, budget, booking]
     rating: 5
     isPublic: true
-    testNote: "TEST: This tip was updated via the NEW JSON system! (Testing with write permissions)"
+    testNote: "TEST: This tip was updated via the NEW YAML system! (Triggering workflow for YAML)"
 
   - id: hotel-secret
     title: Exclusive Hotel Booking Secret
