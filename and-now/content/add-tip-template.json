@@ -10,6 +10,7 @@
 }
 
 /* 
+TIP TEMPLATE:
 Available Categories & Icons:
 - Transportation: ✈️
 - Accommodation: 🏨  
@@ -28,4 +29,19 @@ To add a new tip:
 2. Fill in your details
 3. Add it to the "tips" array in tips-data.json
 4. Update the category tip count in the "categories" array
+
+PRODUCT TEMPLATE:
+{
+  "id": "unique-product-id",
+  "name": "Product Name",
+  "description": "Product description",
+  "rating": 5,
+  "price": "$XX.XX",
+  "icon": "📦"
+}
+
+To add a new product:
+1. Copy the product template above
+2. Fill in your details
+3. Add it to the "products" array in tips-data.json
 */

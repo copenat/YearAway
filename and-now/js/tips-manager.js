@@ -17,6 +17,7 @@ class TipsManager {
             this.setupEventListeners();
             this.renderCategories();
             this.renderTips();
+            this.renderProducts();
             console.log('✅ Tips Manager initialized successfully');
         } catch (error) {
             console.error('❌ Error initializing Tips Manager:', error);
@@ -204,6 +205,34 @@ class TipsManager {
         this.authSystem = authSystem;
         // Re-render tips when auth status changes
         this.renderTips();
+    }
+
+    /**
+     * Render products section
+     */
+    renderProducts() {
+        const container = document.getElementById('travel-products-container');
+        if (!container || !this.tipsData || !this.tipsData.products) return;
+
+        const productsHtml = this.tipsData.products.map(product => `
+            <div class="product-card">
+                <div class="product-image">
+                    <div class="product-placeholder">${product.icon}</div>
+                </div>
+                <div class="product-content">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <div class="product-rating">${'⭐'.repeat(product.rating)}</div>
+                    <div class="product-price">${product.price}</div>
+                </div>
+            </div>
+        `).join('');
+
+        container.innerHTML = `
+            <div class="products-grid">
+                ${productsHtml}
+            </div>
+        `;
     }
 
     /**

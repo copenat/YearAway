@@ -125,5 +125,31 @@
       "description": "Apps, gadgets, and digital tools",
       "tipCount": 1
     }
+  ],
+  "products": [
+    {
+      "id": "travel-backpack",
+      "name": "Travel Backpack",
+      "description": "Lightweight, durable backpack perfect for carry-on travel",
+      "rating": 5,
+      "price": "$89.99",
+      "icon": "📦"
+    },
+    {
+      "id": "universal-adapter",
+      "name": "Universal Adapter",
+      "description": "Works in 150+ countries with USB ports",
+      "rating": 5,
+      "price": "$24.99",
+      "icon": "🔌"
+    },
+    {
+      "id": "noise-canceling-headphones",
+      "name": "Noise-Canceling Headphones",
+      "description": "Perfect for long flights and noisy environments",
+      "rating": 5,
+      "price": "$199.99",
+      "icon": "🎧"
+    }
   ]
 }
