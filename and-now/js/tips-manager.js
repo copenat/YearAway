@@ -129,17 +129,18 @@ class TipsManager {
     }
 
     /**
-     * Load category counts from JSON file
+     * Load category counts from YAML file
      */
     async loadCategoryCounts() {
         try {
-            const response = await fetch('content/category-counts.json');
+            const response = await fetch('content/category-counts.yaml');
             if (!response.ok) {
                 console.warn('⚠️ Category counts file not found, using fallback counts');
                 this.categoryCounts = null;
                 return;
             }
-            this.categoryCounts = await response.json();
+            const yamlText = await response.text();
+            this.categoryCounts = this.parseYAML(yamlText);
             console.log('📊 Category counts loaded:', this.categoryCounts.categories.length, 'categories');
         } catch (error) {
             console.warn('⚠️ Error loading category counts:', error);
@@ -148,7 +149,7 @@ class TipsManager {
     }
 
 
-how     /**
+    /**
      * Setup event listeners for filtering
      */
     setupEventListeners() {

@@ -97,10 +97,11 @@ def create_category_counts_json(tips_data, category_stats):
 
 def update_category_counts_file(category_counts):
     """Write the updated category counts to file"""
-    output_file = "and-now/content/category-counts.json"
+    import yaml
+    output_file = "and-now/content/category-counts.yaml"
     
     with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(category_counts, f, indent=2, ensure_ascii=False)
+        yaml.dump(category_counts, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
     
     print(f"✅ Updated category counts: {output_file}")
     return output_file
