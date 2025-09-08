@@ -146,12 +146,16 @@ class TipsManager {
         const memberOnlyClass = !tip.isPublic ? 'members-only' : '';
         const memberIndicator = !tip.isPublic ? '<div class="member-indicator">🔒 Members Only</div>' : '';
         const testNote = tip.testNote ? ` <strong>${tip.testNote}</strong>` : '';
+        
+        // Get category icon from categories section
+        const category = this.tipsData.categories.find(cat => cat.name === tip.category);
+        const categoryIcon = category ? category.icon : '📝';
 
         return `
             <div class="tip-card ${memberOnlyClass}">
                 ${memberIndicator}
                 <div class="tip-header">
-                    <div class="tip-category">${tip.categoryIcon} ${tip.category}</div>
+                    <div class="tip-category">${categoryIcon} ${tip.category}</div>
                     <div class="tip-rating">${'⭐'.repeat(tip.rating)}</div>
                 </div>
                 <h3>${tip.title}</h3>

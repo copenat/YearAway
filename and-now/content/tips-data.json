@@ -5,7 +5,6 @@
       "title": "Book Flights on Tuesday",
       "description": "Airline prices are typically lowest on Tuesdays, especially for domestic flights. Set up price alerts and book when you see a good deal.",
       "category": "Transportation",
-      "categoryIcon": "✈️",
       "tags": ["flights", "budget", "booking"],
       "rating": 5,
       "isPublic": true,
@@ -16,7 +15,6 @@
       "title": "Exclusive Hotel Booking Secret",
       "description": "This is a members-only tip with insider knowledge about getting the best hotel deals and upgrades. Includes personal experiences and specific recommendations.",
       "category": "Accommodation",
-      "categoryIcon": "🏨",
       "tags": ["hotels", "exclusive", "deals"],
       "rating": 5,
       "isPublic": false
@@ -26,7 +24,6 @@
       "title": "Airline Upgrade Secrets",
       "description": "Personal strategies for getting free upgrades and better seats. Includes specific airline policies and timing tips that have worked for us.",
       "category": "Transportation",
-      "categoryIcon": "✈️",
       "tags": ["flights", "upgrades", "secrets"],
       "rating": 5,
       "isPublic": false
@@ -36,7 +33,6 @@
       "title": "Roll Your Clothes",
       "description": "Rolling clothes instead of folding saves space and reduces wrinkles. Use packing cubes to organize and compress your items even more.",
       "category": "Packing",
-      "categoryIcon": "🎒",
       "tags": ["packing", "space-saving", "organization"],
       "rating": 5,
       "isPublic": true
@@ -46,7 +42,6 @@
       "title": "Hidden Restaurant Gems",
       "description": "Personal recommendations for amazing local restaurants that tourists rarely find. Includes specific locations, what to order, and best times to visit.",
       "category": "Food & Dining",
-      "categoryIcon": "🍽️",
       "tags": ["restaurants", "local", "hidden-gems"],
       "rating": 5,
       "isPublic": false
@@ -56,7 +51,6 @@
       "title": "Offline Maps for Travel",
       "description": "Download Google Maps offline before traveling. Works without internet and saves data costs. Perfect for exploring new cities!",
       "category": "Technology",
-      "categoryIcon": "📱",
       "tags": ["maps", "offline", "technology"],
       "rating": 5,
       "isPublic": true
@@ -66,7 +60,6 @@
       "title": "Track Daily Expenses",
       "description": "Use a simple app to track every expense while traveling. It helps you stay within budget and identify where your money goes.",
       "category": "Budget",
-      "categoryIcon": "💰",
       "tags": ["budget", "tracking", "money"],
       "rating": 4,
       "isPublic": true
@@ -76,7 +69,6 @@
       "title": "Always Get Travel Insurance",
       "description": "Don't skip travel insurance. It's saved us thousands of dollars on medical emergencies and trip cancellations.",
       "category": "Budget",
-      "categoryIcon": "💰",
       "tags": ["insurance", "safety", "budget"],
       "rating": 5,
       "isPublic": true
