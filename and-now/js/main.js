@@ -316,14 +316,31 @@ window.addEventListener('offline', () => {
 });
 
 // Connect authentication system to tips manager
+function connectAuthToTips() {
+    if (window.authSystem && window.tipsManager) {
+        window.tipsManager.setAuthSystem(window.authSystem);
+        console.log('🔗 Auth system connected to tips manager');
+        return true;
+    } else {
+        console.log('⚠️ Auth system or tips manager not ready:', {
+            authSystem: !!window.authSystem,
+            tipsManager: !!window.tipsManager
+        });
+        return false;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Wait for both systems to initialize
-    setTimeout(() => {
-        if (window.authSystem && window.tipsManager) {
-            window.tipsManager.setAuthSystem(window.authSystem);
-            console.log('🔗 Auth system connected to tips manager');
-        }
-    }, 100);
+    // Try to connect immediately
+    if (!connectAuthToTips()) {
+        // If not ready, try again after a delay
+        setTimeout(() => {
+            if (!connectAuthToTips()) {
+                // Try one more time after another delay
+                setTimeout(connectAuthToTips, 1000);
+            }
+        }, 500);
+    }
 });
 
 // Export for use in other scripts
