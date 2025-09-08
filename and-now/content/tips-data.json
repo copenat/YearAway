@@ -74,50 +74,6 @@
       "isPublic": true
     }
   ],
-  "categories": [
-    {
-      "id": "transportation",
-      "name": "Transportation",
-      "icon": "✈️",
-      "description": "Flights, trains, buses, and getting around",
-      "tipCount": 2
-    },
-    {
-      "id": "accommodation",
-      "name": "Accommodation", 
-      "icon": "🏨",
-      "description": "Hotels, hostels, and unique stays",
-      "tipCount": 1
-    },
-    {
-      "id": "food-dining",
-      "name": "Food & Dining",
-      "icon": "🍽️",
-      "description": "Local cuisine and dining experiences",
-      "tipCount": 1
-    },
-    {
-      "id": "packing",
-      "name": "Packing",
-      "icon": "🎒",
-      "description": "What to bring and how to pack",
-      "tipCount": 1
-    },
-    {
-      "id": "budget",
-      "name": "Budget",
-      "icon": "💰",
-      "description": "Money-saving tips and budget planning",
-      "tipCount": 2
-    },
-    {
-      "id": "technology",
-      "name": "Technology",
-      "icon": "📱",
-      "description": "Apps, gadgets, and digital tools",
-      "tipCount": 1
-    }
-  ],
   "products": [
     {
       "id": "travel-backpack",

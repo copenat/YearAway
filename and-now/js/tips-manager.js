@@ -14,6 +14,7 @@ class TipsManager {
     async init() {
         try {
             await this.loadTipsData();
+            await this.loadCategoryCounts();
             this.setupEventListeners();
             this.renderCategories();
             this.renderAllTipsByCategory();
@@ -38,6 +39,25 @@ class TipsManager {
         } catch (error) {
             console.error('Error loading tips data:', error);
             throw error;
+        }
+    }
+
+    /**
+     * Load category counts from JSON file
+     */
+    async loadCategoryCounts() {
+        try {
+            const response = await fetch('content/category-counts.json');
+            if (!response.ok) {
+                console.warn('⚠️ Category counts file not found, using fallback counts');
+                this.categoryCounts = null;
+                return;
+            }
+            this.categoryCounts = await response.json();
+            console.log('📊 Category counts loaded:', this.categoryCounts.categories.length, 'categories');
+        } catch (error) {
+            console.warn('⚠️ Error loading category counts:', error);
+            this.categoryCounts = null;
         }
     }
 
@@ -88,29 +108,21 @@ class TipsManager {
      */
     renderCategories() {
         const container = document.getElementById('tips-categories-container');
-        if (!container || !this.tipsData) return;
+        if (!container || !this.categoryCounts) return;
 
-        const categoriesHtml = this.tipsData.categories.map(category => {
-            // Count visible tips for this category
-            const categoryTips = this.tipsData.tips.filter(tip => tip.category === category.name);
-            const visibleTips = categoryTips.filter(tip => {
-                if (this.authSystem && !this.authSystem.isMember() && !tip.isPublic) {
-                    return false;
-                }
-                return true;
-            });
-            
-            // Count members-only tips
-            const membersOnlyTips = categoryTips.filter(tip => !tip.isPublic);
+        const categoriesHtml = this.categoryCounts.categories.map(category => {
+            // Use pre-calculated counts from category-counts.json
+            const publicTips = category.publicTips;
+            const membersOnlyTips = category.membersOnlyTips;
+            const visibleTips = this.authSystem && this.authSystem.isMember() ? 
+                category.totalTips : category.publicTips;
             
             // Create tip count display
-            let tipCountHtml = `<div class="tip-count">${visibleTips.length} Tips</div>`;
+            let tipCountHtml = `<div class="tip-count">${visibleTips} Tips</div>`;
             
             // Add members-only count for non-members
-            console.log(`Category: ${category.name}, AuthSystem: ${!!this.authSystem}, IsMember: ${this.authSystem ? this.authSystem.isMember() : 'N/A'}, MembersOnlyTips: ${membersOnlyTips.length}`);
-            if (this.authSystem && !this.authSystem.isMember() && membersOnlyTips.length > 0) {
-                tipCountHtml += `<div class="members-only-count">+${membersOnlyTips.length} Members Only</div>`;
-                console.log(`Added members-only count for ${category.name}: +${membersOnlyTips.length}`);
+            if (this.authSystem && !this.authSystem.isMember() && membersOnlyTips > 0) {
+                tipCountHtml += `<div class="members-only-count">+${membersOnlyTips} Members Only</div>`;
             }
             
             return `
@@ -135,12 +147,12 @@ class TipsManager {
      */
     renderAllTipsByCategory() {
         const container = document.getElementById('all-tips-container');
-        if (!container || !this.tipsData) return;
+        if (!container || !this.tipsData || !this.categoryCounts) return;
 
         let allTipsHtml = '';
 
-        // Group tips by category
-        this.tipsData.categories.forEach(category => {
+        // Group tips by category using category counts
+        this.categoryCounts.categories.forEach(category => {
             const categoryTips = this.tipsData.tips.filter(tip => tip.category === category.name);
             
             // Filter tips based on authentication status
@@ -185,8 +197,9 @@ class TipsManager {
         const memberIndicator = !tip.isPublic ? '<div class="member-indicator">🔒 Members Only</div>' : '';
         const testNote = tip.testNote ? ` <strong>${tip.testNote}</strong>` : '';
         
-        // Get category icon from categories section
-        const category = this.tipsData.categories.find(cat => cat.name === tip.category);
+        // Get category icon from category counts
+        const category = this.categoryCounts ? 
+            this.categoryCounts.categories.find(cat => cat.name === tip.category) : null;
         const categoryIcon = category ? category.icon : '📝';
 
         return `
@@ -296,7 +309,6 @@ class TipsManager {
      * Set reference to auth system
      */
     setAuthSystem(authSystem) {
-        console.log('🔗 Setting auth system:', !!authSystem, 'IsMember:', authSystem ? authSystem.isMember() : 'N/A');
         this.authSystem = authSystem;
         // Re-render both categories and tips when auth status changes
         this.renderCategories();

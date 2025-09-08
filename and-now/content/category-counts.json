@@ -1,0 +1,64 @@
+{
+  "categories": [
+    {
+      "id": "accommodation",
+      "name": "Accommodation",
+      "icon": "🏨",
+      "description": "Accommodation tips and advice",
+      "publicTips": 0,
+      "membersOnlyTips": 1,
+      "totalTips": 1
+    },
+    {
+      "id": "budget",
+      "name": "Budget",
+      "icon": "💰",
+      "description": "Budget tips and advice",
+      "publicTips": 2,
+      "membersOnlyTips": 0,
+      "totalTips": 2
+    },
+    {
+      "id": "food-dining",
+      "name": "Food & Dining",
+      "icon": "🍽️",
+      "description": "Food & Dining tips and advice",
+      "publicTips": 0,
+      "membersOnlyTips": 1,
+      "totalTips": 1
+    },
+    {
+      "id": "packing",
+      "name": "Packing",
+      "icon": "🎒",
+      "description": "Packing tips and advice",
+      "publicTips": 1,
+      "membersOnlyTips": 0,
+      "totalTips": 1
+    },
+    {
+      "id": "technology",
+      "name": "Technology",
+      "icon": "📱",
+      "description": "Technology tips and advice",
+      "publicTips": 1,
+      "membersOnlyTips": 0,
+      "totalTips": 1
+    },
+    {
+      "id": "transportation",
+      "name": "Transportation",
+      "icon": "✈️",
+      "description": "Transportation tips and advice",
+      "publicTips": 1,
+      "membersOnlyTips": 1,
+      "totalTips": 2
+    }
+  ],
+  "lastUpdated": "2025-09-08T18:36:34.256980Z",
+  "totalStats": {
+    "publicTips": 5,
+    "membersOnlyTips": 3,
+    "totalTips": 8
+  }
+}
