@@ -12,6 +12,25 @@ from pathlib import Path
 
 def get_current_branch():
     """Get the current git branch name."""
+    # FIRST: Check environment variables (most reliable in CI/CD)
+    import os
+    branch = os.environ.get('CF_PAGES_BRANCH')
+    if branch:
+        return branch
+    
+    # Fallback: try to get branch from Cloudflare Pages environment variables
+    branch = os.environ.get('CF_PAGES_BRANCH_NAME')
+    if branch:
+        return branch
+    
+    # Fallback: try to get branch from Cloudflare Pages URL
+    branch = os.environ.get('CF_PAGES_URL')
+    if branch and 'develop' in branch:
+        return 'develop'
+    elif branch and 'main' in branch:
+        return 'main'
+    
+    # THEN: Try git commands (for local development)
     try:
         result = subprocess.run(['git', 'branch', '--show-current'], 
                               capture_output=True, text=True, check=True)
@@ -33,24 +52,6 @@ def get_current_branch():
                 return branch
     except:
         pass
-    
-    # Fallback: try to get branch from environment variable (Cloudflare Pages)
-    import os
-    branch = os.environ.get('CF_PAGES_BRANCH')
-    if branch:
-        return branch
-    
-    # Fallback: try to get branch from Cloudflare Pages environment variables
-    branch = os.environ.get('CF_PAGES_BRANCH_NAME')
-    if branch:
-        return branch
-    
-    # Fallback: try to get branch from Cloudflare Pages URL
-    branch = os.environ.get('CF_PAGES_URL')
-    if branch and 'develop' in branch:
-        return 'develop'
-    elif branch and 'main' in branch:
-        return 'main'
     
     # Fallback: try to get branch from git remote
     try:
