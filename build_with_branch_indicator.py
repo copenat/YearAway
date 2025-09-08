@@ -45,6 +45,13 @@ def get_current_branch():
     if branch:
         return branch
     
+    # Fallback: try to get branch from Cloudflare Pages URL
+    branch = os.environ.get('CF_PAGES_URL')
+    if branch and 'develop' in branch:
+        return 'develop'
+    elif branch and 'main' in branch:
+        return 'main'
+    
     # Fallback: try to get branch from git remote
     try:
         result = subprocess.run(['git', 'remote', 'show', 'origin'], 
@@ -156,8 +163,19 @@ def process_html_files(directory='.'):
     print("🔍 Debug information:")
     print(f"   CF_PAGES_BRANCH: {os.environ.get('CF_PAGES_BRANCH', 'Not set')}")
     print(f"   CF_PAGES_BRANCH_NAME: {os.environ.get('CF_PAGES_BRANCH_NAME', 'Not set')}")
+    print(f"   CF_PAGES_URL: {os.environ.get('CF_PAGES_URL', 'Not set')}")
+    print(f"   CF_PAGES_COMMIT_SHA: {os.environ.get('CF_PAGES_COMMIT_SHA', 'Not set')}")
     print(f"   GITHUB_REF: {os.environ.get('GITHUB_REF', 'Not set')}")
     print(f"   GITHUB_HEAD_REF: {os.environ.get('GITHUB_HEAD_REF', 'Not set')}")
+    
+    # Debug: Print all CF_PAGES environment variables
+    cf_vars = {k: v for k, v in os.environ.items() if k.startswith('CF_PAGES')}
+    if cf_vars:
+        print("   All CF_PAGES variables:")
+        for k, v in cf_vars.items():
+            print(f"     {k}: {v}")
+    else:
+        print("   No CF_PAGES environment variables found")
     
     branch = get_current_branch()
     
