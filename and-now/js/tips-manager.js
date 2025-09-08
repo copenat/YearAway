@@ -220,7 +220,12 @@ class TipsManager {
             console.log('📊 Raw category YAML text length:', yamlText.length);
             this.categoryCounts = this.parseYAML(yamlText);
             console.log('📊 Parsed category counts:', this.categoryCounts);
-            console.log('📊 Category counts loaded:', this.categoryCounts.categories.length, 'categories');
+            console.log('📊 Category counts structure:', {
+                hasCategories: !!this.categoryCounts.categories,
+                categoriesLength: this.categoryCounts.categories ? this.categoryCounts.categories.length : 'undefined',
+                totalStats: this.categoryCounts.totalStats
+            });
+            console.log('📊 Category counts loaded:', this.categoryCounts.categories ? this.categoryCounts.categories.length : 0, 'categories');
         } catch (error) {
             console.warn('⚠️ Error loading category counts:', error);
             this.categoryCounts = null;
@@ -278,6 +283,11 @@ class TipsManager {
         console.log('🎯 renderCategories called - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
         if (!container || !this.categoryCounts) {
             console.warn('⚠️ Cannot render categories - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
+            return;
+        }
+
+        if (!this.categoryCounts.categories || !Array.isArray(this.categoryCounts.categories)) {
+            console.error('❌ Category counts categories is not an array:', this.categoryCounts.categories);
             return;
         }
 
