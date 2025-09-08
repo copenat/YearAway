@@ -15,20 +15,44 @@ def get_current_branch():
     try:
         result = subprocess.run(['git', 'branch', '--show-current'], 
                               capture_output=True, text=True, check=True)
-        return result.stdout.strip()
+        branch = result.stdout.strip()
+        if branch:
+            return branch
     except subprocess.CalledProcessError:
-        # Fallback: try to get branch from git status
-        try:
-            result = subprocess.run(['git', 'status', '--porcelain=v1', '-b'], 
-                                  capture_output=True, text=True, check=True)
-            # Parse the branch from the first line
-            first_line = result.stdout.split('\n')[0]
-            if first_line.startswith('## '):
-                branch = first_line.split('...')[0].replace('## ', '')
+        pass
+    
+    # Fallback: try to get branch from git status
+    try:
+        result = subprocess.run(['git', 'status', '--porcelain=v1', '-b'], 
+                              capture_output=True, text=True, check=True)
+        # Parse the branch from the first line
+        first_line = result.stdout.split('\n')[0]
+        if first_line.startswith('## '):
+            branch = first_line.split('...')[0].replace('## ', '')
+            if branch:
                 return branch
-        except:
-            pass
-        return None
+    except:
+        pass
+    
+    # Fallback: try to get branch from environment variable (Cloudflare Pages)
+    import os
+    branch = os.environ.get('CF_PAGES_BRANCH')
+    if branch:
+        return branch
+    
+    # Fallback: try to get branch from git log
+    try:
+        result = subprocess.run(['git', 'log', '-1', '--pretty=%D'], 
+                              capture_output=True, text=True, check=True)
+        output = result.stdout.strip()
+        if 'origin/develop' in output:
+            return 'develop'
+        elif 'origin/main' in output:
+            return 'main'
+    except:
+        pass
+    
+    return None
 
 def add_branch_indicator_to_html(html_content, branch):
     """Add or remove branch indicator from HTML content."""
