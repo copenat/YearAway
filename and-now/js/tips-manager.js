@@ -14,6 +14,18 @@ class TipsManager {
     async init() {
         try {
             console.log('🚀 Starting Tips Manager initialization...');
+            
+            // Check if containers exist
+            const categoriesContainer = document.getElementById('tips-categories-container');
+            const tipsContainer = document.getElementById('all-tips-container');
+            const productsContainer = document.getElementById('travel-products-container');
+            
+            console.log('📦 Container check:', {
+                categories: !!categoriesContainer,
+                tips: !!tipsContainer,
+                products: !!productsContainer
+            });
+            
             await this.loadTipsData();
             console.log('📄 Tips data loaded:', this.tipsData);
             await this.loadCategoryCounts();
@@ -520,8 +532,13 @@ class TipsManager {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.tipsManager = new TipsManager();
-    console.log('📝 YearAway Tips Manager Initialized');
+    console.log('🚀 DOM loaded, initializing TipsManager...');
+    try {
+        window.tipsManager = new TipsManager();
+        console.log('📝 YearAway Tips Manager Initialized');
+    } catch (error) {
+        console.error('❌ Error initializing TipsManager:', error);
+    }
 });
 
 // Export for use in other scripts
