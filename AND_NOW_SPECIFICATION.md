@@ -7,7 +7,7 @@ Create a modern, interactive website accessible from the "And Now" button that r
 **Current Status**: Planning Phase  
 **Target Launch**: TBD  
 **Project Owner**: Nathan  
-**Last Updated**: September 1, 2025  
+**Last Updated**: September 8, 2025  
 
 ---
 
@@ -18,6 +18,7 @@ Create a modern, interactive website accessible from the "And Now" button that r
 - **Current Adventures** (`adventures.html`) - Ongoing or recent travels
 - **Hints and Tips** (`hints-and-tips.html`) 
 - **Photo Gallery** (`gallery.html`) - Current photos and memories
+- **Request Access** (`request-access.html`) - Member access request form
 
 ### Navigation Structure
 ```
@@ -27,7 +28,8 @@ YearAway (Main Site)
     ├── Home
     ├── Current Adventures
     ├── Hints and Tips
-    └── Photo Gallery
+    ├── Photo Gallery
+    └── Request Access
 ```
 
 ---
@@ -48,6 +50,7 @@ YearAway (Main Site)
 - **Modern UI Components**: Cards, modals, carousels, progress bars
 - **Responsive Design**: Mobile-first approach with tablet/desktop optimization
 - **Accessibility**: ARIA labels, keyboard navigation, screen reader support
+- **Members-Only Content**: Token-based authentication system for exclusive content
 
 ---
 
@@ -64,19 +67,72 @@ YearAway (Main Site)
 - Interactive maps showing current location
 - Photo galleries of recent trips
 - Travel stories and experiences
+- **Members-Only**: Detailed trip reports, personal reflections, private photos
 
 ### Hints and Tips
-- Travel tips and recommendations
-- Packing guides and checklists
-- Budget planning resources
+- Travel tips and hotel/restaurant recommendations
+- Travel products
 - Destination-specific advice
 - Travel hacks and insights
+- **Members-Only**: Exclusive recommendations, detailed reviews, insider tips
 
 ### Photo Gallery
 - Current photos and memories
 - Organized by trip or destination
 - Interactive photo viewing
 - Photo stories and captions
+- **Members-Only**: Private family photos, personal moments, high-resolution downloads
+
+### Request Access
+- Member access request form
+- Information collection (name, email, relationship, reason)
+- Email integration for request submission
+- Clear instructions for the request process
+- Status updates and response expectations
+
+---
+
+## 🔐 Authentication & Members-Only Content
+
+### Token-Based Authentication System
+- **Client-Side Authentication**: JavaScript-based token validation
+- **Simple Token Format**: `YEARAWAY-XXXX-XXXX-XXXX` format for easy distribution
+- **Local Storage**: Tokens stored in browser's localStorage for persistence
+- **No Server Required**: Fully client-side authentication system
+
+### Content Access Levels
+- **Public Content**: Accessible to all visitors
+- **Members-Only Content**: Requires valid token for access
+- **Content Marking**: Use `.members-only` class to mark restricted content
+- **Visual Indicators**: Lock icons and member badges for exclusive content
+
+### Token Management
+- **Token Generation**: Python script to generate unique member tokens
+- **Token Distribution**: Manual distribution to family/friends
+- **Token Validation**: Real-time validation on page load
+- **Session Management**: Automatic login persistence across browser sessions
+
+### User Experience
+- **Login Form**: Simple token input form with validation
+- **Status Indicators**: Clear member/guest status display
+- **Content Reveal**: Smooth animations when content becomes available
+- **Notifications**: Success/error messages for login attempts
+- **Logout Function**: Easy logout with content hiding
+- **Access Requests**: Non-members can request member access via contact form
+
+### Security Considerations
+- **Client-Side Only**: No server-side validation (by design for static site)
+- **Token Obfuscation**: Tokens not easily guessable
+- **Content Hiding**: CSS/JS hide content from non-members
+- **Browser Storage**: Tokens stored locally (not secure against determined users)
+
+### Member Access Request System
+- **Request Form**: Simple form for non-members to request access
+- **Email Integration**: Requests sent directly to site owner's email
+- **Request Information**: Name, email, relationship, reason for access
+- **Manual Approval**: Site owner reviews and approves requests
+- **Token Distribution**: Approved members receive tokens via email
+- **Request Tracking**: Simple system to track pending/approved requests
 
 ---
 
@@ -89,23 +145,32 @@ new-site/
 ├── adventures.html
 ├── hints-and-tips.html
 ├── gallery.html
+├── request-access.html
 ├── css/
 │   ├── style.css
 │   ├── components.css
-│   └── responsive.css
+│   ├── responsive.css
+│   └── auth-styles.css
 ├── js/
 │   ├── main.js
 │   ├── gallery.js
-│   └── maps.js
+│   ├── maps.js
+│   ├── simple-auth-system.js
+│   └── access-request.js
 ├── images/
 ├── assets/
-└── manifest.json
+├── manifest.json
+└── debug-scripts/
+    ├── simple-token-generator.py
+    └── test-auth.html
 ```
 
 ### Technologies
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript
 - **Styling**: CSS Grid, Flexbox, CSS Variables
 - **Interactivity**: ES6+ JavaScript, Intersection Observer API
+- **Authentication**: Client-side token validation, localStorage
+- **Email Integration**: EmailJS or Formspree for access requests
 - **Performance**: Lazy loading, image optimization, service worker
 - **Responsiveness**: CSS Media Queries, mobile-first design
 - **Hosting**: Cloudflare Pages (static site hosting)
@@ -154,6 +219,7 @@ new-site/
 - [ ] Basic HTML structure for all pages (index, adventures, hints-and-tips, gallery)
 - [ ] Core CSS styling and responsive design
 - [ ] Basic navigation and layout
+- [ ] Authentication system integration
 - [ ] File structure setup
 - [ ] GitHub repository setup
 - [ ] Cloudflare Pages configuration
@@ -162,6 +228,8 @@ new-site/
 - [ ] Populate pages with initial content
 - [ ] Implement interactive features
 - [ ] Photo gallery and media handling
+- [ ] Members-only content implementation
+- [ ] Token generation and distribution
 - [ ] Basic functionality testing
 - [ ] Build process automation
 - [ ] GitHub Actions for automated deployment

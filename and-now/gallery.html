@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Gallery - YearAway</title>
+    <meta name="description" content="Current photos and memories from YearAway adventures">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth-styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <!-- Authentication Header -->
+    <div class="auth-header">
+        <div class="auth-info">
+            <span>Status: <span id="auth-status" class="member-status guest">Guest</span></span>
+            <button id="logout-btn" style="display: none;">Logout</button>
+        </div>
+    </div>
+
+    <!-- Login Form (hidden when logged in) -->
+    <div id="login-form" class="login-form-container">
+        <form>
+            <h3>🔐 Member Access</h3>
+            <div class="form-group">
+                <label for="member-token">Member Token:</label>
+                <input type="text" id="member-token" placeholder="YEARAWAY-XXXX-XXXX-XXXX" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="index.html">YearAway</a>
+                <span class="nav-subtitle">And Now</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="adventures.html">Adventures</a></li>
+                <li><a href="hints-and-tips.html">Hints & Tips</a></li>
+                <li><a href="gallery.html" class="active">Gallery</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <section class="page-header">
+            <div class="container">
+                <h1>Photo Gallery</h1>
+                <p class="page-subtitle">Current photos and memories from adventures</p>
+            </div>
+        </section>
+
+        <!-- Gallery Filters -->
+        <section class="gallery-filters">
+            <div class="container">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All Photos</button>
+                    <button class="filter-btn" data-filter="public">Public</button>
+                    <button class="filter-btn" data-filter="members">Members Only</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Photo Grid -->
+        <section class="photo-gallery">
+            <div class="container">
+                <div class="gallery-grid">
+                    <!-- Public Photos -->
+                    <div class="photo-item" data-category="public">
+                        <div class="photo-container">
+                            <img src="images/placeholder-adventure.jpg" alt="Public adventure photo" loading="lazy">
+                            <div class="photo-overlay">
+                                <div class="photo-info">
+                                    <h3>Planning Phase</h3>
+                                    <p>Getting ready for the next adventure</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="photo-item" data-category="public">
+                        <div class="photo-container">
+                            <img src="images/placeholder-adventure.jpg" alt="Public travel photo" loading="lazy">
+                            <div class="photo-overlay">
+                                <div class="photo-info">
+                                    <h3>Travel Preparation</h3>
+                                    <p>Researching destinations and planning routes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Members-only Photos -->
+                    <div class="photo-item members-only" data-category="members">
+                        <div class="member-indicator">🔒 Members Only</div>
+                        <div class="photo-container">
+                            <img src="images/placeholder-members.jpg" alt="Members-only family photo" loading="lazy">
+                            <div class="photo-overlay">
+                                <div class="photo-info">
+                                    <h3>Family Moments</h3>
+                                    <p>Private family photos and personal memories</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="photo-item members-only" data-category="members">
+                        <div class="member-indicator">🔒 Members Only</div>
+                        <div class="photo-container">
+                            <img src="images/placeholder-members.jpg" alt="Members-only travel photo" loading="lazy">
+                            <div class="photo-overlay">
+                                <div class="photo-info">
+                                    <h3>Exclusive Adventure</h3>
+                                    <p>Detailed photos from private adventures</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="photo-item" data-category="public">
+                        <div class="photo-container">
+                            <img src="images/placeholder-adventure.jpg" alt="Public destination photo" loading="lazy">
+                            <div class="photo-overlay">
+                                <div class="photo-info">
+                                    <h3>Destination Research</h3>
+                                    <p>Exploring new places and cultures</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="photo-item members-only" data-category="members">
+                        <div class="member-indicator">🔒 Members Only</div>
+                        <div class="photo-container">
+                            <img src="images/placeholder-members.jpg" alt="Members-only personal photo" loading="lazy">
+                            <div class="photo-overlay">
+                                <div class="photo-info">
+                                    <h3>Personal Reflections</h3>
+                                    <p>Private moments and personal experiences</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="photo-item" data-category="public">
+                        <div class="photo-container">
+                            <img src="images/placeholder-adventure.jpg" alt="Public travel planning photo" loading="lazy">
+                            <div class="photo-overlay">
+                                <div class="photo-info">
+                                    <h3>Travel Planning</h3>
+                                    <p>Organizing the next big adventure</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="photo-item members-only" data-category="members">
+                        <div class="member-indicator">🔒 Members Only</div>
+                        <div class="photo-container">
+                            <img src="images/placeholder-members.jpg" alt="Members-only exclusive photo" loading="lazy">
+                            <div class="photo-overlay">
+                                <div class="photo-info">
+                                    <h3>Exclusive Content</h3>
+                                    <p>High-resolution photos and exclusive memories</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Photo Stories -->
+        <section class="photo-stories">
+            <div class="container">
+                <h2>Photo Stories</h2>
+                <div class="stories-grid">
+                    <div class="story-card">
+                        <div class="story-image">
+                            <img src="images/placeholder-adventure.jpg" alt="Story image" loading="lazy">
+                        </div>
+                        <div class="story-content">
+                            <h3>Planning the Next Adventure</h3>
+                            <p>A behind-the-scenes look at how we plan our travels, from research to booking.</p>
+                            <div class="story-meta">
+                                <span class="story-date">September 2025</span>
+                                <span class="story-photos">5 Photos</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="story-card members-only">
+                        <div class="member-indicator">🔒 Members Only</div>
+                        <div class="story-image">
+                            <img src="images/placeholder-members.jpg" alt="Members story image" loading="lazy">
+                        </div>
+                        <div class="story-content">
+                            <h3>Private Family Moments</h3>
+                            <p>Exclusive photos and stories from private family adventures and personal experiences.</p>
+                            <div class="story-meta">
+                                <span class="story-date">August 2025</span>
+                                <span class="story-photos">12 Photos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Want to See More?</h2>
+                    <p>Get access to exclusive photos, high-resolution downloads, and private family memories.</p>
+                    <a href="index.html" class="btn btn-primary">Request Member Access</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>YearAway</h3>
+                    <p>Current adventures and experiences</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="adventures.html">Adventures</a></li>
+                        <li><a href="hints-and-tips.html">Hints & Tips</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Archive</h4>
+                    <ul>
+                        <li><a href="../that_was_then/">Then (2001-2011)</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 YearAway. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/simple-auth-system.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/gallery.js"></script>
+</body>
+</html>

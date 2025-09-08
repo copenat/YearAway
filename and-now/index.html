@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YearAway - And Now</title>
+    <meta name="description" content="Current adventures and experiences from YearAway">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth-styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <!-- Authentication Header -->
+    <div class="auth-header">
+        <div class="auth-info">
+            <span>Status: <span id="auth-status" class="member-status guest">Guest</span></span>
+            <button id="logout-btn" style="display: none;">Logout</button>
+        </div>
+    </div>
+
+    <!-- Login Form (hidden when logged in) -->
+    <div id="login-form" class="login-form-container">
+        <form>
+            <h3>🔐 Member Access</h3>
+            <div class="form-group">
+                <label for="member-token">Member Token:</label>
+                <input type="text" id="member-token" placeholder="YEARAWAY-XXXX-XXXX-XXXX" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="index.html">YearAway</a>
+                <span class="nav-subtitle">And Now</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="adventures.html">Adventures</a></li>
+                <li><a href="hints-and-tips.html">Hints & Tips</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Welcome to YearAway - And Now</h1>
+                <p class="hero-subtitle">Current adventures, travel stories, and life updates</p>
+                <div class="hero-actions">
+                    <a href="adventures.html" class="btn btn-primary">Explore Adventures</a>
+                    <a href="gallery.html" class="btn btn-secondary">View Gallery</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Current Status Section -->
+        <section class="current-status">
+            <div class="container">
+                <h2>Current Status</h2>
+                <div class="status-card">
+                    <div class="status-info">
+                        <h3>📍 Current Location</h3>
+                        <p>Planning the next adventure...</p>
+                    </div>
+                    <div class="status-info">
+                        <h3>📅 Last Update</h3>
+                        <p>September 2025</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Adventures Preview -->
+        <section class="recent-adventures">
+            <div class="container">
+                <h2>Recent Adventures</h2>
+                <div class="adventures-grid">
+                    <div class="adventure-card">
+                        <div class="adventure-image">
+                            <img src="images/placeholder-adventure.jpg" alt="Adventure placeholder" loading="lazy">
+                        </div>
+                        <div class="adventure-content">
+                            <h3>Planning Phase</h3>
+                            <p>Getting ready for the next big adventure...</p>
+                            <a href="adventures.html" class="btn btn-outline">Read More</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Members-only adventure card -->
+                    <div class="adventure-card members-only">
+                        <div class="member-indicator">🔒 Members Only</div>
+                        <div class="adventure-image">
+                            <img src="images/placeholder-members.jpg" alt="Members adventure placeholder" loading="lazy">
+                        </div>
+                        <div class="adventure-content">
+                            <h3>Exclusive Adventure</h3>
+                            <p>This is a members-only adventure with detailed stories and personal reflections.</p>
+                            <a href="adventures.html" class="btn btn-outline">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Links -->
+        <section class="quick-links">
+            <div class="container">
+                <h2>Quick Links</h2>
+                <div class="links-grid">
+                    <a href="adventures.html" class="link-card">
+                        <div class="link-icon">🗺️</div>
+                        <h3>Current Adventures</h3>
+                        <p>Ongoing travels and experiences</p>
+                    </a>
+                    <a href="hints-and-tips.html" class="link-card">
+                        <div class="link-icon">💡</div>
+                        <h3>Hints & Tips</h3>
+                        <p>Travel advice and recommendations</p>
+                    </a>
+                    <a href="gallery.html" class="link-card">
+                        <div class="link-icon">📸</div>
+                        <h3>Photo Gallery</h3>
+                        <p>Current photos and memories</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>YearAway</h3>
+                    <p>Current adventures and experiences</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="adventures.html">Adventures</a></li>
+                        <li><a href="hints-and-tips.html">Hints & Tips</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Archive</h4>
+                    <ul>
+                        <li><a href="../that_was_then/">Then (2001-2011)</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 YearAway. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/simple-auth-system.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
