@@ -20,6 +20,8 @@ class TipsManager {
             this.renderAllTipsByCategory();
             this.renderProducts();
             console.log('✅ Tips Manager initialized successfully');
+            console.log('📊 Category counts available:', !!this.categoryCounts);
+            console.log('📄 Tips data available:', !!this.tipsData);
         } catch (error) {
             console.error('❌ Error initializing Tips Manager:', error);
         }
@@ -108,7 +110,11 @@ class TipsManager {
      */
     renderCategories() {
         const container = document.getElementById('tips-categories-container');
-        if (!container || !this.categoryCounts) return;
+        console.log('🎯 renderCategories called - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
+        if (!container || !this.categoryCounts) {
+            console.warn('⚠️ Cannot render categories - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
+            return;
+        }
 
         const categoriesHtml = this.categoryCounts.categories.map(category => {
             // Use pre-calculated counts from category-counts.json

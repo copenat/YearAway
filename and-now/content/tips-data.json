@@ -8,7 +8,7 @@
       "tags": ["flights", "budget", "booking"],
       "rating": 5,
       "isPublic": true,
-      "testNote": "TEST: This tip was updated via the NEW JSON system!"
+      "testNote": "TEST: This tip was updated via the NEW JSON system! (Triggering workflow)"
     },
     {
       "id": "hotel-secret",
