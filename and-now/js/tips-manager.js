@@ -107,8 +107,10 @@ class TipsManager {
             let tipCountHtml = `<div class="tip-count">${visibleTips.length} Tips</div>`;
             
             // Add members-only count for non-members
+            console.log(`Category: ${category.name}, AuthSystem: ${!!this.authSystem}, IsMember: ${this.authSystem ? this.authSystem.isMember() : 'N/A'}, MembersOnlyTips: ${membersOnlyTips.length}`);
             if (this.authSystem && !this.authSystem.isMember() && membersOnlyTips.length > 0) {
                 tipCountHtml += `<div class="members-only-count">+${membersOnlyTips.length} Members Only</div>`;
+                console.log(`Added members-only count for ${category.name}: +${membersOnlyTips.length}`);
             }
             
             return `
@@ -294,6 +296,7 @@ class TipsManager {
      * Set reference to auth system
      */
     setAuthSystem(authSystem) {
+        console.log('🔗 Setting auth system:', !!authSystem, 'IsMember:', authSystem ? authSystem.isMember() : 'N/A');
         this.authSystem = authSystem;
         // Re-render both categories and tips when auth status changes
         this.renderCategories();
