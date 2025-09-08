@@ -1170,3 +1170,36 @@ input:focus {
     font-size: 0.9rem;
     padding: 0.5rem 1rem;
 }
+
+/* Members Only Count */
+.members-only-count {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(238, 90, 36, 0.3);
+    animation: pulse 2s infinite;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.members-only-count:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(238, 90, 36, 0.4);
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 2px 8px rgba(238, 90, 36, 0.3);
+    }
+    50% {
+        box-shadow: 0 2px 8px rgba(238, 90, 36, 0.6);
+    }
+    100% {
+        box-shadow: 0 2px 8px rgba(238, 90, 36, 0.3);
+    }
+}

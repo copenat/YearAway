@@ -74,6 +74,13 @@ class TipsManager {
                 this.backToCategories();
             }
         });
+
+        // Members-only count click
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('members-only-count')) {
+                this.showMembershipPrompt();
+            }
+        });
     }
 
     /**
@@ -93,12 +100,23 @@ class TipsManager {
                 return true;
             });
             
+            // Count members-only tips
+            const membersOnlyTips = categoryTips.filter(tip => !tip.isPublic);
+            
+            // Create tip count display
+            let tipCountHtml = `<div class="tip-count">${visibleTips.length} Tips</div>`;
+            
+            // Add members-only count for non-members
+            if (this.authSystem && !this.authSystem.isMember() && membersOnlyTips.length > 0) {
+                tipCountHtml += `<div class="members-only-count">+${membersOnlyTips.length} Members Only</div>`;
+            }
+            
             return `
                 <div class="category-card category-filter" data-category="${category.id}">
                     <div class="category-icon">${category.icon}</div>
                     <h3>${category.name}</h3>
                     <p>${category.description}</p>
-                    <div class="tip-count">${visibleTips.length} Tips</div>
+                    ${tipCountHtml}
                 </div>
             `;
         }).join('');
@@ -249,6 +267,27 @@ class TipsManager {
                 block: 'start'
             });
         }
+    }
+
+    /**
+     * Show membership prompt
+     */
+    showMembershipPrompt() {
+        if (this.authSystem && this.authSystem.isMember()) {
+            return; // Already a member
+        }
+
+        // Create a simple prompt (you could replace this with a modal or redirect)
+        const message = "🔒 Unlock exclusive travel tips! Become a member to access premium content including insider secrets, exclusive deals, and personal recommendations.";
+        
+        if (window.yearawayApp && window.yearawayApp.showNotification) {
+            window.yearawayApp.showNotification(message, 'info', 5000);
+        } else {
+            alert(message);
+        }
+        
+        // You could also redirect to a membership page or show a login modal
+        // window.location.href = 'request-access.html';
     }
 
     /**
