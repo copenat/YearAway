@@ -40,9 +40,50 @@ def get_current_branch():
     if branch:
         return branch
     
+    # Fallback: try to get branch from Cloudflare Pages environment variables
+    branch = os.environ.get('CF_PAGES_BRANCH_NAME')
+    if branch:
+        return branch
+    
+    # Fallback: try to get branch from git remote
+    try:
+        result = subprocess.run(['git', 'remote', 'show', 'origin'], 
+                              capture_output=True, text=True, check=True)
+        output = result.stdout.strip()
+        if 'HEAD branch: develop' in output:
+            return 'develop'
+        elif 'HEAD branch: main' in output:
+            return 'main'
+    except:
+        pass
+    
     # Fallback: try to get branch from git log
     try:
         result = subprocess.run(['git', 'log', '-1', '--pretty=%D'], 
+                              capture_output=True, text=True, check=True)
+        output = result.stdout.strip()
+        if 'origin/develop' in output:
+            return 'develop'
+        elif 'origin/main' in output:
+            return 'main'
+    except:
+        pass
+    
+    # Fallback: try to get branch from git show-ref
+    try:
+        result = subprocess.run(['git', 'show-ref', '--heads'], 
+                              capture_output=True, text=True, check=True)
+        output = result.stdout.strip()
+        if 'refs/heads/develop' in output:
+            return 'develop'
+        elif 'refs/heads/main' in output:
+            return 'main'
+    except:
+        pass
+    
+    # Fallback: try to get branch from git branch -a
+    try:
+        result = subprocess.run(['git', 'branch', '-a'], 
                               capture_output=True, text=True, check=True)
         output = result.stdout.strip()
         if 'origin/develop' in output:
@@ -110,6 +151,14 @@ def add_branch_indicator_to_html(html_content, branch):
 
 def process_html_files(directory='.'):
     """Process all HTML files in the directory."""
+    # Debug: Print environment variables for troubleshooting
+    import os
+    print("🔍 Debug information:")
+    print(f"   CF_PAGES_BRANCH: {os.environ.get('CF_PAGES_BRANCH', 'Not set')}")
+    print(f"   CF_PAGES_BRANCH_NAME: {os.environ.get('CF_PAGES_BRANCH_NAME', 'Not set')}")
+    print(f"   GITHUB_REF: {os.environ.get('GITHUB_REF', 'Not set')}")
+    print(f"   GITHUB_HEAD_REF: {os.environ.get('GITHUB_HEAD_REF', 'Not set')}")
+    
     branch = get_current_branch()
     
     if branch is None:
