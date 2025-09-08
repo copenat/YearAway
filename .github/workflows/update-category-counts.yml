@@ -28,6 +28,10 @@ jobs:
       with:
         python-version: '3.9'
     
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+    
     - name: Update category counts
       run: |
         python3 update-category-counts.py

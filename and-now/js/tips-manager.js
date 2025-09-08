@@ -28,20 +28,104 @@ class TipsManager {
     }
 
     /**
-     * Load tips data from JSON file
+     * Load tips data from YAML file
      */
     async loadTipsData() {
         try {
-            const response = await fetch('content/tips-data.json');
+            const response = await fetch('content/tips-data.yaml');
             if (!response.ok) {
                 throw new Error(`Failed to load tips data: ${response.status}`);
             }
-            this.tipsData = await response.json();
+            const yamlText = await response.text();
+            this.tipsData = this.parseYAML(yamlText);
             console.log('📄 Tips data loaded:', this.tipsData.tips.length, 'tips');
         } catch (error) {
             console.error('Error loading tips data:', error);
             throw error;
         }
+    }
+
+    /**
+     * Simple YAML parser for our specific format
+     */
+    parseYAML(yamlText) {
+        // This is a simplified YAML parser for our specific structure
+        // In production, you'd want to use a proper YAML library like js-yaml
+        
+        const data = { tips: [], products: [] };
+        const lines = yamlText.split('\n');
+        let currentSection = null;
+        let currentItem = null;
+        let descriptionLines = [];
+        let inDescription = false;
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const trimmed = line.trim();
+            
+            // Section headers
+            if (trimmed === 'tips:') {
+                currentSection = 'tips';
+                continue;
+            } else if (trimmed === 'products:') {
+                currentSection = 'products';
+                continue;
+            }
+            
+            // New item
+            if (trimmed.startsWith('- id:')) {
+                // Save previous item
+                if (currentItem) {
+                    if (descriptionLines.length > 0) {
+                        currentItem.description = descriptionLines.join('\n').trim();
+                        descriptionLines = [];
+                    }
+                    data[currentSection].push(currentItem);
+                }
+                
+                // Start new item
+                currentItem = { id: trimmed.split(': ')[1] };
+                inDescription = false;
+                continue;
+            }
+            
+            // Item properties
+            if (currentItem && trimmed.includes(': ')) {
+                const [key, ...valueParts] = trimmed.split(': ');
+                const value = valueParts.join(': ');
+                
+                if (key === 'description' && value === '|') {
+                    inDescription = true;
+                    continue;
+                } else if (key === 'description') {
+                    currentItem[key] = value;
+                    continue;
+                } else if (key === 'tags') {
+                    // Parse array format [item1, item2, item3]
+                    currentItem[key] = value.slice(1, -1).split(', ').map(tag => tag.trim());
+                } else if (key === 'rating' || key === 'isPublic') {
+                    currentItem[key] = key === 'isPublic' ? value === 'true' : parseInt(value);
+                } else {
+                    currentItem[key] = value;
+                }
+                continue;
+            }
+            
+            // Description content (indented lines after description: |)
+            if (inDescription && trimmed) {
+                descriptionLines.push(trimmed);
+            }
+        }
+        
+        // Save last item
+        if (currentItem) {
+            if (descriptionLines.length > 0) {
+                currentItem.description = descriptionLines.join('\n').trim();
+            }
+            data[currentSection].push(currentItem);
+        }
+        
+        return data;
     }
 
     /**
@@ -64,7 +148,7 @@ class TipsManager {
     }
 
 
-    /**
+how     /**
      * Setup event listeners for filtering
      */
     setupEventListeners() {

@@ -10,14 +10,19 @@ from datetime import datetime
 from collections import defaultdict
 
 def load_tips_data():
-    """Load tips data from JSON file"""
-    tips_file = "and-now/content/tips-data.json"
+    """Load tips data from YAML file"""
+    tips_file = "and-now/content/tips-data.yaml"
     if not os.path.exists(tips_file):
         print(f"❌ Tips data file not found: {tips_file}")
         return None
     
-    with open(tips_file, 'r', encoding='utf-8') as f:
-        return json.load(f)
+    try:
+        import yaml
+        with open(tips_file, 'r', encoding='utf-8') as f:
+            return yaml.safe_load(f)
+    except ImportError:
+        print("❌ PyYAML not installed. Install with: pip install PyYAML")
+        return None
 
 def calculate_category_counts(tips_data):
     """Calculate tip counts for each category"""
