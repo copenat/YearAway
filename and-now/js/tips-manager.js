@@ -16,7 +16,7 @@ class TipsManager {
             await this.loadTipsData();
             this.setupEventListeners();
             this.renderCategories();
-            this.renderTips();
+            this.renderAllTipsByCategory();
             this.renderProducts();
             console.log('✅ Tips Manager initialized successfully');
         } catch (error) {
@@ -67,6 +67,13 @@ class TipsManager {
                 this.showAllTips();
             }
         });
+
+        // Back to categories button
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('back-to-categories')) {
+                this.backToCategories();
+            }
+        });
     }
 
     /**
@@ -93,56 +100,48 @@ class TipsManager {
     }
 
     /**
-     * Render tips based on current filter
+     * Render all tips organized by category
      */
-    renderTips() {
-        const container = document.getElementById('featured-tips-container');
+    renderAllTipsByCategory() {
+        const container = document.getElementById('all-tips-container');
         if (!container || !this.tipsData) return;
 
-        const filteredTips = this.getFilteredTips();
-        const tipsHtml = filteredTips.map(tip => this.renderTipCard(tip)).join('');
+        let allTipsHtml = '';
 
-        container.innerHTML = `
-            <div class="filter-controls">
-                <button class="btn btn-secondary show-all-tips">Show All Tips</button>
-                <span class="filter-info">Showing ${filteredTips.length} of ${this.tipsData.tips.length} tips</span>
-            </div>
-            <div class="tips-grid">
-                ${tipsHtml}
-            </div>
-        `;
-    }
-
-    /**
-     * Get filtered tips based on current filter
-     */
-    getFilteredTips() {
-        if (!this.tipsData) return [];
-
-        let filtered = this.tipsData.tips;
-
-        // Filter by category
-        if (this.currentFilter !== 'all') {
-            const category = this.tipsData.categories.find(cat => cat.id === this.currentFilter);
-            if (category) {
-                filtered = filtered.filter(tip => 
-                    tip.category.toLowerCase().replace(' & ', '-').replace(' ', '-') === category.id
-                );
+        // Group tips by category
+        this.tipsData.categories.forEach(category => {
+            const categoryTips = this.tipsData.tips.filter(tip => tip.category === category.name);
+            
+            if (categoryTips.length > 0) {
+                const tipsHtml = categoryTips.map(tip => this.renderTipCard(tip)).join('');
+                
+                allTipsHtml += `
+                    <div class="category-section" id="category-${category.id}">
+                        <div class="category-header">
+                            <h3>${category.icon} ${category.name}</h3>
+                            <span class="category-tip-count">${categoryTips.length} tips</span>
+                        </div>
+                        <div class="tips-grid">
+                            ${tipsHtml}
+                        </div>
+                    </div>
+                `;
             }
-        }
+        });
 
-        // Filter by authentication status
-        if (this.authSystem && !this.authSystem.isMember()) {
-            filtered = filtered.filter(tip => tip.isPublic);
-        }
-
-        return filtered;
+        container.innerHTML = allTipsHtml;
     }
+
 
     /**
      * Render individual tip card
      */
     renderTipCard(tip) {
+        // Filter out members-only content for non-members
+        if (this.authSystem && !this.authSystem.isMember() && !tip.isPublic) {
+            return '';
+        }
+
         const memberOnlyClass = !tip.isPublic ? 'members-only' : '';
         const memberIndicator = !tip.isPublic ? '<div class="member-indicator">🔒 Members Only</div>' : '';
         const testNote = tip.testNote ? ` <strong>${tip.testNote}</strong>` : '';
@@ -168,17 +167,23 @@ class TipsManager {
     }
 
     /**
-     * Filter tips by category
+     * Scroll to category section
      */
     filterByCategory(categoryId) {
-        this.currentFilter = categoryId;
-        this.renderTips();
-        
         // Update active state
         document.querySelectorAll('.category-filter').forEach(btn => {
             btn.classList.remove('active');
         });
         document.querySelector(`[data-category="${categoryId}"]`).classList.add('active');
+        
+        // Scroll to the category section
+        const targetSection = document.getElementById(`category-${categoryId}`);
+        if (targetSection) {
+            targetSection.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
     }
 
     /**
@@ -190,16 +195,41 @@ class TipsManager {
     }
 
     /**
-     * Show all tips
+     * Show all tips (scroll to top)
      */
     showAllTips() {
-        this.currentFilter = 'all';
-        this.renderTips();
-        
         // Remove active state from category buttons
         document.querySelectorAll('.category-filter').forEach(btn => {
             btn.classList.remove('active');
         });
+        
+        // Scroll to the top of the tips section
+        const tipsSection = document.querySelector('.all-tips');
+        if (tipsSection) {
+            tipsSection.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    }
+
+    /**
+     * Back to categories (scroll to categories section)
+     */
+    backToCategories() {
+        // Remove active state from category buttons
+        document.querySelectorAll('.category-filter').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Scroll to the categories section
+        const categoriesSection = document.querySelector('.tips-categories');
+        if (categoriesSection) {
+            categoriesSection.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
     }
 
     /**
@@ -208,7 +238,7 @@ class TipsManager {
     setAuthSystem(authSystem) {
         this.authSystem = authSystem;
         // Re-render tips when auth status changes
-        this.renderTips();
+        this.renderAllTipsByCategory();
     }
 
     /**
@@ -250,7 +280,7 @@ class TipsManager {
             ...tipData
         });
         
-        this.renderTips();
+        this.renderAllTipsByCategory();
         this.renderCategories();
     }
 }
