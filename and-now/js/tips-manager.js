@@ -52,7 +52,7 @@ class TipsManager {
         // This is a simplified YAML parser for our specific structure
         // In production, you'd want to use a proper YAML library like js-yaml
         
-        const data = { tips: [], products: [] };
+        const data = { tips: [], products: [], categories: [] };
         const lines = yamlText.split('\n');
         let currentSection = null;
         let currentItem = null;
@@ -70,9 +70,12 @@ class TipsManager {
             } else if (trimmed === 'products:') {
                 currentSection = 'products';
                 continue;
+            } else if (trimmed === 'categories:') {
+                currentSection = 'categories';
+                continue;
             }
             
-            // New item
+            // New item (for tips and products)
             if (trimmed.startsWith('- id:')) {
                 // Save previous item
                 if (currentItem) {
@@ -86,6 +89,18 @@ class TipsManager {
                 // Start new item
                 currentItem = { id: trimmed.split(': ')[1] };
                 inDescription = false;
+                continue;
+            }
+            
+            // New category item (different format)
+            if (currentSection === 'categories' && trimmed.startsWith('- id:')) {
+                // Save previous item
+                if (currentItem) {
+                    data[currentSection].push(currentItem);
+                }
+                
+                // Start new category item
+                currentItem = { id: trimmed.split(': ')[1] };
                 continue;
             }
             
@@ -105,8 +120,27 @@ class TipsManager {
                     currentItem[key] = value.slice(1, -1).split(', ').map(tag => tag.trim());
                 } else if (key === 'rating' || key === 'isPublic') {
                     currentItem[key] = key === 'isPublic' ? value === 'true' : parseInt(value);
+                } else if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                    currentItem[key] = parseInt(value);
                 } else {
                     currentItem[key] = value;
+                }
+                continue;
+            }
+            
+            // Top-level properties (like lastUpdated, totalStats)
+            if (!currentItem && trimmed.includes(': ')) {
+                const [key, ...valueParts] = trimmed.split(': ');
+                const value = valueParts.join(': ');
+                
+                if (key === 'lastUpdated') {
+                    data[key] = value.replace(/'/g, ''); // Remove quotes
+                } else if (key === 'totalStats') {
+                    // This will be handled by the next lines
+                    continue;
+                } else if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                    if (!data.totalStats) data.totalStats = {};
+                    data.totalStats[key] = parseInt(value);
                 }
                 continue;
             }
