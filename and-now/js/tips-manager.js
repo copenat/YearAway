@@ -58,6 +58,7 @@ class TipsManager {
         let currentItem = null;
         let descriptionLines = [];
         let inDescription = false;
+        let inTotalStats = false;
         
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
@@ -128,22 +129,47 @@ class TipsManager {
                 continue;
             }
             
-            // Top-level properties (like lastUpdated, totalStats)
-            if (!currentItem && trimmed.includes(': ')) {
-                const [key, ...valueParts] = trimmed.split(': ');
-                const value = valueParts.join(': ');
-                
-                if (key === 'lastUpdated') {
-                    data[key] = value.replace(/'/g, ''); // Remove quotes
-                } else if (key === 'totalStats') {
-                    // This will be handled by the next lines
-                    continue;
-                } else if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
-                    if (!data.totalStats) data.totalStats = {};
-                    data.totalStats[key] = parseInt(value);
+        // Top-level properties (like lastUpdated, totalStats)
+        if (trimmed.includes('totalStats')) {
+            // Save the last item before processing totalStats
+            if (currentItem) {
+                if (descriptionLines.length > 0) {
+                    currentItem.description = descriptionLines.join('\n').trim();
+                    descriptionLines = [];
                 }
-                continue;
+                data[currentSection].push(currentItem);
+                currentItem = null;
             }
+        }
+        if (!currentItem && trimmed.includes(': ')) {
+            const [key, ...valueParts] = trimmed.split(': ');
+            const value = valueParts.join(': ');
+            
+            if (key === 'totalStats') {
+                // Initialize totalStats object
+                data.totalStats = {};
+                inTotalStats = true;
+                continue;
+            } else if (key === 'lastUpdated') {
+                data[key] = value.replace(/'/g, ''); // Remove quotes
+            } else if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                if (!data.totalStats) data.totalStats = {};
+                data.totalStats[key] = parseInt(value);
+            }
+            continue;
+        }
+        
+        // Handle indented properties under totalStats
+        if (inTotalStats && line.startsWith('  ') && trimmed.includes(': ')) {
+            const [key, ...valueParts] = trimmed.split(': ');
+            const value = valueParts.join(': ');
+            
+            if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                if (!data.totalStats) data.totalStats = {};
+                data.totalStats[key] = parseInt(value);
+            }
+            continue;
+        }
             
             // Description content (indented lines after description: |)
             if (inDescription && trimmed) {
