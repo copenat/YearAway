@@ -13,8 +13,11 @@ class TipsManager {
 
     async init() {
         try {
+            console.log('🚀 Starting Tips Manager initialization...');
             await this.loadTipsData();
+            console.log('📄 Tips data loaded:', this.tipsData);
             await this.loadCategoryCounts();
+            console.log('📊 Category counts loaded:', this.categoryCounts);
             this.setupEventListeners();
             this.renderCategories();
             this.renderAllTipsByCategory();
@@ -37,7 +40,9 @@ class TipsManager {
                 throw new Error(`Failed to load tips data: ${response.status}`);
             }
             const yamlText = await response.text();
+            console.log('📄 Raw YAML text length:', yamlText.length);
             this.tipsData = this.parseYAML(yamlText);
+            console.log('📄 Parsed tips data:', this.tipsData);
             console.log('📄 Tips data loaded:', this.tipsData.tips.length, 'tips');
         } catch (error) {
             console.error('Error loading tips data:', error);
@@ -200,7 +205,9 @@ class TipsManager {
                 return;
             }
             const yamlText = await response.text();
+            console.log('📊 Raw category YAML text length:', yamlText.length);
             this.categoryCounts = this.parseYAML(yamlText);
+            console.log('📊 Parsed category counts:', this.categoryCounts);
             console.log('📊 Category counts loaded:', this.categoryCounts.categories.length, 'categories');
         } catch (error) {
             console.warn('⚠️ Error loading category counts:', error);
