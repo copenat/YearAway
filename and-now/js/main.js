@@ -315,6 +315,17 @@ window.addEventListener('offline', () => {
     }
 });
 
+// Connect authentication system to tips manager
+document.addEventListener('DOMContentLoaded', () => {
+    // Wait for both systems to initialize
+    setTimeout(() => {
+        if (window.authSystem && window.tipsManager) {
+            window.tipsManager.setAuthSystem(window.authSystem);
+            console.log('🔗 Auth system connected to tips manager');
+        }
+    }, 100);
+});
+
 // Export for use in other scripts
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = YearAwayApp;

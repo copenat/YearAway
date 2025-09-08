@@ -1071,3 +1071,44 @@ input:focus {
         max-width: 200px;
     }
 }
+
+/* Tips Filtering Styles */
+.filter-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.filter-info {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Category Filter Active State */
+.category-filter.active {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.category-filter.active .category-icon {
+    transform: scale(1.1);
+}
+
+/* Tag Filter Styles */
+.tag-filter {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tag-filter:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.05);
+}

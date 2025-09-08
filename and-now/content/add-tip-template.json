@@ -1,0 +1,31 @@
+{
+  "id": "unique-tip-id",
+  "title": "Your Tip Title",
+  "description": "Your tip description goes here. Keep it concise but informative.",
+  "category": "Transportation",
+  "categoryIcon": "✈️",
+  "tags": ["tag1", "tag2", "tag3"],
+  "rating": 5,
+  "isPublic": true
+}
+
+/* 
+Available Categories & Icons:
+- Transportation: ✈️
+- Accommodation: 🏨  
+- Food & Dining: 🍽️
+- Packing: 🎒
+- Budget: 💰
+- Technology: 📱
+
+Tag Examples:
+- flights, hotels, restaurants, packing, budget, apps
+- exclusive, local, insider, personal, secret, hack
+- deals, upgrades, space-saving, organization
+
+To add a new tip:
+1. Copy this template
+2. Fill in your details
+3. Add it to the "tips" array in tips-data.json
+4. Update the category tip count in the "categories" array
+*/
