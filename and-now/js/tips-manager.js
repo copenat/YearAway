@@ -63,6 +63,7 @@ class TipsManager {
         }
     }
 
+
     /**
      * Setup event listeners for filtering
      */
