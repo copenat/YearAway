@@ -83,14 +83,25 @@ class TipsManager {
         const container = document.getElementById('tips-categories-container');
         if (!container || !this.tipsData) return;
 
-        const categoriesHtml = this.tipsData.categories.map(category => `
-            <div class="category-card category-filter" data-category="${category.id}">
-                <div class="category-icon">${category.icon}</div>
-                <h3>${category.name}</h3>
-                <p>${category.description}</p>
-                <div class="tip-count">${category.tipCount} Tips</div>
-            </div>
-        `).join('');
+        const categoriesHtml = this.tipsData.categories.map(category => {
+            // Count visible tips for this category
+            const categoryTips = this.tipsData.tips.filter(tip => tip.category === category.name);
+            const visibleTips = categoryTips.filter(tip => {
+                if (this.authSystem && !this.authSystem.isMember() && !tip.isPublic) {
+                    return false;
+                }
+                return true;
+            });
+            
+            return `
+                <div class="category-card category-filter" data-category="${category.id}">
+                    <div class="category-icon">${category.icon}</div>
+                    <h3>${category.name}</h3>
+                    <p>${category.description}</p>
+                    <div class="tip-count">${visibleTips.length} Tips</div>
+                </div>
+            `;
+        }).join('');
 
         container.innerHTML = `
             <div class="categories-grid">
@@ -112,14 +123,22 @@ class TipsManager {
         this.tipsData.categories.forEach(category => {
             const categoryTips = this.tipsData.tips.filter(tip => tip.category === category.name);
             
-            if (categoryTips.length > 0) {
-                const tipsHtml = categoryTips.map(tip => this.renderTipCard(tip)).join('');
+            // Filter tips based on authentication status
+            const visibleTips = categoryTips.filter(tip => {
+                if (this.authSystem && !this.authSystem.isMember() && !tip.isPublic) {
+                    return false;
+                }
+                return true;
+            });
+            
+            if (visibleTips.length > 0) {
+                const tipsHtml = visibleTips.map(tip => this.renderTipCard(tip)).join('');
                 
                 allTipsHtml += `
                     <div class="category-section" id="category-${category.id}">
                         <div class="category-header">
                             <h3>${category.icon} ${category.name}</h3>
-                            <span class="category-tip-count">${categoryTips.length} tips</span>
+                            <span class="category-tip-count">${visibleTips.length} tips</span>
                         </div>
                         <div class="tips-grid">
                             ${tipsHtml}
@@ -237,7 +256,8 @@ class TipsManager {
      */
     setAuthSystem(authSystem) {
         this.authSystem = authSystem;
-        // Re-render tips when auth status changes
+        // Re-render both categories and tips when auth status changes
+        this.renderCategories();
         this.renderAllTipsByCategory();
     }
 
@@ -280,8 +300,8 @@ class TipsManager {
             ...tipData
         });
         
-        this.renderAllTipsByCategory();
         this.renderCategories();
+        this.renderAllTipsByCategory();
     }
 }
 
