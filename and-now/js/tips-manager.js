@@ -440,6 +440,8 @@ class TipsManager {
 
         const isMember = this.authSystem ? this.authSystem.isMember() : false;
         console.log('🎯 Rendering tips - Auth system:', !!this.authSystem, 'Is member:', isMember);
+        console.log('🎯 Total tips available:', this.tipsData.tips.length);
+        console.log('🎯 Tips data:', this.tipsData.tips.map(tip => ({id: tip.id, title: tip.title, category: tip.category, isPublic: tip.isPublic})));
 
         let allTipsHtml = '';
 
@@ -453,6 +455,12 @@ class TipsManager {
                     return false;
                 }
                 return true;
+            });
+            
+            console.log(`🎯 Category ${category.name}:`, {
+                categoryTips: categoryTips.length,
+                visibleTips: visibleTips.length,
+                tips: categoryTips.map(tip => ({id: tip.id, title: tip.title, isPublic: tip.isPublic}))
             });
             
             if (visibleTips.length > 0) {
@@ -481,6 +489,7 @@ class TipsManager {
             }
         });
 
+        console.log('🎯 Final HTML length:', allTipsHtml.length);
         container.innerHTML = allTipsHtml;
     }
 
