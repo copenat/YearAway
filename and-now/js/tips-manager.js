@@ -96,7 +96,9 @@ class TipsManager {
                 const value = valueParts.join(': ');
                 
                 if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
-                    currentItem[key] = parseInt(value);
+                    const parsedValue = parseInt(value);
+                    console.log(`🔢 Parsing ${key}: "${value}" -> ${parsedValue} (type: ${typeof parsedValue})`);
+                    currentItem[key] = parsedValue;
                 } else {
                     currentItem[key] = value;
                 }
@@ -381,14 +383,23 @@ class TipsManager {
                     publicTips,
                     membersOnlyTips,
                     totalTips,
-                    category
+                    category,
+                    membersOnlyTipsType: typeof membersOnlyTips,
+                    membersOnlyTipsValue: membersOnlyTips,
+                    membersOnlyTipsGreaterThanZero: membersOnlyTips > 0,
+                    membersOnlyTipsStrictGreaterThanZero: membersOnlyTips > 0
                 });
             }
             
             // Create tip count display - always show public tips + members-only indicator
             let tipCountHtml = `<div class="tip-count">${publicTips} Tips</div>`;
+            
+            // Debug all categories with members-only tips
             if (membersOnlyTips > 0) {
+                console.log(`🔒 Category ${category.id} has ${membersOnlyTips} members-only tips`);
                 tipCountHtml += `<div class="members-only-count">+${membersOnlyTips} Members Only</div>`;
+            } else {
+                console.log(`📝 Category ${category.id} has no members-only tips (${membersOnlyTips})`);
             }
             
             // Debug logging for accommodation category HTML
