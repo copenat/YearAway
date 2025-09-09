@@ -279,6 +279,9 @@ class TipsManager {
             return;
         }
 
+        console.log('🔍 About to map categories:', this.categoryCounts.categories.length, 'categories');
+        console.log('🔍 First category:', this.categoryCounts.categories[0]);
+
         const categoriesHtml = this.categoryCounts.categories.map(category => {
             // Use pre-calculated counts from category-counts.yaml
             const publicTips = category.publicTips;
