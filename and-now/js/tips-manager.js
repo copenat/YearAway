@@ -285,10 +285,25 @@ class TipsManager {
             const membersOnlyTips = category.membersOnlyTips;
             const totalTips = category.totalTips;
             
+            // Debug logging for accommodation category
+            if (category.id === 'accommodation') {
+                console.log('🏨 Accommodation category data:', {
+                    publicTips,
+                    membersOnlyTips,
+                    totalTips,
+                    category
+                });
+            }
+            
             // Create tip count display - always show public tips + members-only indicator
             let tipCountHtml = `<div class="tip-count">${publicTips} Tips</div>`;
             if (membersOnlyTips > 0) {
                 tipCountHtml += `<div class="members-only-count">+${membersOnlyTips} Members Only</div>`;
+            }
+            
+            // Debug logging for accommodation category HTML
+            if (category.id === 'accommodation') {
+                console.log('🏨 Accommodation HTML:', tipCountHtml);
             }
             
             return `
