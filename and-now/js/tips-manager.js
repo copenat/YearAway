@@ -120,6 +120,10 @@ class TipsManager {
                     continue;
                 } else if (key === 'lastUpdated') {
                     data[key] = value.replace(/'/g, ''); // Remove quotes
+                } else if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                    // These should only be in totalStats, not at top level
+                    if (!data.totalStats) data.totalStats = {};
+                    data.totalStats[key] = parseInt(value);
                 }
                 continue;
             }
