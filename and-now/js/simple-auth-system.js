@@ -197,10 +197,9 @@ class SimpleYearAwayAuth {
 document.addEventListener('DOMContentLoaded', () => {
     window.yearawayAuth = new SimpleYearAwayAuth();
     
-    // Add some helpful info to console
+    // Add some helpful info to console (without exposing sensitive data)
     console.log('🔐 YearAway Authentication System Loaded');
-    console.log('Valid tokens:', window.yearawayAuth.validTokens);
-    console.log('Current token:', window.yearawayAuth.getCurrentToken());
+    console.log('Current token:', window.yearawayAuth.getCurrentToken() ? 'Present' : 'None');
 });
 
 // Export for use in other scripts

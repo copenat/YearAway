@@ -41,8 +41,15 @@ categories:
   publicTips: 1
   membersOnlyTips: 1
   totalTips: 2
+- id: products
+  name: Products
+  icon: 🛍️
+  description: Recommended travel products and gear
+  publicTips: 3
+  membersOnlyTips: 0
+  totalTips: 3
 lastUpdated: '2025-09-08T21:02:42.759210Z'
 totalStats:
-  publicTips: 5
+  publicTips: 8
   membersOnlyTips: 3
-  totalTips: 8
+  totalTips: 11

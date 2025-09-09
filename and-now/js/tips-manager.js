@@ -18,12 +18,10 @@ class TipsManager {
             // Check if containers exist
             const categoriesContainer = document.getElementById('tips-categories-container');
             const tipsContainer = document.getElementById('all-tips-container');
-            const productsContainer = document.getElementById('travel-products-container');
             
             console.log('📦 Container check:', {
                 categories: !!categoriesContainer,
-                tips: !!tipsContainer,
-                products: !!productsContainer
+                tips: !!tipsContainer
             });
             
             await this.loadCategoryCounts();
@@ -58,7 +56,6 @@ class TipsManager {
             
             this.renderCategories();
             this.renderAllTipsByCategory();
-            this.renderProducts();
             
             // Dispatch event to notify auth system that members-only content was created
             console.log('🔔 Dispatching membersContentCreated event after initial render');
@@ -90,7 +87,6 @@ class TipsManager {
             // Initialize tips data with public tips
             this.tipsData = {
                 tips: publicData.tips || [],
-                products: publicData.products || [],
                 categories: publicData.categories || []
             };
             
@@ -217,7 +213,7 @@ class TipsManager {
         // This is a simplified YAML parser for our specific structure
         // In production, you'd want to use a proper YAML library like js-yaml
         
-        const data = { tips: [], products: [], categories: [] };
+        const data = { tips: [], categories: [] };
         const lines = yamlText.split('\n');
         let currentSection = null;
         let currentItem = null;
@@ -231,12 +227,27 @@ class TipsManager {
             
             // Section headers
             if (trimmed === 'tips:') {
+                // Save previous item before switching sections
+                if (currentItem) {
+                    if (descriptionLines.length > 0) {
+                        currentItem.description = descriptionLines.join('\n').trim();
+                        descriptionLines = [];
+                    }
+                    data[currentSection].push(currentItem);
+                    currentItem = null;
+                }
                 currentSection = 'tips';
                 continue;
-            } else if (trimmed === 'products:') {
-                currentSection = 'products';
-                continue;
             } else if (trimmed === 'categories:') {
+                // Save previous item before switching sections
+                if (currentItem) {
+                    if (descriptionLines.length > 0) {
+                        currentItem.description = descriptionLines.join('\n').trim();
+                        descriptionLines = [];
+                    }
+                    data[currentSection].push(currentItem);
+                    currentItem = null;
+                }
                 currentSection = 'categories';
                 continue;
             }
@@ -277,7 +288,8 @@ class TipsManager {
                 } else if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
                     currentItem[key] = parseInt(value);
                 } else {
-                    currentItem[key] = value;
+                    // Remove quotes from string values (common in YAML)
+                    currentItem[key] = value.replace(/^["']|["']$/g, '');
                 }
                 continue;
             }
@@ -542,20 +554,48 @@ class TipsManager {
             this.categoryCounts.categories.find(cat => cat.name === tip.category) : null;
         const categoryIcon = category ? category.icon : '📝';
 
-        return `
-            <div class="tip-card ${memberOnlyClass}">
-                ${memberIndicator}
-                <div class="tip-header">
-                    <div class="tip-category">${categoryIcon} ${tip.category}</div>
-                    <div class="tip-rating">${'⭐'.repeat(tip.rating)}</div>
+        // Check if this is a product (has price and icon properties)
+        const isProduct = tip.price && tip.icon;
+        
+        if (isProduct) {
+            // Render as product card
+            return `
+                <div class="tip-card product-card ${memberOnlyClass}">
+                    ${memberIndicator}
+                    <div class="product-image">
+                        <div class="product-placeholder">${tip.icon}</div>
+                    </div>
+                    <div class="product-content">
+                        <div class="tip-header">
+                            <div class="tip-category">${categoryIcon} ${tip.category}</div>
+                            <div class="tip-rating">${'⭐'.repeat(tip.rating)}</div>
+                        </div>
+                        <h3>${tip.title}</h3>
+                        <p>${tip.description}${testNote}</p>
+                        <div class="product-price">${tip.price}</div>
+                        <div class="tip-tags">
+                            ${tip.tags.map(tag => `<span class="tag tag-filter" data-tag="${tag}">${tag}</span>`).join('')}
+                        </div>
+                    </div>
                 </div>
-                <h3>${tip.title}</h3>
-                <p>${tip.description}${testNote}</p>
-                <div class="tip-tags">
-                    ${tip.tags.map(tag => `<span class="tag tag-filter" data-tag="${tag}">${tag}</span>`).join('')}
+            `;
+        } else {
+            // Render as regular tip card
+            return `
+                <div class="tip-card ${memberOnlyClass}">
+                    ${memberIndicator}
+                    <div class="tip-header">
+                        <div class="tip-category">${categoryIcon} ${tip.category}</div>
+                        <div class="tip-rating">${'⭐'.repeat(tip.rating)}</div>
+                    </div>
+                    <h3>${tip.title}</h3>
+                    <p>${tip.description}${testNote}</p>
+                    <div class="tip-tags">
+                        ${tip.tags.map(tag => `<span class="tag tag-filter" data-tag="${tag}">${tag}</span>`).join('')}
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
     }
 
     /**
@@ -678,33 +718,6 @@ class TipsManager {
         }
     }
 
-    /**
-     * Render products section
-     */
-    renderProducts() {
-        const container = document.getElementById('travel-products-container');
-        if (!container || !this.tipsData || !this.tipsData.products) return;
-
-        const productsHtml = this.tipsData.products.map(product => `
-            <div class="product-card">
-                <div class="product-image">
-                    <div class="product-placeholder">${product.icon}</div>
-                </div>
-                <div class="product-content">
-                    <h3>${product.name}</h3>
-                    <p>${product.description}</p>
-                    <div class="product-rating">${'⭐'.repeat(product.rating)}</div>
-                    <div class="product-price">${product.price}</div>
-                </div>
-            </div>
-        `).join('');
-
-        container.innerHTML = `
-            <div class="products-grid">
-                ${productsHtml}
-            </div>
-        `;
-    }
 
     /**
      * Add new tip (for future use)

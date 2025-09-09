@@ -45,24 +45,35 @@ tips:
     tags: [insurance, safety, budget]
     rating: 5
 
-products:
   - id: travel-backpack
-    name: Travel Backpack
-    description: Lightweight, durable backpack perfect for carry-on travel
+    title: Travel Backpack
+    description: |
+      Lightweight, durable backpack perfect for carry-on travel.
+      Features multiple compartments and comfortable straps for long journeys.
+    category: Products
+    tags: [backpack, luggage, carry-on]
     rating: 5
     price: "$89.99"
     icon: "📦"
 
   - id: universal-adapter
-    name: Universal Adapter
-    description: Works in 150+ countries with USB ports
+    title: Universal Adapter
+    description: |
+      Works in 150+ countries with USB ports.
+      Essential for keeping your devices charged while traveling internationally.
+    category: Products
+    tags: [adapter, charging, electronics]
     rating: 5
     price: "$24.99"
     icon: "🔌"
 
   - id: noise-canceling-headphones
-    name: Noise-Canceling Headphones
-    description: Perfect for long flights and noisy environments
+    title: Noise-Canceling Headphones
+    description: |
+      Perfect for long flights and noisy environments.
+      High-quality sound and excellent noise cancellation for comfortable travel.
+    category: Products
+    tags: [headphones, audio, comfort]
     rating: 5
     price: "$199.99"
     icon: "🎧"
