@@ -1133,11 +1133,43 @@ input:focus {
     border-bottom: 2px solid var(--primary-brown);
 }
 
+.category-header h2 {
+    margin: 0;
+    color: var(--primary-brown);
+    font-size: 2rem;
+    font-weight: 600;
+}
+
 .category-header h3 {
     margin: 0;
     color: var(--primary-brown);
     font-size: 1.8rem;
     font-weight: 600;
+}
+
+.category-header p {
+    margin: 0;
+    color: var(--text-gray);
+    font-size: 1rem;
+}
+
+.no-tips-message {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--light-gray);
+    border-radius: var(--radius-lg);
+    margin: 2rem 0;
+}
+
+.no-tips-message h3 {
+    color: var(--primary-brown);
+    margin-bottom: 1rem;
+}
+
+.back-to-all {
+    text-align: center;
+    margin: 2rem 0;
+    padding: 1rem 0;
 }
 
 .category-tip-count {

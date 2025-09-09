@@ -599,23 +599,78 @@ class TipsManager {
     }
 
     /**
-     * Scroll to category section
+     * Filter tips by category and scroll to tips section
      */
     filterByCategory(categoryId) {
+        console.log('🎯 Filtering by category:', categoryId);
+        
         // Update active state
         document.querySelectorAll('.category-filter').forEach(btn => {
             btn.classList.remove('active');
         });
         document.querySelector(`[data-category="${categoryId}"]`).classList.add('active');
         
-        // Scroll to the category section
-        const targetSection = document.getElementById(`category-${categoryId}`);
-        if (targetSection) {
-            targetSection.scrollIntoView({ 
+        // Get category name from category counts
+        const category = this.categoryCounts?.categories.find(cat => cat.id === categoryId);
+        const categoryName = category ? category.name : categoryId;
+        
+        // Filter tips to show only this category
+        this.renderTipsByCategory(categoryName);
+        
+        // Scroll to the tips section
+        const tipsSection = document.querySelector('.all-tips');
+        if (tipsSection) {
+            tipsSection.scrollIntoView({ 
                 behavior: 'smooth',
                 block: 'start'
             });
         }
+    }
+
+    /**
+     * Render tips filtered by category
+     */
+    renderTipsByCategory(categoryName) {
+        const container = document.getElementById('all-tips-container');
+        if (!container || !this.tipsData || !this.categoryCounts) return;
+
+        const isMember = this.authSystem ? this.authSystem.isMember() : false;
+        console.log('🎯 Rendering filtered tips for category:', categoryName, 'Is member:', isMember);
+
+        // Filter tips by category
+        const categoryTips = this.tipsData.tips.filter(tip => tip.category === categoryName);
+        
+        if (categoryTips.length === 0) {
+            container.innerHTML = `
+                <div class="no-tips-message">
+                    <h3>No tips found for ${categoryName}</h3>
+                    <p>Try selecting a different category or check back later for new tips.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Render tips for this category
+        const tipsHtml = categoryTips.map(tip => this.renderTipCard(tip)).join('');
+        
+        container.innerHTML = `
+            <div class="category-header">
+                <h2>${categoryName} Tips</h2>
+                <p>Showing ${categoryTips.length} tip${categoryTips.length === 1 ? '' : 's'}</p>
+            </div>
+            <div class="tips-grid">
+                ${tipsHtml}
+            </div>
+            <div class="back-to-all">
+                <button class="btn btn-secondary" onclick="window.tipsManager.showAllTips()">
+                    ← Back to All Tips
+                </button>
+            </div>
+        `;
+
+        // Dispatch event to notify auth system that members-only content was created
+        console.log('🔔 Dispatching membersContentCreated event after category filter');
+        document.dispatchEvent(new CustomEvent('yearaway:membersContentCreated'));
     }
 
     /**
@@ -627,13 +682,18 @@ class TipsManager {
     }
 
     /**
-     * Show all tips (scroll to top)
+     * Show all tips (restore full view)
      */
     showAllTips() {
+        console.log('🎯 Showing all tips');
+        
         // Remove active state from category buttons
         document.querySelectorAll('.category-filter').forEach(btn => {
             btn.classList.remove('active');
         });
+        
+        // Re-render all tips
+        this.renderAllTipsByCategory();
         
         // Scroll to the top of the tips section
         const tipsSection = document.querySelector('.all-tips');
