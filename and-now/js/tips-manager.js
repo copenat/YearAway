@@ -285,12 +285,17 @@ class TipsManager {
             const membersOnlyTips = category.membersOnlyTips;
             const totalTips = category.totalTips;
             
-            // Create tip count display - always show public tips
-            let tipCountHtml = `<div class="tip-count">${publicTips} Tips</div>`;
-            
-            // Add members-only count if there are any
-            if (membersOnlyTips > 0) {
-                tipCountHtml += `<div class="members-only-count">+${membersOnlyTips} Members Only</div>`;
+            // Create tip count display based on authentication status
+            let tipCountHtml;
+            if (this.authSystem && this.authSystem.isMember()) {
+                // Members see total tips
+                tipCountHtml = `<div class="tip-count">${totalTips} Tips</div>`;
+            } else {
+                // Non-members see public tips + members-only indicator
+                tipCountHtml = `<div class="tip-count">${publicTips} Tips</div>`;
+                if (membersOnlyTips > 0) {
+                    tipCountHtml += `<div class="members-only-count">+${membersOnlyTips} Members Only</div>`;
+                }
             }
             
             return `
