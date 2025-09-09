@@ -267,12 +267,17 @@ class TipsManager {
      * Render category cards
      */
     renderCategories() {
-        const container = document.getElementById('tips-categories-container');
-        console.log('🎯 renderCategories called - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
-        console.log('🎯 Full categoryCounts object:', this.categoryCounts);
-        
-        if (!container || !this.categoryCounts) {
-            console.warn('⚠️ Cannot render categories - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
+        try {
+            const container = document.getElementById('tips-categories-container');
+            console.log('🎯 renderCategories called - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
+            console.log('🎯 Full categoryCounts object:', this.categoryCounts);
+            
+            if (!container || !this.categoryCounts) {
+                console.warn('⚠️ Cannot render categories - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
+                return;
+            }
+        } catch (error) {
+            console.error('❌ Error in renderCategories:', error);
             return;
         }
 
