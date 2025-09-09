@@ -425,6 +425,16 @@ class TipsManager {
             if (visibleTips.length > 0) {
                 const tipsHtml = visibleTips.map(tip => this.renderTipCard(tip)).join('');
                 
+                // Debug logging for transportation category
+                if (category.id === 'transportation') {
+                    console.log('🚗 Transportation category tips:', {
+                        categoryTips: categoryTips.length,
+                        visibleTips: visibleTips.length,
+                        isMember: isMember,
+                        authSystem: !!this.authSystem
+                    });
+                }
+                
                 allTipsHtml += `
                     <div class="category-section" id="category-${category.id}">
                         <div class="category-header">
