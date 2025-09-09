@@ -52,21 +52,16 @@ class SimpleYearAwayAuth {
      * Login with token
      */
     login(token) {
-        console.log('🔑 Login attempt with token:', token);
         const cleanToken = token.trim().toUpperCase();
-        console.log('🔑 Cleaned token:', cleanToken);
         
         if (this.validateToken(cleanToken)) {
-            console.log('✅ Token is valid, logging in...');
             localStorage.setItem(this.tokenKey, cleanToken);
             localStorage.setItem(this.memberStatusKey, 'true');
             this.setMemberStatus(true);
             this.showMemberContent();
             this.showNotification('Welcome back, member! 🎉', 'success');
-            console.log('🎉 Login successful! Current token:', this.getCurrentToken());
             return true;
         } else {
-            console.log('❌ Invalid token');
             this.showNotification('Invalid token. Please check and try again. ❌', 'error');
             return false;
         }

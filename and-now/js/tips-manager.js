@@ -702,12 +702,23 @@ class TipsManager {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 DOM loaded, initializing TipsManager...');
-    try {
-        window.tipsManager = new TipsManager();
-        console.log('📝 YearAway Tips Manager Initialized');
-    } catch (error) {
-        console.error('❌ Error initializing TipsManager:', error);
-    }
+    
+    // Wait for authentication system to be ready
+    const initTipsManager = () => {
+        if (window.yearawayAuth) {
+            try {
+                window.tipsManager = new TipsManager();
+                console.log('📝 YearAway Tips Manager Initialized');
+            } catch (error) {
+                console.error('❌ Error initializing TipsManager:', error);
+            }
+        } else {
+            // Try again after a short delay
+            setTimeout(initTipsManager, 100);
+        }
+    };
+    
+    initTipsManager();
 });
 
 // Export for use in other scripts

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .log { background: #f0f0f0; padding: 10px; margin: 5px 0; border-radius: 5px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+    </style>
+</head>
+<body>
+    <h1>Live Test - Hints & Tips</h1>
+    
+    <!-- Simulate the actual page structure -->
+    <section class="tips-categories">
+        <h2>Travel Categories</h2>
+        <div id="tips-categories-container">
+            <!-- Content loaded dynamically -->
+        </div>
+    </section>
+    
+    <section class="all-tips">
+        <h2>All Travel Tips</h2>
+        <div id="all-tips-container">
+            <!-- Content loaded dynamically -->
+        </div>
+    </section>
+    
+    <section class="recommended-products">
+        <h2>Recommended Products</h2>
+        <div id="products-container">
+            <!-- Content loaded dynamically -->
+        </div>
+    </section>
+    
+    <div id="logs"></div>
+    
+    <script>
+        const logs = document.getElementById('logs');
+        
+        function addLog(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logs.appendChild(div);
+            console.log(message);
+        }
+        
+        // Override console methods
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+        
+        // Test TipsManager
+        function testTipsManager() {
+            addLog('Testing TipsManager...', 'info');
+            
+            if (window.tipsManager) {
+                addLog('TipsManager exists', 'success');
+                addLog(`Tips data: ${window.tipsManager.tipsData ? 'loaded' : 'not loaded'}`, 'info');
+                addLog(`Category counts: ${window.tipsManager.categoryCounts ? 'loaded' : 'not loaded'}`, 'info');
+                
+                // Check if containers have content
+                const categoriesContainer = document.getElementById('tips-categories-container');
+                const tipsContainer = document.getElementById('all-tips-container');
+                const productsContainer = document.getElementById('products-container');
+                
+                addLog(`Categories container children: ${categoriesContainer.children.length}`, 'info');
+                addLog(`Tips container children: ${tipsContainer.children.length}`, 'info');
+                addLog(`Products container children: ${productsContainer.children.length}`, 'info');
+                
+            } else {
+                addLog('TipsManager not found', 'error');
+            }
+        }
+        
+        // Run test
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('DOM loaded, starting test...', 'info');
+            
+            // Test TipsManager after a delay
+            setTimeout(testTipsManager, 3000);
+        });
+    </script>
+    
+    <!-- Load the actual scripts -->
+    <script src="https://develop.yearaway.pages.dev/and-now/js/simple-auth-system.js"></script>
+    <script src="https://develop.yearaway.pages.dev/and-now/js/main.js"></script>
+    <script src="https://develop.yearaway.pages.dev/and-now/js/tips-manager.js"></script>
+</body>
+</html>

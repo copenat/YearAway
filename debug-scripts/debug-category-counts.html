@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Category Counts</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .category-card { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
+        .tip-count { font-weight: bold; color: #333; }
+        .members-only-count { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Debug Category Counts Display</h1>
+    
+    <div class="debug-section">
+        <h2>Raw Category Counts Data</h2>
+        <div id="raw-data"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Parsed Category Counts</h2>
+        <div id="parsed-data"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Rendered Categories</h2>
+        <div id="rendered-categories"></div>
+    </div>
+
+    <script>
+        // Copy the parseCategoryCountsYAML method from tips-manager.js
+        function parseCategoryCountsYAML(yamlText) {
+            const data = { categories: [], totalStats: {}, lastUpdated: null };
+            const lines = yamlText.split('\n');
+            let currentItem = null;
+            let inTotalStats = false;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                const trimmed = line.trim();
+                
+                // Skip empty lines
+                if (!trimmed) continue;
+                
+                // New category item
+                if (trimmed.startsWith('- id:')) {
+                    // Save previous item
+                    if (currentItem) {
+                        data.categories.push(currentItem);
+                    }
+                    
+                    // Start new item
+                    currentItem = { id: trimmed.split(': ')[1] };
+                    continue;
+                }
+                
+                // Category item properties
+                if (currentItem && trimmed.includes(': ')) {
+                    const [key, ...valueParts] = trimmed.split(': ');
+                    const value = valueParts.join(': ');
+                    
+                    if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                        currentItem[key] = parseInt(value);
+                    } else {
+                        currentItem[key] = value;
+                    }
+                    continue;
+                }
+                
+                // Top-level properties
+                if (!currentItem && trimmed.includes(': ')) {
+                    const [key, ...valueParts] = trimmed.split(': ');
+                    const value = valueParts.join(': ');
+                    
+                    if (key === 'totalStats') {
+                        inTotalStats = true;
+                        continue;
+                    } else if (key === 'lastUpdated') {
+                        data[key] = value.replace(/'/g, ''); // Remove quotes
+                    }
+                    continue;
+                }
+                
+                // Handle indented properties under totalStats
+                if (inTotalStats && line.startsWith('  ') && trimmed.includes(': ')) {
+                    const [key, ...valueParts] = trimmed.split(': ');
+                    const value = valueParts.join(': ');
+                    
+                    if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                        data.totalStats[key] = parseInt(value);
+                    }
+                    continue;
+                }
+            }
+            
+            // Save last item
+            if (currentItem) {
+                data.categories.push(currentItem);
+            }
+            
+            return data;
+        }
+
+        // Test the parsing and rendering
+        async function testCategoryCounts() {
+            try {
+                // Load the raw YAML
+                const response = await fetch('../and-now/content/category-counts.yaml');
+                const yamlText = await response.text();
+                
+                // Display raw data
+                document.getElementById('raw-data').innerHTML = `<pre>${yamlText}</pre>`;
+                
+                // Parse the data
+                const parsedData = parseCategoryCountsYAML(yamlText);
+                
+                // Display parsed data
+                document.getElementById('parsed-data').innerHTML = `
+                    <pre>${JSON.stringify(parsedData, null, 2)}</pre>
+                `;
+                
+                // Test the rendering logic
+                const categoriesHtml = parsedData.categories.map(category => {
+                    const publicTips = category.publicTips;
+                    const membersOnlyTips = category.membersOnlyTips;
+                    const totalTips = category.totalTips;
+                    
+                    console.log(`Category ${category.id}:`, {
+                        publicTips,
+                        membersOnlyTips,
+                        totalTips,
+                        membersOnlyTipsType: typeof membersOnlyTips,
+                        membersOnlyTipsGreaterThanZero: membersOnlyTips > 0
+                    });
+                    
+                    // Create tip count display - always show public tips + members-only indicator
+                    let tipCountHtml = `<div class="tip-count">${publicTips} Tips</div>`;
+                    if (membersOnlyTips > 0) {
+                        tipCountHtml += `<div class="members-only-count">+${membersOnlyTips} Members Only</div>`;
+                    }
+                    
+                    return `
+                        <div class="category-card">
+                            <h3>${category.icon} ${category.name}</h3>
+                            <p>${category.description}</p>
+                            ${tipCountHtml}
+                            <div style="font-size: 12px; color: #666;">
+                                Debug: public=${publicTips}, members=${membersOnlyTips}, total=${totalTips}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('rendered-categories').innerHTML = categoriesHtml;
+                
+            } catch (error) {
+                console.error('Error testing category counts:', error);
+                document.getElementById('parsed-data').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        // Run the test when page loads
+        testCategoryCounts();
+    </script>
+</body>
+</html>
