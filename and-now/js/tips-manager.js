@@ -383,6 +383,9 @@ class TipsManager {
         const container = document.getElementById('all-tips-container');
         if (!container || !this.tipsData || !this.categoryCounts) return;
 
+        const isMember = this.authSystem ? this.authSystem.isMember() : false;
+        console.log('🎯 Rendering tips - Auth system:', !!this.authSystem, 'Is member:', isMember);
+
         let allTipsHtml = '';
 
         // Group tips by category using category counts
@@ -543,9 +546,14 @@ class TipsManager {
      */
     setAuthSystem(authSystem) {
         this.authSystem = authSystem;
+        console.log('🔗 Auth system connected to tips manager');
+        
         // Re-render both categories and tips when auth status changes
-        this.renderCategories();
-        this.renderAllTipsByCategory();
+        if (this.tipsData && this.categoryCounts) {
+            console.log('🔄 Re-rendering with auth system connected');
+            this.renderCategories();
+            this.renderAllTipsByCategory();
+        }
     }
 
     /**
