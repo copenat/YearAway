@@ -338,7 +338,6 @@ class TipsManager {
                     <div class="category-section" id="category-${category.id}">
                         <div class="category-header">
                             <h3>${category.icon} ${category.name}</h3>
-                            <span class="category-tip-count">${visibleTips.length} tips</span>
                         </div>
                         <div class="tips-grid">
                             ${tipsHtml}
