@@ -31,6 +31,13 @@ class TipsManager {
             await this.loadCategoryCounts();
             console.log('📊 Category counts loaded:', this.categoryCounts);
             this.setupEventListeners();
+            
+            // Check if auth system is already available
+            if (window.yearawayAuth) {
+                this.authSystem = window.yearawayAuth;
+                console.log('🔗 Auth system found during initialization');
+            }
+            
             this.renderCategories();
             this.renderAllTipsByCategory();
             this.renderProducts();
