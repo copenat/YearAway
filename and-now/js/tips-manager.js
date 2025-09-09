@@ -103,7 +103,9 @@ class TipsManager {
                 const value = valueParts.join(': ');
                 
                 if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
-                    currentItem[key] = parseInt(value);
+                    const parsedValue = parseInt(value);
+                    console.log(`🔢 Category ${currentItem.id} - ${key}: "${value}" -> ${parsedValue}`);
+                    currentItem[key] = parsedValue;
                 } else {
                     currentItem[key] = value;
                 }
