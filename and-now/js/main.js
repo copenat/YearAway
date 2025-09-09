@@ -317,13 +317,13 @@ window.addEventListener('offline', () => {
 
 // Connect authentication system to tips manager
 function connectAuthToTips() {
-    if (window.authSystem && window.tipsManager) {
-        window.tipsManager.setAuthSystem(window.authSystem);
+    if (window.yearawayAuth && window.tipsManager) {
+        window.tipsManager.setAuthSystem(window.yearawayAuth);
         console.log('🔗 Auth system connected to tips manager');
         return true;
     } else {
         console.log('⚠️ Auth system or tips manager not ready:', {
-            authSystem: !!window.authSystem,
+            authSystem: !!window.yearawayAuth,
             tipsManager: !!window.tipsManager
         });
         return false;
