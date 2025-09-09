@@ -26,8 +26,6 @@ class TipsManager {
                 products: !!productsContainer
             });
             
-            await this.loadTipsData();
-            console.log('📄 Tips data loaded:', this.tipsData);
             await this.loadCategoryCounts();
             console.log('📊 Category counts loaded:', this.categoryCounts);
             this.setupEventListeners();
@@ -36,6 +34,13 @@ class TipsManager {
             if (window.yearawayAuth) {
                 this.authSystem = window.yearawayAuth;
                 console.log('🔗 Auth system found during initialization');
+                // Load tips data with auth status
+                await this.loadTipsData();
+                console.log('📄 Tips data loaded:', this.tipsData);
+            } else {
+                // Load only public tips initially
+                await this.loadTipsData();
+                console.log('📄 Tips data loaded:', this.tipsData);
             }
             
             this.renderCategories();
