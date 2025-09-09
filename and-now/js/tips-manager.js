@@ -63,6 +63,81 @@ class TipsManager {
     }
 
     /**
+     * Parse category counts YAML (different structure from tips data)
+     */
+    parseCategoryCountsYAML(yamlText) {
+        const data = { categories: [], totalStats: {}, lastUpdated: null };
+        const lines = yamlText.split('\n');
+        let currentItem = null;
+        let inTotalStats = false;
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const trimmed = line.trim();
+            
+            // Skip empty lines
+            if (!trimmed) continue;
+            
+            // New category item
+            if (trimmed.startsWith('- id:')) {
+                // Save previous item
+                if (currentItem) {
+                    data.categories.push(currentItem);
+                }
+                
+                // Start new item
+                currentItem = { id: trimmed.split(': ')[1] };
+                continue;
+            }
+            
+            // Category item properties
+            if (currentItem && trimmed.includes(': ')) {
+                const [key, ...valueParts] = trimmed.split(': ');
+                const value = valueParts.join(': ');
+                
+                if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                    currentItem[key] = parseInt(value);
+                } else {
+                    currentItem[key] = value;
+                }
+                continue;
+            }
+            
+            // Top-level properties
+            if (!currentItem && trimmed.includes(': ')) {
+                const [key, ...valueParts] = trimmed.split(': ');
+                const value = valueParts.join(': ');
+                
+                if (key === 'totalStats') {
+                    inTotalStats = true;
+                    continue;
+                } else if (key === 'lastUpdated') {
+                    data[key] = value.replace(/'/g, ''); // Remove quotes
+                }
+                continue;
+            }
+            
+            // Handle indented properties under totalStats
+            if (inTotalStats && line.startsWith('  ') && trimmed.includes(': ')) {
+                const [key, ...valueParts] = trimmed.split(': ');
+                const value = valueParts.join(': ');
+                
+                if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                    data.totalStats[key] = parseInt(value);
+                }
+                continue;
+            }
+        }
+        
+        // Save last item
+        if (currentItem) {
+            data.categories.push(currentItem);
+        }
+        
+        return data;
+    }
+
+    /**
      * Simple YAML parser for our specific format
      */
     parseYAML(yamlText) {
@@ -206,7 +281,7 @@ class TipsManager {
             }
             const yamlText = await response.text();
             console.log('📊 Raw category YAML text length:', yamlText.length);
-            this.categoryCounts = this.parseYAML(yamlText);
+            this.categoryCounts = this.parseCategoryCountsYAML(yamlText);
             console.log('📊 Parsed category counts:', this.categoryCounts);
             console.log('📊 Category counts structure:', {
                 hasCategories: !!this.categoryCounts.categories,
