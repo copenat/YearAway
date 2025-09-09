@@ -1172,6 +1172,19 @@ input:focus {
     padding: 1rem 0;
 }
 
+.no-adventures-message {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--light-gray);
+    border-radius: var(--radius-lg);
+    margin: 2rem 0;
+}
+
+.no-adventures-message h3 {
+    color: var(--primary-brown);
+    margin-bottom: 1rem;
+}
+
 .category-tip-count {
     background: var(--primary-brown);
     color: white;

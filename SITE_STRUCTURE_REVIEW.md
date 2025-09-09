@@ -18,7 +18,7 @@ This document shows the proposed page structure and navigation for the new YearA
 - Brief life update summary
 
 **Navigation Links**:
-- Current Adventures
+- Latest Adventures
 - Future Plans  
 - Life Updates
 - Photo Gallery
@@ -26,7 +26,7 @@ This document shows the proposed page structure and navigation for the new YearA
 
 ---
 
-### **2. Current Adventures** (`adventures.html`)
+### **2. Latest Adventures** (`adventures.html`)
 **Purpose**: Show ongoing or recent travels and experiences
 
 **Content Sections**:
@@ -59,7 +59,7 @@ This document shows the proposed page structure and navigation for the new YearA
 
 **Navigation Links**:
 - Home
-- Current Adventures
+- Latest Adventures
 - Life Updates
 - Photo Gallery
 - Contact
@@ -79,7 +79,7 @@ This document shows the proposed page structure and navigation for the new YearA
 
 **Navigation Links**:
 - Home
-- Current Adventures
+- Latest Adventures
 - Future Plans
 - Photo Gallery
 - Contact
@@ -99,7 +99,7 @@ This document shows the proposed page structure and navigation for the new YearA
 
 **Navigation Links**:
 - Home
-- Current Adventures
+- Latest Adventures
 - Future Plans
 - Life Updates
 - Contact
@@ -119,7 +119,7 @@ This document shows the proposed page structure and navigation for the new YearA
 
 **Navigation Links**:
 - Home
-- Current Adventures
+- Latest Adventures
 - Future Plans
 - Life Updates
 - Photo Gallery
@@ -130,7 +130,7 @@ This document shows the proposed page structure and navigation for the new YearA
 
 ### **Primary Navigation (Header)**
 ```
-[Home] [Current Adventures] [Future Plans] [Life Updates] [Photo Gallery] [Contact]
+[Home] [Latest Adventures] [Future Plans] [Life Updates] [Photo Gallery] [Contact]
 ```
 
 ### **Secondary Navigation (Footer)**
@@ -140,7 +140,7 @@ This document shows the proposed page structure and navigation for the new YearA
 
 ### **Breadcrumb Navigation**
 ```
-Home > Current Adventures > [Specific Adventure]
+Home > Latest Adventures > [Specific Adventure]
 Home > Future Plans > [Specific Trip]
 Home > Life Updates > [Specific Update]
 ```
@@ -167,7 +167,7 @@ Home > Life Updates > [Specific Update]
 ```
 ☰ Menu
 ├── Home
-├── Current Adventures
+├── Latest Adventures
 ├── Future Plans
 ├── Life Updates
 ├── Photo Gallery

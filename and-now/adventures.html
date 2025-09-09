@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Current Adventures - YearAway</title>
+    <title>Latest Adventures - YearAway</title>
     <meta name="description" content="Current travel adventures and experiences from YearAway">
     
     <!-- CSS -->
@@ -60,7 +60,7 @@
         <!-- Page Header -->
         <section class="page-header">
             <div class="container">
-                <h1>Current Adventures</h1>
+                <h1>Latest Adventures</h1>
                 <p class="page-subtitle">Travel stories, experiences, and ongoing adventures</p>
             </div>
         </section>
@@ -86,55 +86,8 @@
         <section class="recent-adventures">
             <div class="container">
                 <h2>Recent Adventures</h2>
-                <div class="adventures-timeline">
-                    <!-- Public Adventure -->
-                    <div class="adventure-item">
-                        <div class="adventure-date">
-                            <span class="month">Sep</span>
-                            <span class="year">2025</span>
-                        </div>
-                        <div class="adventure-content">
-                            <h3>Site Development</h3>
-                            <p>Working on the new YearAway "And Now" site to share current adventures and experiences.</p>
-                            <div class="adventure-tags">
-                                <span class="tag">Development</span>
-                                <span class="tag">Planning</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Members-only Adventure -->
-                    <div class="adventure-item members-only">
-                        <div class="member-indicator">🔒 Members Only</div>
-                        <div class="adventure-date">
-                            <span class="month">Aug</span>
-                            <span class="year">2025</span>
-                        </div>
-                        <div class="adventure-content">
-                            <h3>Private Adventure</h3>
-                            <p>This is a members-only adventure with detailed stories, personal reflections, and exclusive photos.</p>
-                            <div class="adventure-tags">
-                                <span class="tag">Exclusive</span>
-                                <span class="tag">Personal</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Another Public Adventure -->
-                    <div class="adventure-item">
-                        <div class="adventure-date">
-                            <span class="month">Jul</span>
-                            <span class="year">2025</span>
-                        </div>
-                        <div class="adventure-content">
-                            <h3>Planning Future Travels</h3>
-                            <p>Researching destinations and planning upcoming adventures. Exciting times ahead!</p>
-                            <div class="adventure-tags">
-                                <span class="tag">Planning</span>
-                                <span class="tag">Research</span>
-                            </div>
-                        </div>
-                    </div>
+                <div id="adventures-timeline">
+                    <!-- Adventures loaded from content/adventures-data.yaml -->
                 </div>
             </div>
         </section>
@@ -143,34 +96,8 @@
         <section class="adventure-categories">
             <div class="container">
                 <h2>Adventure Categories</h2>
-                <div class="categories-grid">
-                    <div class="category-card">
-                        <div class="category-icon">🏔️</div>
-                        <h3>Outdoor Adventures</h3>
-                        <p>Hiking, camping, and nature exploration</p>
-                        <div class="category-count">Coming Soon</div>
-                    </div>
-                    
-                    <div class="category-card">
-                        <div class="category-icon">🏛️</div>
-                        <h3>Cultural Experiences</h3>
-                        <p>Museums, historical sites, and local culture</p>
-                        <div class="category-count">Coming Soon</div>
-                    </div>
-                    
-                    <div class="category-card">
-                        <div class="category-icon">🍽️</div>
-                        <h3>Food & Dining</h3>
-                        <p>Local cuisine and dining experiences</p>
-                        <div class="category-count">Coming Soon</div>
-                    </div>
-                    
-                    <div class="category-card">
-                        <div class="category-icon">🏨</div>
-                        <h3>Accommodations</h3>
-                        <p>Hotels, hostels, and unique stays</p>
-                        <div class="category-count">Coming Soon</div>
-                    </div>
+                <div id="categories-grid">
+                    <!-- Categories loaded from content/adventures-data.yaml -->
                 </div>
             </div>
         </section>
@@ -218,8 +145,9 @@
     </footer>
 
     <!-- JavaScript -->
-    <script src="js/auth-config.js?v=22"></script>
-    <script src="js/simple-auth-system.js?v=22"></script>
-    <script src="js/main.js"></script>
+    <script src="js/auth-config.js?v=33"></script>
+    <script src="js/simple-auth-system.js?v=33"></script>
+    <script src="js/main.js?v=33"></script>
+    <script src="js/adventures-manager.js?v=33"></script>
 </body>
 </html>

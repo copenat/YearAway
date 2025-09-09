@@ -15,7 +15,7 @@ Create a modern, interactive website accessible from the "And Now" button that r
 
 ### Main Pages
 - **Home** (`index.html`) - Landing page with overview
-- **Current Adventures** (`adventures.html`) - Ongoing or recent travels
+- **Latest Adventures** (`adventures.html`) - Ongoing or recent travels
 - **Hints and Tips** (`hints-and-tips.html`) 
 - **Photo Gallery** (`gallery.html`) - Current photos and memories
 - **Request Access** (`request-access.html`) - Member access request form
@@ -26,7 +26,7 @@ YearAway (Main Site)
 ├── Then (that_was_then/) ← Historical archive (2001-2011)
 └── And Now (new-site/) ← Current adventures
     ├── Home
-    ├── Current Adventures
+    ├── Latest Adventures
     ├── Hints and Tips
     ├── Photo Gallery
     └── Request Access
@@ -62,7 +62,7 @@ YearAway (Main Site)
 - Call-to-action buttons for key sections
 - Integration with social media feeds (if applicable)
 
-### Current Adventures
+### Latest Adventures
 - Real-time or recent travel updates
 - Interactive maps showing current location
 - Photo galleries of recent trips
