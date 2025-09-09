@@ -112,7 +112,15 @@ class TipsManager {
                 continue;
             }
             
-            // Top-level properties
+            // Top-level properties (like lastUpdated, totalStats)
+            if (trimmed.includes('lastUpdated') || trimmed.includes('totalStats')) {
+                // Save the last item before processing top-level properties
+                if (currentItem) {
+                    data.categories.push(currentItem);
+                    currentItem = null;
+                }
+            }
+            
             if (!currentItem && trimmed.includes(': ')) {
                 const [key, ...valueParts] = trimmed.split(': ');
                 const value = valueParts.join(': ');
@@ -126,6 +134,7 @@ class TipsManager {
                     // These should only be in totalStats, not at top level
                     if (!data.totalStats) data.totalStats = {};
                     data.totalStats[key] = parseInt(value);
+                    console.log(`🔢 TotalStats - ${key}: "${value}" -> ${parseInt(value)}`);
                 }
                 continue;
             }
