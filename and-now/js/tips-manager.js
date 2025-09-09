@@ -267,6 +267,7 @@ class TipsManager {
      * Render category cards
      */
     renderCategories() {
+        console.log('🚨 RENDER CATEGORIES START - NEW VERSION');
         try {
             const container = document.getElementById('tips-categories-container');
             console.log('🎯 renderCategories called - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
