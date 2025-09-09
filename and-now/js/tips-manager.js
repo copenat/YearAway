@@ -38,17 +38,8 @@ class TipsManager {
                 await this.loadTipsData();
                 console.log('📄 Tips data loaded:', this.tipsData);
             } else {
-                // Check localStorage directly for auth status (same logic as auth system)
-                const token = localStorage.getItem('yearaway_member_token');
-                const validTokens = [
-                    'YEARAWAY-ULZE-1SVR-Z0JG',
-                    'YEARAWAY-I80B-HJ7Y-FKNO', 
-                    'YEARAWAY-Q2FZ-KID3-ISML',
-                    'YEARAWAY-9ND6-6QMU-KYW7',
-                    'YEARAWAY-1G9L-Q9I4-4AMQ'
-                ];
-                
-                if (token && validTokens.includes(token.toUpperCase())) {
+                // Check localStorage directly for auth status using centralized config
+                if (window.YearAwayAuthConfig && window.YearAwayAuthConfig.isAuthenticated()) {
                     console.log('🔗 Auth token found in localStorage, loading members content');
                     // Create a temporary auth object for loading
                     this.authSystem = {
