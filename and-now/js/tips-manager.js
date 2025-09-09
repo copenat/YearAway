@@ -424,11 +424,16 @@ class TipsManager {
             `;
         }).join('');
 
-        container.innerHTML = `
+        const categoriesContainerHtml = `
             <div class="categories-grid">
                 ${categoriesHtml}
             </div>
         `;
+        console.log('🎯 Categories HTML length:', categoriesContainerHtml.length);
+        console.log('🎯 Categories container before:', container.innerHTML.length, 'characters');
+        container.innerHTML = categoriesContainerHtml;
+        console.log('🎯 Categories container after:', container.innerHTML.length, 'characters');
+        console.log('🎯 Categories container visible:', container.offsetHeight > 0 ? 'YES' : 'NO');
     }
 
     /**
@@ -490,7 +495,10 @@ class TipsManager {
         });
 
         console.log('🎯 Final HTML length:', allTipsHtml.length);
+        console.log('🎯 Container before:', container.innerHTML.length, 'characters');
         container.innerHTML = allTipsHtml;
+        console.log('🎯 Container after:', container.innerHTML.length, 'characters');
+        console.log('🎯 Container visible:', container.offsetHeight > 0 ? 'YES' : 'NO');
     }
 
 
