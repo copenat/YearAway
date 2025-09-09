@@ -210,8 +210,8 @@ class TipsManager {
             }
             
             // Top-level properties (like lastUpdated, totalStats)
-            if (trimmed.includes('totalStats')) {
-                // Save the last item before processing totalStats
+            if (trimmed.includes('totalStats') || trimmed === 'products:') {
+                // Save the last item before processing totalStats or switching to products
                 if (currentItem) {
                     if (descriptionLines.length > 0) {
                         currentItem.description = descriptionLines.join('\n').trim();
