@@ -1085,13 +1085,13 @@ input:focus {
 }
 
 .filter-info {
-    color: var(--text-muted);
+    color: var(--medium-gray);
     font-size: 0.9rem;
 }
 
 /* Category Filter Active State */
 .category-filter.active {
-    background: var(--primary-color);
+    background: var(--primary-brown);
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -1108,7 +1108,7 @@ input:focus {
 }
 
 .tag-filter:hover {
-    background: var(--primary-color);
+    background: var(--primary-brown);
     color: white;
     transform: scale(1.05);
 }
@@ -1117,7 +1117,7 @@ input:focus {
 .category-section {
     margin-bottom: 3rem;
     padding: 2rem 0;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--light-gray);
 }
 
 .category-section:last-child {
@@ -1130,18 +1130,18 @@ input:focus {
     align-items: center;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid var(--primary-color);
+    border-bottom: 2px solid var(--primary-brown);
 }
 
 .category-header h3 {
     margin: 0;
-    color: var(--primary-color);
+    color: var(--primary-brown);
     font-size: 1.8rem;
     font-weight: 600;
 }
 
 .category-tip-count {
-    background: var(--primary-color);
+    background: var(--primary-brown);
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 20px;
