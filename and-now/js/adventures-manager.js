@@ -6,6 +6,7 @@
 class AdventuresManager {
     constructor() {
         this.adventuresData = null;
+        this.tipsData = null;
         this.authSystem = null;
         this.init();
     }
@@ -48,6 +49,10 @@ class AdventuresManager {
                 await this.loadAdventuresData();
                 console.log('📄 Adventures data loaded:', this.adventuresData);
             }
+            
+            // Load tips data for tag integration
+            await this.loadTipsData();
+            console.log('💡 Tips data loaded:', this.tipsData);
             
             this.renderAdventures();
             this.renderCategories();
@@ -121,6 +126,132 @@ class AdventuresManager {
             // Fallback to empty data structure
             this.adventuresData = { adventures: [], categories: [] };
         }
+    }
+
+    /**
+     * Load tips data for tag integration
+     */
+    async loadTipsData() {
+        try {
+            console.log('💡 Loading tips data for tag integration...');
+            
+            // Load public tips
+            const publicResponse = await fetch('/and-now/content/tips-data-public.yaml');
+            const publicYamlText = await publicResponse.text();
+            const publicTipsData = this.parseTipsYAML(publicYamlText);
+            
+            // Load members tips if user is authenticated
+            let membersTipsData = { tips: [] };
+            if (this.authSystem && this.authSystem.isMember()) {
+                try {
+                    const membersResponse = await fetch('/and-now/content/tips-data-members.yaml');
+                    const membersYamlText = await membersResponse.text();
+                    membersTipsData = this.parseTipsYAML(membersYamlText);
+                } catch (error) {
+                    console.log('💡 Members tips not available or user not authenticated');
+                }
+            }
+            
+            // Merge tips data
+            this.tipsData = {
+                tips: [...publicTipsData.tips, ...membersTipsData.tips]
+            };
+            
+            console.log('💡 Tips data loaded:', this.tipsData);
+        } catch (error) {
+            console.error('❌ Error loading tips data:', error);
+            this.tipsData = { tips: [] };
+        }
+    }
+
+    /**
+     * Parse tips YAML content (simplified parser)
+     */
+    parseTipsYAML(yamlText) {
+        const data = { tips: [] };
+        const lines = yamlText.split('\n');
+        let currentItem = null;
+        let descriptionLines = [];
+        let inDescription = false;
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const trimmed = line.trim();
+            
+            // Section headers
+            if (trimmed === 'tips:') {
+                // Save previous item before switching sections
+                if (currentItem) {
+                    if (descriptionLines.length > 0) {
+                        currentItem.description = descriptionLines.join('\n').trim();
+                    }
+                    data.tips.push(currentItem);
+                }
+                currentItem = null;
+                descriptionLines = [];
+                inDescription = false;
+                continue;
+            }
+            
+            // Skip empty lines
+            if (!trimmed) {
+                continue;
+            }
+            
+            // New item
+            if (trimmed.startsWith('- id:')) {
+                // Save previous item
+                if (currentItem) {
+                    if (descriptionLines.length > 0) {
+                        currentItem.description = descriptionLines.join('\n').trim();
+                    }
+                    data.tips.push(currentItem);
+                }
+                
+                // Start new item
+                currentItem = { id: trimmed.replace('- id:', '').trim() };
+                descriptionLines = [];
+                inDescription = false;
+                continue;
+            }
+            
+            // Item properties
+            if (currentItem && trimmed.includes(':')) {
+                const [key, ...valueParts] = trimmed.split(':');
+                const value = valueParts.join(':').trim();
+                
+                if (key === 'description') {
+                    inDescription = true;
+                    if (value) {
+                        descriptionLines.push(value);
+                    }
+                } else if (key === 'tags') {
+                    // Parse tags array
+                    const tagsText = value.replace(/[\[\]]/g, '');
+                    currentItem.tags = tagsText.split(',').map(tag => tag.trim());
+                } else {
+                    // Remove quotes from string values
+                    currentItem[key] = value.replace(/^["']|["']$/g, '');
+                }
+                continue;
+            }
+            
+            // Description lines (multiline)
+            if (inDescription && trimmed) {
+                descriptionLines.push(trimmed);
+                continue;
+            }
+        }
+        
+        // Save the last item
+        if (currentItem) {
+            if (descriptionLines.length > 0) {
+                currentItem.description = descriptionLines.join('\n').trim();
+            }
+            data.tips.push(currentItem);
+        }
+        
+        return data;
     }
 
     /**
@@ -270,6 +401,10 @@ class AdventuresManager {
         const month = date.toLocaleDateString('en-US', { month: 'short' });
         const year = date.getFullYear();
 
+        // Find connected tips based on shared tags
+        const connectedTips = this.getConnectedTips(adventure.tags);
+        const connectedTipsHtml = this.renderConnectedTips(connectedTips);
+
         return `
             <div class="adventure-item ${memberOnlyClass}">
                 ${memberIndicator}
@@ -283,6 +418,74 @@ class AdventuresManager {
                     <div class="adventure-tags">
                         ${adventure.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
                     </div>
+                    ${connectedTipsHtml}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Get tips that share tags with the adventure
+     */
+    getConnectedTips(adventureTags) {
+        if (!this.tipsData || !this.tipsData.tips) return [];
+        
+        const isMember = this.authSystem ? this.authSystem.isMember() : false;
+        
+        // List of members-only tip IDs (from tips-data-members.yaml)
+        const membersOnlyTipIds = ['hotel-secret', 'airline-upgrades', 'hidden-restaurants'];
+        
+        return this.tipsData.tips.filter(tip => {
+            if (!tip.tags) return false;
+            
+            // Check if tip shares tags with adventure
+            const hasMatchingTag = tip.tags.some(tag => adventureTags.includes(tag));
+            if (!hasMatchingTag) return false;
+            
+            // Filter based on authentication status
+            const isMembersOnlyTip = membersOnlyTipIds.includes(tip.id);
+            if (isMembersOnlyTip && !isMember) {
+                return false; // Hide members-only tips for non-members
+            }
+            
+            return true;
+        });
+    }
+
+    /**
+     * Render connected tips section
+     */
+    renderConnectedTips(connectedTips) {
+        if (!connectedTips || connectedTips.length === 0) return '';
+        
+        const isMember = this.authSystem ? this.authSystem.isMember() : false;
+        const membersOnlyTipIds = ['hotel-secret', 'airline-upgrades', 'hidden-restaurants'];
+        
+        const tipsHtml = connectedTips.map(tip => {
+            const isMembersOnlyTip = membersOnlyTipIds.includes(tip.id);
+            const memberOnlyClass = isMembersOnlyTip ? 'members-only' : '';
+            const memberIndicator = isMembersOnlyTip ? '<div class="member-indicator">🔒 Members Only</div>' : '';
+            
+            return `
+                <div class="connected-tip ${memberOnlyClass}">
+                    ${memberIndicator}
+                    <div class="tip-header">
+                        <span class="tip-icon">💡</span>
+                        <span class="tip-title">${tip.title}</span>
+                    </div>
+                    <p class="tip-description">${tip.description}</p>
+                    <div class="tip-tags">
+                        ${tip.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        return `
+            <div class="connected-tips">
+                <h4>💡 Related Hints & Tips</h4>
+                <div class="connected-tips-list">
+                    ${tipsHtml}
                 </div>
             </div>
         `;
@@ -320,6 +523,14 @@ class AdventuresManager {
             console.log('🔄 Adventures data reloaded with auth status');
         } catch (error) {
             console.error('❌ Error reloading adventures data:', error);
+        }
+        
+        // Reload tips data with new auth status
+        try {
+            await this.loadTipsData();
+            console.log('🔄 Tips data reloaded with auth status');
+        } catch (error) {
+            console.error('❌ Error reloading tips data:', error);
         }
         
         // Re-render adventures and categories when auth status changes

@@ -6,7 +6,7 @@ adventures:
       Contains sensitive information and personal experiences that are only shared with trusted members.
     date: "2025-08-15"
     category: Travel
-    tags: [exclusive, personal, travel]
+    tags: [exclusive, personal, travel, flights]
     status: completed
 
   - id: members-only-trip-report

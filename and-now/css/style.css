@@ -1248,3 +1248,98 @@ input:focus {
         box-shadow: 0 2px 8px rgba(238, 90, 36, 0.3);
     }
 }
+
+/* Connected Tips Styles */
+.connected-tips {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 12px;
+    border-left: 4px solid #007bff;
+}
+
+.connected-tips h4 {
+    margin: 0 0 1rem 0;
+    color: #007bff;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.connected-tips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.connected-tip {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.connected-tip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+}
+
+.tip-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.tip-icon {
+    font-size: 1.1rem;
+}
+
+.tip-title {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.tip-description {
+    margin: 0.5rem 0;
+    color: #6c757d;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.connected-tip .tip-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.connected-tip .tag {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Members-only connected tips */
+.connected-tip.members-only {
+    border-left: 4px solid #ff6b6b;
+    background: linear-gradient(135deg, #fff5f5, #ffe8e8);
+}
+
+.connected-tip.members-only .tip-title {
+    color: #d63031;
+}
+
+.connected-tip.members-only .member-indicator {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+}
