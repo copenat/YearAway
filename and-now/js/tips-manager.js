@@ -280,14 +280,13 @@ class TipsManager {
         }
 
         const categoriesHtml = this.categoryCounts.categories.map(category => {
-            // Use pre-calculated counts from category-counts.json
+            // Use pre-calculated counts from category-counts.yaml
             const publicTips = category.publicTips;
             const membersOnlyTips = category.membersOnlyTips;
-            const visibleTips = this.authSystem && this.authSystem.isMember() ? 
-                category.totalTips : category.publicTips;
+            const totalTips = category.totalTips;
             
-            // Create tip count display
-            let tipCountHtml = `<div class="tip-count">${visibleTips} Tips</div>`;
+            // Create tip count display - always show public tips
+            let tipCountHtml = `<div class="tip-count">${publicTips} Tips</div>`;
             
             // Add members-only count for non-members
             if (this.authSystem && !this.authSystem.isMember() && membersOnlyTips > 0) {
