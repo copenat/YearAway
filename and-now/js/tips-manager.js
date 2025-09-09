@@ -96,9 +96,7 @@ class TipsManager {
                 const value = valueParts.join(': ');
                 
                 if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
-                    const parsedValue = parseInt(value);
-                    console.log(`🔢 Parsing ${key}: "${value}" -> ${parsedValue} (type: ${typeof parsedValue})`);
-                    currentItem[key] = parsedValue;
+                    currentItem[key] = parseInt(value);
                 } else {
                     currentItem[key] = value;
                 }
@@ -170,22 +168,22 @@ class TipsManager {
                 continue;
             }
             
-                // New item (for all sections)
-                if (trimmed.startsWith('- id:')) {
-                    // Save previous item
-                    if (currentItem) {
-                        if (descriptionLines.length > 0) {
-                            currentItem.description = descriptionLines.join('\n').trim();
-                            descriptionLines = [];
-                        }
-                        data[currentSection].push(currentItem);
+            // New item (for all sections)
+            if (trimmed.startsWith('- id:')) {
+                // Save previous item
+                if (currentItem) {
+                    if (descriptionLines.length > 0) {
+                        currentItem.description = descriptionLines.join('\n').trim();
+                        descriptionLines = [];
                     }
-                    
-                    // Start new item
-                    currentItem = { id: trimmed.split(': ')[1] };
-                    inDescription = false;
-                    continue;
+                    data[currentSection].push(currentItem);
                 }
+                
+                // Start new item
+                currentItem = { id: trimmed.split(': ')[1] };
+                inDescription = false;
+                continue;
+            }
             
             // Item properties
             if (currentItem && trimmed.includes(': ')) {
@@ -211,47 +209,48 @@ class TipsManager {
                 continue;
             }
             
-        // Top-level properties (like lastUpdated, totalStats)
-        if (trimmed.includes('totalStats')) {
-            // Save the last item before processing totalStats
-            if (currentItem) {
-                if (descriptionLines.length > 0) {
-                    currentItem.description = descriptionLines.join('\n').trim();
-                    descriptionLines = [];
+            // Top-level properties (like lastUpdated, totalStats)
+            if (trimmed.includes('totalStats')) {
+                // Save the last item before processing totalStats
+                if (currentItem) {
+                    if (descriptionLines.length > 0) {
+                        currentItem.description = descriptionLines.join('\n').trim();
+                        descriptionLines = [];
+                    }
+                    data[currentSection].push(currentItem);
+                    currentItem = null;
                 }
-                data[currentSection].push(currentItem);
-                currentItem = null;
             }
-        }
-        if (!currentItem && trimmed.includes(': ')) {
-            const [key, ...valueParts] = trimmed.split(': ');
-            const value = valueParts.join(': ');
             
-            if (key === 'totalStats') {
-                // Initialize totalStats object
-                data.totalStats = {};
-                inTotalStats = true;
+            if (!currentItem && trimmed.includes(': ')) {
+                const [key, ...valueParts] = trimmed.split(': ');
+                const value = valueParts.join(': ');
+                
+                if (key === 'totalStats') {
+                    // Initialize totalStats object
+                    data.totalStats = {};
+                    inTotalStats = true;
+                    continue;
+                } else if (key === 'lastUpdated') {
+                    data[key] = value.replace(/'/g, ''); // Remove quotes
+                } else if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                    if (!data.totalStats) data.totalStats = {};
+                    data.totalStats[key] = parseInt(value);
+                }
                 continue;
-            } else if (key === 'lastUpdated') {
-                data[key] = value.replace(/'/g, ''); // Remove quotes
-            } else if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
-                if (!data.totalStats) data.totalStats = {};
-                data.totalStats[key] = parseInt(value);
             }
-            continue;
-        }
-        
-        // Handle indented properties under totalStats
-        if (inTotalStats && line.startsWith('  ') && trimmed.includes(': ')) {
-            const [key, ...valueParts] = trimmed.split(': ');
-            const value = valueParts.join(': ');
             
-            if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
-                if (!data.totalStats) data.totalStats = {};
-                data.totalStats[key] = parseInt(value);
+            // Handle indented properties under totalStats
+            if (inTotalStats && line.startsWith('  ') && trimmed.includes(': ')) {
+                const [key, ...valueParts] = trimmed.split(': ');
+                const value = valueParts.join(': ');
+                
+                if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                    if (!data.totalStats) data.totalStats = {};
+                    data.totalStats[key] = parseInt(value);
+                }
+                continue;
             }
-            continue;
-        }
             
             // Description content (indented lines after description: |)
             if (inDescription && trimmed) {
@@ -344,67 +343,20 @@ class TipsManager {
      * Render category cards
      */
     renderCategories() {
-        console.log('🚨 RENDER CATEGORIES START - NEW VERSION');
-        try {
-            const container = document.getElementById('tips-categories-container');
-            console.log('🎯 renderCategories called - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
-            console.log('🎯 Full categoryCounts object:', this.categoryCounts);
-            
-            if (!container || !this.categoryCounts) {
-                console.warn('⚠️ Cannot render categories - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
-                return;
-            }
-        } catch (error) {
-            console.error('❌ Error in renderCategories:', error);
+        const container = document.getElementById('tips-categories-container');
+        if (!container || !this.categoryCounts || !this.categoryCounts.categories) {
+            console.warn('⚠️ Cannot render categories - missing container or category data');
             return;
         }
-
-        console.log('🎯 Checking categories array...');
-        console.log('🎯 this.categoryCounts.categories:', this.categoryCounts.categories);
-        console.log('🎯 Is array?', Array.isArray(this.categoryCounts.categories));
-        
-        if (!this.categoryCounts.categories || !Array.isArray(this.categoryCounts.categories)) {
-            console.error('❌ Category counts categories is not an array:', this.categoryCounts.categories);
-            return;
-        }
-
-        console.log('🔍 About to map categories:', this.categoryCounts.categories.length, 'categories');
-        console.log('🔍 First category:', this.categoryCounts.categories[0]);
 
         const categoriesHtml = this.categoryCounts.categories.map(category => {
-            // Use pre-calculated counts from category-counts.yaml
-            const publicTips = category.publicTips;
-            const membersOnlyTips = category.membersOnlyTips;
-            const totalTips = category.totalTips;
+            const publicTips = category.publicTips || 0;
+            const membersOnlyTips = category.membersOnlyTips || 0;
             
-            // Debug logging for accommodation category
-            if (category.id === 'accommodation') {
-                console.log('🏨 Accommodation category data:', {
-                    publicTips,
-                    membersOnlyTips,
-                    totalTips,
-                    category,
-                    membersOnlyTipsType: typeof membersOnlyTips,
-                    membersOnlyTipsValue: membersOnlyTips,
-                    membersOnlyTipsGreaterThanZero: membersOnlyTips > 0,
-                    membersOnlyTipsStrictGreaterThanZero: membersOnlyTips > 0
-                });
-            }
-            
-            // Create tip count display - always show public tips + members-only indicator
+            // Create tip count display
             let tipCountHtml = `<div class="tip-count">${publicTips} Tips</div>`;
-            
-            // Debug all categories with members-only tips
             if (membersOnlyTips > 0) {
-                console.log(`🔒 Category ${category.id} has ${membersOnlyTips} members-only tips`);
                 tipCountHtml += `<div class="members-only-count">+${membersOnlyTips} Members Only</div>`;
-            } else {
-                console.log(`📝 Category ${category.id} has no members-only tips (${membersOnlyTips})`);
-            }
-            
-            // Debug logging for accommodation category HTML
-            if (category.id === 'accommodation') {
-                console.log('🏨 Accommodation HTML:', tipCountHtml);
             }
             
             return `
