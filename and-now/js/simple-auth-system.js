@@ -14,26 +14,17 @@ class SimpleYearAwayAuth {
     }
 
     init() {
-        // Check if user is already authenticated
-        this.checkAuthStatus();
-        
-        // Listen for auth events
-        this.setupEventListeners();
-    }
-
-    /**
-     * Check if user has valid authentication
-     */
-    checkAuthStatus() {
-        const token = localStorage.getItem(this.tokenKey);
-        
-        if (token && this.validateToken(token)) {
+        // Check if user is already authenticated and update UI
+        if (this.isMember()) {
             this.setMemberStatus(true);
             this.showMemberContent();
         } else {
             this.setMemberStatus(false);
             this.hideMemberContent();
         }
+        
+        // Listen for auth events
+        this.setupEventListeners();
     }
 
     /**
@@ -52,7 +43,6 @@ class SimpleYearAwayAuth {
         
         if (this.validateToken(cleanToken)) {
             localStorage.setItem(this.tokenKey, cleanToken);
-            localStorage.setItem(this.memberStatusKey, 'true');
             this.setMemberStatus(true);
             this.showMemberContent();
             this.showNotification('Welcome back, member! 🎉', 'success');
@@ -68,17 +58,17 @@ class SimpleYearAwayAuth {
      */
     logout() {
         localStorage.removeItem(this.tokenKey);
-        localStorage.removeItem(this.memberStatusKey);
         this.setMemberStatus(false);
         this.hideMemberContent();
         this.showNotification('You have been logged out. 👋', 'info');
     }
 
     /**
-     * Check if user is a member
+     * Check if user is a member (validates token)
      */
     isMember() {
-        return localStorage.getItem(this.memberStatusKey) === 'true';
+        const token = localStorage.getItem(this.tokenKey);
+        return token && this.validateToken(token);
     }
 
     /**

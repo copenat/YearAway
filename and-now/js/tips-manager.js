@@ -481,7 +481,8 @@ class TipsManager {
                 console.log('🎯 Budget category detailed:', {
                     categoryTips: categoryTips,
                     allTips: this.tipsData.tips.filter(tip => tip.category === 'Budget'),
-                    totalTips: this.tipsData.tips.length
+                    totalTips: this.tipsData.tips.length,
+                    allTipIds: this.tipsData.tips.map(tip => ({id: tip.id, category: tip.category}))
                 });
             }
             
@@ -660,6 +661,16 @@ class TipsManager {
             console.log('🔄 Auth status during re-render:', this.authSystem.isMember());
             this.renderCategories();
             this.renderAllTipsByCategory();
+            
+            // IMPORTANT: Call showMemberContent after rendering to ensure
+            // members-only elements get the member-visible class
+            if (this.authSystem.isMember()) {
+                console.log('🔓 Showing member content after re-render');
+                this.authSystem.showMemberContent();
+            } else {
+                console.log('🔒 Hiding member content after re-render');
+                this.authSystem.hideMemberContent();
+            }
         } else {
             console.log('⚠️ Cannot re-render - missing data:', {
                 tipsData: !!this.tipsData,

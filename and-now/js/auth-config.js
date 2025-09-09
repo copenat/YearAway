@@ -15,7 +15,6 @@ window.YearAwayAuthConfig = {
     
     // LocalStorage keys
     tokenKey: 'yearaway_member_token',
-    memberStatusKey: 'yearaway_member_status',
     
     /**
      * Validate a token
