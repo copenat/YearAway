@@ -93,34 +93,22 @@ class TipsManager {
                 continue;
             }
             
-            // New item (for tips and products)
-            if (trimmed.startsWith('- id:')) {
-                // Save previous item
-                if (currentItem) {
-                    if (descriptionLines.length > 0) {
-                        currentItem.description = descriptionLines.join('\n').trim();
-                        descriptionLines = [];
+                // New item (for all sections)
+                if (trimmed.startsWith('- id:')) {
+                    // Save previous item
+                    if (currentItem) {
+                        if (descriptionLines.length > 0) {
+                            currentItem.description = descriptionLines.join('\n').trim();
+                            descriptionLines = [];
+                        }
+                        data[currentSection].push(currentItem);
                     }
-                    data[currentSection].push(currentItem);
+                    
+                    // Start new item
+                    currentItem = { id: trimmed.split(': ')[1] };
+                    inDescription = false;
+                    continue;
                 }
-                
-                // Start new item
-                currentItem = { id: trimmed.split(': ')[1] };
-                inDescription = false;
-                continue;
-            }
-            
-            // New category item (different format)
-            if (currentSection === 'categories' && trimmed.startsWith('- id:')) {
-                // Save previous item
-                if (currentItem) {
-                    data[currentSection].push(currentItem);
-                }
-                
-                // Start new category item
-                currentItem = { id: trimmed.split(': ')[1] };
-                continue;
-            }
             
             // Item properties
             if (currentItem && trimmed.includes(': ')) {
