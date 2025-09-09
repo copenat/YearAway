@@ -558,8 +558,14 @@ class TipsManager {
         // Re-render both categories and tips when auth status changes
         if (this.tipsData && this.categoryCounts) {
             console.log('🔄 Re-rendering with auth system connected');
+            console.log('🔄 Auth status during re-render:', this.authSystem.isMember());
             this.renderCategories();
             this.renderAllTipsByCategory();
+        } else {
+            console.log('⚠️ Cannot re-render - missing data:', {
+                tipsData: !!this.tipsData,
+                categoryCounts: !!this.categoryCounts
+            });
         }
     }
 
