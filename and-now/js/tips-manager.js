@@ -463,6 +463,15 @@ class TipsManager {
                 tips: categoryTips.map(tip => ({id: tip.id, title: tip.title}))
             });
             
+            // Extra debugging for Budget category
+            if (category.name === 'Budget') {
+                console.log('🎯 Budget category detailed:', {
+                    categoryTips: categoryTips,
+                    allTips: this.tipsData.tips.filter(tip => tip.category === 'Budget'),
+                    totalTips: this.tipsData.tips.length
+                });
+            }
+            
             if (visibleTips.length > 0) {
                 const tipsHtml = visibleTips.map(tip => this.renderTipCard(tip)).join('');
                 
