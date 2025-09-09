@@ -269,11 +269,17 @@ class TipsManager {
     renderCategories() {
         const container = document.getElementById('tips-categories-container');
         console.log('🎯 renderCategories called - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
+        console.log('🎯 Full categoryCounts object:', this.categoryCounts);
+        
         if (!container || !this.categoryCounts) {
             console.warn('⚠️ Cannot render categories - Container:', !!container, 'CategoryCounts:', !!this.categoryCounts);
             return;
         }
 
+        console.log('🎯 Checking categories array...');
+        console.log('🎯 this.categoryCounts.categories:', this.categoryCounts.categories);
+        console.log('🎯 Is array?', Array.isArray(this.categoryCounts.categories));
+        
         if (!this.categoryCounts.categories || !Array.isArray(this.categoryCounts.categories)) {
             console.error('❌ Category counts categories is not an array:', this.categoryCounts.categories);
             return;
