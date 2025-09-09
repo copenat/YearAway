@@ -1,0 +1,30 @@
+tips:
+  - id: hotel-secret
+    title: Exclusive Hotel Booking Secret
+    description: |
+      This is a members-only tip with insider knowledge about getting the best hotel deals and upgrades.
+      Includes personal experiences and specific recommendations.
+    category: Accommodation
+    tags: [hotels, exclusive, deals]
+    rating: 5
+    isPublic: false
+
+  - id: airline-upgrades
+    title: Airline Upgrade Secrets
+    description: |
+      Personal strategies for getting free upgrades and better seats.
+      Includes specific airline policies and timing tips that have worked for us.
+    category: Transportation
+    tags: [flights, upgrades, secrets]
+    rating: 5
+    isPublic: false
+
+  - id: hidden-restaurants
+    title: Hidden Restaurant Gems
+    description: |
+      Personal recommendations for amazing local restaurants that tourists rarely find.
+      Includes specific locations, what to order, and best times to visit.
+    category: Food & Dining
+    tags: [restaurants, local, hidden-gems]
+    rating: 5
+    isPublic: false

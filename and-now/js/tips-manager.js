@@ -50,18 +50,46 @@ class TipsManager {
     }
 
     /**
-     * Load tips data from YAML file
+     * Load tips data from separate public and members files
      */
     async loadTipsData() {
         try {
-            const response = await fetch('content/tips-data.yaml');
-            if (!response.ok) {
-                throw new Error(`Failed to load tips data: ${response.status}`);
+            // Always load public tips
+            const publicResponse = await fetch('content/tips-data-public.yaml');
+            if (!publicResponse.ok) {
+                throw new Error(`Failed to load public tips data: ${publicResponse.status}`);
             }
-            const yamlText = await response.text();
-            console.log('📄 Raw YAML text length:', yamlText.length);
-            this.tipsData = this.parseYAML(yamlText);
-            console.log('📄 Parsed tips data:', this.tipsData);
+            const publicYamlText = await publicResponse.text();
+            console.log('📄 Raw public YAML text length:', publicYamlText.length);
+            const publicData = this.parseYAML(publicYamlText);
+            console.log('📄 Parsed public tips data:', publicData);
+            
+            // Initialize tips data with public tips
+            this.tipsData = {
+                tips: publicData.tips || [],
+                products: publicData.products || [],
+                categories: publicData.categories || []
+            };
+            
+            // Load members-only tips if authenticated
+            if (this.authSystem && this.authSystem.isMember()) {
+                try {
+                    const membersResponse = await fetch('content/tips-data-members.yaml');
+                    if (membersResponse.ok) {
+                        const membersYamlText = await membersResponse.text();
+                        console.log('📄 Raw members YAML text length:', membersYamlText.length);
+                        const membersData = this.parseYAML(membersYamlText);
+                        console.log('📄 Parsed members tips data:', membersData);
+                        
+                        // Merge members-only tips
+                        this.tipsData.tips = [...this.tipsData.tips, ...(membersData.tips || [])];
+                        console.log('📄 Combined tips data:', this.tipsData);
+                    }
+                } catch (membersError) {
+                    console.warn('⚠️ Could not load members-only tips:', membersError);
+                }
+            }
+            
             console.log('📄 Tips data loaded:', this.tipsData.tips.length, 'tips');
         } catch (error) {
             console.error('Error loading tips data:', error);
@@ -576,9 +604,17 @@ class TipsManager {
     /**
      * Set reference to auth system
      */
-    setAuthSystem(authSystem) {
+    async setAuthSystem(authSystem) {
         this.authSystem = authSystem;
         console.log('🔗 Auth system connected to tips manager');
+        
+        // Reload tips data with new auth status
+        try {
+            await this.loadTipsData();
+            console.log('🔄 Tips data reloaded with auth status');
+        } catch (error) {
+            console.error('❌ Error reloading tips data:', error);
+        }
         
         // Re-render both categories and tips when auth status changes
         if (this.tipsData && this.categoryCounts) {

@@ -316,9 +316,9 @@ window.addEventListener('offline', () => {
 });
 
 // Connect authentication system to tips manager
-function connectAuthToTips() {
+async function connectAuthToTips() {
     if (window.yearawayAuth && window.tipsManager) {
-        window.tipsManager.setAuthSystem(window.yearawayAuth);
+        await window.tipsManager.setAuthSystem(window.yearawayAuth);
         console.log('🔗 Auth system connected to tips manager');
         return true;
     } else {
