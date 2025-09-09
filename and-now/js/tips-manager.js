@@ -446,7 +446,7 @@ class TipsManager {
         const isMember = this.authSystem ? this.authSystem.isMember() : false;
         console.log('🎯 Rendering tips - Auth system:', !!this.authSystem, 'Is member:', isMember);
         console.log('🎯 Total tips available:', this.tipsData.tips.length);
-        console.log('🎯 Tips data:', this.tipsData.tips.map(tip => ({id: tip.id, title: tip.title, category: tip.category, isPublic: tip.isPublic})));
+        console.log('🎯 Tips data:', this.tipsData.tips.map(tip => ({id: tip.id, title: tip.title, category: tip.category})));
 
         let allTipsHtml = '';
 
@@ -454,18 +454,13 @@ class TipsManager {
         this.categoryCounts.categories.forEach(category => {
             const categoryTips = this.tipsData.tips.filter(tip => tip.category === category.name);
             
-            // Filter tips based on authentication status
-            const visibleTips = categoryTips.filter(tip => {
-                if (this.authSystem && !this.authSystem.isMember() && !tip.isPublic) {
-                    return false;
-                }
-                return true;
-            });
+            // All tips are visible based on which file they came from
+            const visibleTips = categoryTips;
             
             console.log(`🎯 Category ${category.name}:`, {
                 categoryTips: categoryTips.length,
                 visibleTips: visibleTips.length,
-                tips: categoryTips.map(tip => ({id: tip.id, title: tip.title, isPublic: tip.isPublic}))
+                tips: categoryTips.map(tip => ({id: tip.id, title: tip.title}))
             });
             
             if (visibleTips.length > 0) {
@@ -506,13 +501,12 @@ class TipsManager {
      * Render individual tip card
      */
     renderTipCard(tip) {
-        // Filter out members-only content for non-members
-        if (this.authSystem && !this.authSystem.isMember() && !tip.isPublic) {
-            return '';
-        }
-
-        const memberOnlyClass = !tip.isPublic ? 'members-only' : '';
-        const memberIndicator = !tip.isPublic ? '<div class="member-indicator">🔒 Members Only</div>' : '';
+        // Members-only tips are: hotel-secret, airline-upgrades, hidden-restaurants
+        const membersOnlyTipIds = ['hotel-secret', 'airline-upgrades', 'hidden-restaurants'];
+        const isMembersOnly = membersOnlyTipIds.includes(tip.id);
+        
+        const memberOnlyClass = isMembersOnly ? 'members-only' : '';
+        const memberIndicator = isMembersOnly ? '<div class="member-indicator">🔒 Members Only</div>' : '';
         const testNote = tip.testNote ? ` <strong>${tip.testNote}</strong>` : '';
         
         // Get category icon from category counts

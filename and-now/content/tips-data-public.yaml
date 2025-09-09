@@ -7,7 +7,6 @@ tips:
     category: Transportation
     tags: [flights, budget, booking]
     rating: 5
-    isPublic: true
     testNote: "TEST: This tip was updated via the NEW YAML system! (Triggering workflow for YAML)"
 
   - id: roll-clothes
@@ -18,7 +17,6 @@ tips:
     category: Packing
     tags: [packing, space-saving, organization]
     rating: 5
-    isPublic: true
 
   - id: offline-maps
     title: Offline Maps for Travel
@@ -28,7 +26,6 @@ tips:
     category: Technology
     tags: [maps, offline, technology]
     rating: 5
-    isPublic: true
 
   - id: budget-tracking
     title: Track Daily Expenses
@@ -38,7 +35,6 @@ tips:
     category: Budget
     tags: [budget, tracking, money]
     rating: 4
-    isPublic: true
 
   - id: travel-insurance
     title: Always Get Travel Insurance
@@ -48,7 +44,6 @@ tips:
     category: Budget
     tags: [insurance, safety, budget]
     rating: 5
-    isPublic: true
 
 products:
   - id: travel-backpack
