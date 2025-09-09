@@ -288,8 +288,8 @@ class TipsManager {
             // Create tip count display - always show public tips
             let tipCountHtml = `<div class="tip-count">${publicTips} Tips</div>`;
             
-            // Add members-only count for non-members
-            if (this.authSystem && !this.authSystem.isMember() && membersOnlyTips > 0) {
+            // Add members-only count if there are any
+            if (membersOnlyTips > 0) {
                 tipCountHtml += `<div class="members-only-count">+${membersOnlyTips} Members Only</div>`;
             }
             
