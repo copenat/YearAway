@@ -59,6 +59,11 @@ class TipsManager {
             this.renderCategories();
             this.renderAllTipsByCategory();
             this.renderProducts();
+            
+            // Dispatch event to notify auth system that members-only content was created
+            console.log('🔔 Dispatching membersContentCreated event after initial render');
+            document.dispatchEvent(new CustomEvent('yearaway:membersContentCreated'));
+            
             console.log('✅ Tips Manager initialized successfully');
             console.log('📊 Category counts available:', !!this.categoryCounts);
             console.log('📄 Tips data available:', !!this.tipsData);
@@ -662,15 +667,9 @@ class TipsManager {
             this.renderCategories();
             this.renderAllTipsByCategory();
             
-            // IMPORTANT: Call showMemberContent after rendering to ensure
-            // members-only elements get the member-visible class
-            if (this.authSystem.isMember()) {
-                console.log('🔓 Showing member content after re-render');
-                this.authSystem.showMemberContent();
-            } else {
-                console.log('🔒 Hiding member content after re-render');
-                this.authSystem.hideMemberContent();
-            }
+            // Dispatch event to notify auth system that new members-only content was created
+            console.log('🔔 Dispatching membersContentCreated event');
+            document.dispatchEvent(new CustomEvent('yearaway:membersContentCreated'));
         } else {
             console.log('⚠️ Cannot re-render - missing data:', {
                 tipsData: !!this.tipsData,

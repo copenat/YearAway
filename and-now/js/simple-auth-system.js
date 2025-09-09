@@ -173,6 +173,16 @@ class SimpleYearAwayAuth {
                 this.logout();
             });
         }
+
+        // Listen for new members-only content being created
+        document.addEventListener('yearaway:membersContentCreated', () => {
+            console.log('🔔 New members-only content detected, updating visibility');
+            if (this.isMember()) {
+                this.showMemberContent();
+            } else {
+                this.hideMemberContent();
+            }
+        });
     }
 
     /**
