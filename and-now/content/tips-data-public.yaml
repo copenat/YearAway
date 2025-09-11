@@ -7,7 +7,7 @@ tips:
     category: Transportation
     tags: [flights, budget, booking]
     rating: 5
-    testNote: "TEST: This tip was updated via the NEW YAML system! (Triggering workflow for YAML)"
+    testNote: "TEST: This tip was updated via the NEW YAML system! (Triggering workflow for YAML - v2)"
 
   - id: roll-clothes
     title: Roll Your Clothes
