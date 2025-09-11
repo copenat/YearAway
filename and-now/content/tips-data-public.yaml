@@ -21,10 +21,9 @@ tips:
   - id: offline-maps
     title: Offline Maps for Travel
     description: |
-      Download Google Maps offline before traveling.
-      Works without internet and saves data costs. Perfect for exploring new cities!
+      In China you cannot access anything Google. So for maps we use maps.me.
     category: Technology
-    tags: [maps, offline, technology]
+    tags: [china, maps, offline, technology]
     rating: 5
 
   - id: budget-tracking

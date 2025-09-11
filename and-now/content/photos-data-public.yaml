@@ -1,0 +1,52 @@
+photos:
+  - id: asia-planning-1
+    filename: "asia-trip-1.jpg"
+    path: "content/images/adventures/"
+    caption: "Researching destinations for our Asia trip"
+    date: "2025-09-10"
+    tags: [asia, planning, china, thailand, laos, india, travel]
+    adventure_ids: ["planning-a-trip-to-asia"]
+    isPublic: true
+    featured: false
+
+  - id: asia-planning-2
+    filename: "asia-trip-2.jpg"
+    path: "content/images/adventures/"
+    caption: "Booking flights and accommodations"
+    date: "2025-09-12"
+    tags: [asia, planning, booking, travel, logistics]
+    adventure_ids: ["planning-a-trip-to-asia"]
+    isPublic: true
+    featured: true
+
+  - id: site-development-1
+    filename: "planning-1.jpg"
+    path: "content/images/adventures/"
+    caption: "Working on the new YearAway site development"
+    date: "2025-09-08"
+    tags: [development, website, planning, technical]
+    adventure_ids: ["site-development"]
+    isPublic: true
+    featured: false
+
+categories:
+  - id: adventure-photos
+    name: Adventure Photos
+    icon: 📸
+    description: Photos from current adventures and travels
+    count: 3
+
+  - id: planning-photos
+    name: Planning Photos
+    icon: 📋
+    description: Photos from trip planning and preparation
+    count: 2
+
+  - id: development-photos
+    name: Development Photos
+    icon: 💻
+    description: Photos from website development and technical projects
+    count: 1
+
+
+lastUpdated: '2025-09-08T21:30:00.000Z'

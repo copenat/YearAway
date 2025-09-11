@@ -98,8 +98,10 @@ class AdventuresManager {
                         const membersData = this.parseYAML(membersYamlText);
                         console.log('📄 Parsed members adventures data:', membersData);
                         
-                        // Merge members-only adventures
-                        this.adventuresData.adventures = [...this.adventuresData.adventures, ...(membersData.adventures || [])];
+                        // Merge members-only adventures (avoid duplicates)
+                        const existingIds = new Set(this.adventuresData.adventures.map(adv => adv.id));
+                        const newMembersAdventures = (membersData.adventures || []).filter(adv => !existingIds.has(adv.id));
+                        this.adventuresData.adventures = [...this.adventuresData.adventures, ...newMembersAdventures];
                         
                         // Merge categories (update counts)
                         if (membersData.categories) {
@@ -136,7 +138,7 @@ class AdventuresManager {
             console.log('💡 Loading tips data for tag integration...');
             
             // Load public tips
-            const publicResponse = await fetch('/and-now/content/tips-data-public.yaml');
+            const publicResponse = await fetch('content/tips-data-public.yaml');
             const publicYamlText = await publicResponse.text();
             const publicTipsData = this.parseTipsYAML(publicYamlText);
             
@@ -144,7 +146,7 @@ class AdventuresManager {
             let membersTipsData = { tips: [] };
             if (this.authSystem && this.authSystem.isMember()) {
                 try {
-                    const membersResponse = await fetch('/and-now/content/tips-data-members.yaml');
+                    const membersResponse = await fetch('content/tips-data-members.yaml');
                     const membersYamlText = await membersResponse.text();
                     membersTipsData = this.parseTipsYAML(membersYamlText);
                 } catch (error) {
@@ -236,9 +238,12 @@ class AdventuresManager {
                 continue;
             }
             
-            // Description lines (multiline)
-            if (inDescription && trimmed) {
-                descriptionLines.push(trimmed);
+            // Description lines (multiline) - preserve original line content for HTML
+            if (inDescription && line.trim()) {
+                // Use original line content to preserve HTML formatting
+                // Remove only the YAML indentation (6 spaces) but preserve HTML content
+                const content = line.replace(/^\s{6}/, '');
+                descriptionLines.push(content);
                 continue;
             }
         }
@@ -315,7 +320,7 @@ class AdventuresManager {
             }
             
             // Item properties
-            if (currentItem && trimmed.includes(': ')) {
+            if (currentItem && trimmed.includes(': ') && !inDescription) {
                 const [key, ...valueParts] = trimmed.split(': ');
                 const value = valueParts.join(': ');
                 
@@ -337,9 +342,41 @@ class AdventuresManager {
                 continue;
             }
             
-            // Description lines (multiline)
-            if (inDescription && trimmed) {
-                descriptionLines.push(trimmed);
+            // Description lines (multiline) - preserve HTML content
+            if (inDescription) {
+                // Check if this line starts a new property (less indented than description content)
+                if (trimmed && !line.startsWith('      ') && trimmed.includes(': ')) {
+                    // This is a new property, end description parsing
+                    inDescription = false;
+                    // Process this line as a property
+                    const [key, ...valueParts] = trimmed.split(': ');
+                    const value = valueParts.join(': ');
+                    
+                    if (key === 'tags') {
+                        // Parse array format [item1, item2, item3]
+                        currentItem[key] = value.slice(1, -1).split(', ').map(tag => tag.trim());
+                    } else if (key === 'isPublic') {
+                        currentItem[key] = value === 'true';
+                    } else {
+                        // Remove quotes from string values (common in YAML)
+                        currentItem[key] = value.replace(/^["']|["']$/g, '');
+                    }
+                    continue;
+                }
+                
+                if (line.trim()) {
+                    // For HTML content, we need to be more careful about whitespace
+                    // The YAML multiline format uses 6 spaces for indentation
+                    // We want to preserve the content but remove the YAML indentation
+                    let content = line;
+                    
+                    // Remove YAML indentation (6 spaces) but preserve HTML formatting
+                    if (content.startsWith('      ')) {
+                        content = content.substring(6);
+                    }
+                    
+                    descriptionLines.push(content);
+                }
                 continue;
             }
         }
@@ -405,6 +442,10 @@ class AdventuresManager {
         const connectedTips = this.getConnectedTips(adventure.tags);
         const connectedTipsHtml = this.renderConnectedTips(connectedTips);
 
+        // Get connected photos
+        const connectedPhotos = this.getConnectedPhotos(adventure);
+        const connectedPhotosHtml = this.renderConnectedPhotos(connectedPhotos);
+
         return `
             <div class="adventure-item ${memberOnlyClass}">
                 ${memberIndicator}
@@ -414,14 +455,37 @@ class AdventuresManager {
                 </div>
                 <div class="adventure-content">
                     <h3>${adventure.title}</h3>
-                    <p>${adventure.description}</p>
+                    <div class="adventure-description">${adventure.description}</div>
                     <div class="adventure-tags">
                         ${adventure.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
                     </div>
+                    ${connectedPhotosHtml}
                     ${connectedTipsHtml}
                 </div>
             </div>
         `;
+    }
+
+    /**
+     * Get photos connected to an adventure
+     */
+    getConnectedPhotos(adventure) {
+        if (!window.photosManager || !window.photosManager.photosData) {
+            console.log('📸 No photos manager or data available');
+            return [];
+        }
+        
+        // First try to get photos by adventure ID
+        let photos = window.photosManager.getPhotosForAdventure(adventure.id);
+        console.log('📸 Photos for adventure', adventure.id, ':', photos.map(p => p.id));
+        
+        // If no photos found by ID, try to get photos by shared tags
+        if (photos.length === 0 && adventure.tags) {
+            photos = window.photosManager.getPhotosByTags(adventure.tags);
+            console.log('📸 Photos by tags for adventure', adventure.id, ':', photos.map(p => p.id));
+        }
+        
+        return photos;
     }
 
     /**
@@ -450,6 +514,46 @@ class AdventuresManager {
             
             return true;
         });
+    }
+
+    /**
+     * Render connected photos section
+     */
+    renderConnectedPhotos(connectedPhotos) {
+        if (!connectedPhotos || connectedPhotos.length === 0) return '';
+        
+        const isMember = this.authSystem ? this.authSystem.isMember() : false;
+        
+        const photosHtml = connectedPhotos.map(photo => {
+            const memberOnlyClass = !photo.isPublic ? 'members-only' : '';
+            const memberIndicator = !photo.isPublic ? '<div class="member-indicator">🔒 Members Only</div>' : '';
+            
+            return `
+                <div class="connected-photo ${memberOnlyClass}">
+                    ${memberIndicator}
+                    <div class="photo-container">
+                        <img src="${photo.path}${photo.filename}" alt="${photo.caption}" loading="lazy">
+                        <div class="photo-overlay">
+                            <div class="photo-info">
+                                <p class="photo-caption">${photo.caption}</p>
+                                <div class="photo-tags">
+                                    ${photo.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        return `
+            <div class="connected-photos">
+                <h4>📸 Photos</h4>
+                <div class="connected-photos-grid">
+                    ${photosHtml}
+                </div>
+            </div>
+        `;
     }
 
     /**
