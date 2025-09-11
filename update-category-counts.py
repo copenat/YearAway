@@ -10,16 +10,49 @@ from datetime import datetime
 from collections import defaultdict
 
 def load_tips_data():
-    """Load tips data from YAML file"""
-    tips_file = "and-now/content/tips-data.yaml"
-    if not os.path.exists(tips_file):
-        print(f"❌ Tips data file not found: {tips_file}")
-        return None
+    """Load tips data from separate YAML files"""
+    public_file = "and-now/content/tips-data-public.yaml"
+    members_file = "and-now/content/tips-data-members.yaml"
     
     try:
         import yaml
-        with open(tips_file, 'r', encoding='utf-8') as f:
-            return yaml.safe_load(f)
+        
+        # Load public tips
+        public_tips = []
+        if os.path.exists(public_file):
+            with open(public_file, 'r', encoding='utf-8') as f:
+                public_data = yaml.safe_load(f)
+                public_tips = public_data.get('tips', [])
+                # Mark all public tips as public
+                for tip in public_tips:
+                    tip['isPublic'] = True
+        
+        # Load members tips
+        members_tips = []
+        if os.path.exists(members_file):
+            with open(members_file, 'r', encoding='utf-8') as f:
+                members_data = yaml.safe_load(f)
+                members_tips = members_data.get('tips', [])
+                # Mark all members tips as not public
+                for tip in members_tips:
+                    tip['isPublic'] = False
+        
+        # Combine tips
+        all_tips = public_tips + members_tips
+        
+        # Get categories from category-counts.yaml (existing structure)
+        categories_file = "and-now/content/category-counts.yaml"
+        categories = []
+        if os.path.exists(categories_file):
+            with open(categories_file, 'r', encoding='utf-8') as f:
+                categories_data = yaml.safe_load(f)
+                categories = categories_data.get('categories', [])
+        
+        return {
+            'tips': all_tips,
+            'categories': categories
+        }
+        
     except ImportError:
         print("❌ PyYAML not installed. Install with: pip install PyYAML")
         return None
@@ -62,7 +95,9 @@ def create_category_counts_json(tips_data, category_stats):
             'Food & Dining': '🍽️',
             'Packing': '🎒',
             'Budget': '💰',
-            'Technology': '📱'
+            'Technology': '📱',
+            'Running': '🏃',
+            'Products': '🛍️'
         }
         
         category_data = {

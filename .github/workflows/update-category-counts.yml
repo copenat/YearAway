@@ -4,11 +4,13 @@ on:
   push:
     branches: [ main, develop ]
     paths:
-      - 'and-now/content/tips-data.json'
+      - 'and-now/content/tips-data-public.yaml'
+      - 'and-now/content/tips-data-members.yaml'
   pull_request:
     branches: [ main, develop ]
     paths:
-      - 'and-now/content/tips-data.json'
+      - 'and-now/content/tips-data-public.yaml'
+      - 'and-now/content/tips-data-members.yaml'
 
 jobs:
   update-counts:

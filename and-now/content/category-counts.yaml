@@ -27,13 +27,20 @@ categories:
   publicTips: 1
   membersOnlyTips: 0
   totalTips: 1
+- id: products
+  name: Products
+  icon: 🛍️
+  description: Recommended travel products and gear
+  publicTips: 3
+  membersOnlyTips: 0
+  totalTips: 3
 - id: running
   name: Running
   icon: 🏃
   description: Hints and tips for running
   publicTips: 0
-  membersOnlyTips: 0
-  totalTips: 0
+  membersOnlyTips: 1
+  totalTips: 1
 - id: technology
   name: Technology
   icon: 📱
@@ -48,15 +55,8 @@ categories:
   publicTips: 1
   membersOnlyTips: 1
   totalTips: 2
-- id: products
-  name: Products
-  icon: 🛍️
-  description: Recommended travel products and gear
-  publicTips: 3
-  membersOnlyTips: 0
-  totalTips: 3
-lastUpdated: '2025-09-08T21:02:42.759210Z'
+lastUpdated: '2025-09-11T19:25:06.843952Z'
 totalStats:
   publicTips: 8
-  membersOnlyTips: 3
-  totalTips: 11
+  membersOnlyTips: 4
+  totalTips: 12
