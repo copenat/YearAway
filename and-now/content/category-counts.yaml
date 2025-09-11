@@ -27,6 +27,13 @@ categories:
   publicTips: 1
   membersOnlyTips: 0
   totalTips: 1
+- id: running
+  name: Running
+  icon: 🏃
+  description: Hints and tips for running
+  publicTips: 0
+  membersOnlyTips: 0
+  totalTips: 0
 - id: technology
   name: Technology
   icon: 📱

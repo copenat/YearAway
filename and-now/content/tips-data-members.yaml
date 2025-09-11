@@ -25,3 +25,11 @@ tips:
     category: Food & Dining
     tags: [restaurants, local, hidden-gems]
     rating: 5
+
+  - id: running-trainers
+    title: Running Trainers
+    description: |
+      I really like the Brooks Ghost trainers for running. I've had two pairs and both have been great.
+    category: Running
+    tags: [shoes, brooks, ghost, comfort, durability]
+    rating: 5
