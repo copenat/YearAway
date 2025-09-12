@@ -115,13 +115,17 @@ class YAMLValidator:
             
         existing_photos = set()
         for photo in photos_data['photos']:
-            if 'filename' in photo:
+            if 'filename' in photo and 'path' in photo:
+                # Create full path like the validation script expects
+                full_path = photo['path'] + photo['filename']
+                existing_photos.add(full_path)
+                # Also add just the filename for partial matching
                 existing_photos.add(photo['filename'])
-            if 'path' in photo:
-                existing_photos.add(photo['path'])
                 
         for image in new_images:
-            if image not in existing_photos:
+            # Extract just the filename from the full path
+            image_filename = image.split('/')[-1] if '/' in image else image
+            if image not in existing_photos and image_filename not in existing_photos:
                 self.log_warning(f"New image {image} not found in photos-data files")
     
     def validate_photo_paths(self, photos_data: Dict, yaml_file_name: str) -> None:
