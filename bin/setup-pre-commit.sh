@@ -20,7 +20,7 @@ cat > .git/hooks/pre-commit << 'EOF'
 echo "🔍 Running pre-commit validation..."
 
 # Run the YAML validation script
-python3 and-now/content/bin/validate-yaml.py --exit-on-error
+python3 bin/validate-yaml.py --exit-on-error
 
 # Check if validation passed
 if [ $? -ne 0 ]; then
