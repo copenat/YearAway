@@ -76,3 +76,4 @@ tips:
     rating: 5
     price: "$199.99"
     icon: "🎧"
+# Test pre-commit hook
