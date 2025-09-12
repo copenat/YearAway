@@ -40,8 +40,8 @@ def load_tips_data():
         # Combine tips
         all_tips = public_tips + members_tips
         
-        # Get categories from category-counts.yaml (existing structure)
-        categories_file = "and-now/content/category-counts.yaml"
+        # Get categories from tips-category-counts.yaml (existing structure)
+        categories_file = "and-now/content/tips-category-counts.yaml"
         categories = []
         if os.path.exists(categories_file):
             with open(categories_file, 'r', encoding='utf-8') as f:
@@ -133,7 +133,7 @@ def create_category_counts_json(tips_data, category_stats):
 def update_category_counts_file(category_counts):
     """Write the updated category counts to file"""
     import yaml
-    output_file = "and-now/content/category-counts.yaml"
+    output_file = "and-now/content/tips-category-counts.yaml"
     
     with open(output_file, 'w', encoding='utf-8') as f:
         yaml.dump(category_counts, f, default_flow_style=False, allow_unicode=True, sort_keys=False)

@@ -62,7 +62,7 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-        git add and-now/content/category-counts.yaml
+        git add and-now/content/tips-category-counts.yaml
         git commit -m "🤖 Auto-update category counts from tips data
         
         - Updated category tip counts based on current tips-data.yaml

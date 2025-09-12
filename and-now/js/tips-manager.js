@@ -359,7 +359,7 @@ class TipsManager {
      */
     async loadCategoryCounts() {
         try {
-            const response = await fetch('content/category-counts.yaml');
+            const response = await fetch('content/tips-category-counts.yaml');
             if (!response.ok) {
                 console.warn('⚠️ Category counts file not found, using fallback counts');
                 this.categoryCounts = null;
