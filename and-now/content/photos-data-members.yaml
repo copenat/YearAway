@@ -31,6 +31,22 @@ photos:
   - planning-a-trip-to-asia
   isPublic: false
   featured: false
+- id: vietnameselagoon-paddleboats
+  filename: IMG_20191030_133226.jpg
+  path: content/images/members/
+  caption: A serene view of a Vietnamese lagoon with paddle boats and palm trees
+  date: '2019-10-30'
+  tags:
+  - lagoon
+  - paddleboat
+  - nature
+  - tourism
+  - vietnam
+  - water
+  adventure_ids:
+  - planning-a-trip-to-asia
+  isPublic: false
+  featured: false
 categories:
 - id: cafe-photos
   name: Cafe & Travel Spots
