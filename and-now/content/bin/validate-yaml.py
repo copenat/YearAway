@@ -1,0 +1,332 @@
+#!/usr/bin/env python3
+"""
+YearAway YAML Validation Script
+Validates YAML files for format, content, and cross-references
+"""
+
+import os
+import sys
+import yaml
+import subprocess
+import json
+from pathlib import Path
+from typing import Dict, List, Set, Any, Optional
+import argparse
+
+class YAMLValidator:
+    def __init__(self, repo_root: str):
+        self.repo_root = Path(repo_root)
+        self.content_dir = self.repo_root / "and-now" / "content"
+        self.errors = []
+        self.warnings = []
+        
+    def log_error(self, message: str):
+        """Log an error message"""
+        self.errors.append(f"❌ ERROR: {message}")
+        print(f"❌ ERROR: {message}")
+        
+    def log_warning(self, message: str):
+        """Log a warning message"""
+        self.warnings.append(f"⚠️  WARNING: {message}")
+        print(f"⚠️  WARNING: {message}")
+        
+    def log_success(self, message: str):
+        """Log a success message"""
+        print(f"✅ {message}")
+        
+    def validate_yaml_format(self, file_path: Path) -> Optional[Dict]:
+        """Validate YAML file format and return parsed data"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = yaml.safe_load(f)
+                self.log_success(f"YAML format valid: {file_path.name}")
+                return data
+        except yaml.YAMLError as e:
+            self.log_error(f"Invalid YAML format in {file_path.name}: {e}")
+            return None
+        except FileNotFoundError:
+            self.log_error(f"File not found: {file_path.name}")
+            return None
+            
+    def get_git_diff_files(self) -> Dict[str, List[str]]:
+        """Get files changed in git diff"""
+        try:
+            # Get staged changes
+            result = subprocess.run(
+                ['git', 'diff', '--cached', '--name-only'],
+                capture_output=True, text=True, cwd=self.repo_root
+            )
+            staged_files = result.stdout.strip().split('\n') if result.stdout.strip() else []
+            
+            # Get unstaged changes
+            result = subprocess.run(
+                ['git', 'diff', '--name-only'],
+                capture_output=True, text=True, cwd=self.repo_root
+            )
+            unstaged_files = result.stdout.strip().split('\n') if result.stdout.strip() else []
+            
+            return {
+                'staged': staged_files,
+                'unstaged': unstaged_files
+            }
+        except subprocess.CalledProcessError as e:
+            self.log_warning(f"Could not get git diff: {e}")
+            return {'staged': [], 'unstaged': []}
+            
+    def get_git_diff_content(self, file_path: str) -> str:
+        """Get the diff content for a specific file"""
+        try:
+            result = subprocess.run(
+                ['git', 'diff', '--cached', file_path],
+                capture_output=True, text=True, cwd=self.repo_root
+            )
+            if result.stdout:
+                return result.stdout
+                
+            result = subprocess.run(
+                ['git', 'diff', file_path],
+                capture_output=True, text=True, cwd=self.repo_root
+            )
+            return result.stdout
+        except subprocess.CalledProcessError:
+            return ""
+            
+    def find_new_images_in_diff(self, diff_content: str) -> List[str]:
+        """Find new image files mentioned in git diff"""
+        new_images = []
+        lines = diff_content.split('\n')
+        
+        for line in lines:
+            if line.startswith('+') and any(ext in line.lower() for ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp']):
+                # Extract image path from the line
+                if 'content/images/' in line:
+                    # Look for image paths in the diff
+                    parts = line.split('content/images/')
+                    if len(parts) > 1:
+                        image_path = 'content/images/' + parts[1].split()[0].strip('"\'')
+                        new_images.append(image_path)
+                        
+        return new_images
+        
+    def validate_photos_data(self, photos_data: Dict, new_images: List[str]) -> None:
+        """Validate that new images are referenced in photos data"""
+        if not photos_data or 'photos' not in photos_data:
+            return
+            
+        existing_photos = set()
+        for photo in photos_data['photos']:
+            if 'filename' in photo:
+                existing_photos.add(photo['filename'])
+            if 'path' in photo:
+                existing_photos.add(photo['path'])
+                
+        for image in new_images:
+            if image not in existing_photos:
+                self.log_warning(f"New image {image} not found in photos-data files")
+                
+    def validate_adventure_tags(self, adventures_data: Dict, photos_data: Dict) -> None:
+        """Validate that photo tags will make photos show up in adventure entries"""
+        if not adventures_data or 'adventures' not in adventures_data:
+            return
+            
+        if not photos_data or 'photos' not in photos_data:
+            return
+            
+        # Get all adventure tags
+        adventure_tags = set()
+        for adventure in adventures_data['adventures']:
+            if 'tags' in adventure:
+                adventure_tags.update(adventure['tags'])
+                
+        # Check photo tags against adventure tags
+        for photo in photos_data['photos']:
+            if 'tags' in photo:
+                photo_tags = set(photo['tags'])
+                matching_adventures = []
+                
+                for adventure in adventures_data['adventures']:
+                    if 'tags' in adventure:
+                        adventure_tag_set = set(adventure['tags'])
+                        if photo_tags.intersection(adventure_tag_set):
+                            matching_adventures.append(adventure.get('title', adventure.get('id', 'Unknown')))
+                            
+                if not matching_adventures:
+                    self.log_warning(f"Photo {photo.get('filename', photo.get('id', 'Unknown'))} tags {photo['tags']} don't match any adventure tags")
+                else:
+                    self.log_success(f"Photo {photo.get('filename', photo.get('id', 'Unknown'))} will appear in adventures: {', '.join(matching_adventures)}")
+                    
+    def validate_tips_data(self, tips_data: Dict) -> None:
+        """Validate tips data structure"""
+        if not tips_data or 'tips' not in tips_data:
+            return
+            
+        required_fields = ['id', 'title', 'description', 'category', 'tags', 'rating']
+        
+        for i, tip in enumerate(tips_data['tips']):
+            for field in required_fields:
+                if field not in tip:
+                    self.log_error(f"Tip {i+1} missing required field: {field}")
+                    
+            # Validate rating is between 1-5
+            if 'rating' in tip:
+                try:
+                    rating = int(tip['rating'])
+                    if rating < 1 or rating > 5:
+                        self.log_warning(f"Tip {tip.get('id', i+1)} has invalid rating: {rating} (should be 1-5)")
+                except (ValueError, TypeError):
+                    self.log_error(f"Tip {tip.get('id', i+1)} has invalid rating format: {tip['rating']}")
+                    
+    def validate_adventures_data(self, adventures_data: Dict) -> None:
+        """Validate adventures data structure"""
+        if not adventures_data or 'adventures' not in adventures_data:
+            return
+            
+        required_fields = ['id', 'title', 'description', 'date', 'category', 'tags', 'status']
+        
+        for i, adventure in enumerate(adventures_data['adventures']):
+            for field in required_fields:
+                if field not in adventure:
+                    self.log_error(f"Adventure {i+1} missing required field: {field}")
+                    
+            # Validate date format
+            if 'date' in adventure:
+                try:
+                    from datetime import datetime
+                    datetime.strptime(adventure['date'], '%Y-%m-%d')
+                except ValueError:
+                    self.log_error(f"Adventure {adventure.get('id', i+1)} has invalid date format: {adventure['date']} (should be YYYY-MM-DD)")
+                    
+    def validate_category_counts(self, category_counts: Dict) -> None:
+        """Validate category counts structure"""
+        if not category_counts:
+            return
+            
+        required_fields = ['categories', 'lastUpdated', 'totalStats']
+        
+        for field in required_fields:
+            if field not in category_counts:
+                self.log_error(f"category-counts missing required field: {field}")
+                
+        if 'categories' in category_counts:
+            for i, category in enumerate(category_counts['categories']):
+                required_cat_fields = ['id', 'name', 'icon', 'description', 'publicTips', 'membersOnlyTips', 'totalTips']
+                for field in required_cat_fields:
+                    if field not in category:
+                        self.log_error(f"Category {i+1} missing required field: {field}")
+                        
+    def run_validation(self) -> bool:
+        """Run the complete validation process"""
+        print("🔍 YearAway YAML Validation")
+        print("=" * 50)
+        
+        # Get changed files
+        changed_files = self.get_git_diff_files()
+        all_changed = set(changed_files['staged'] + changed_files['unstaged'])
+        
+        print(f"📁 Found {len(all_changed)} changed files")
+        
+        # Validate all YAML files in content directory
+        yaml_files = list(self.content_dir.glob("*.yaml"))
+        print(f"📄 Validating {len(yaml_files)} YAML files...")
+        
+        photos_data_public = None
+        photos_data_members = None
+        adventures_data_public = None
+        adventures_data_members = None
+        tips_data_public = None
+        tips_data_members = None
+        category_counts = None
+        
+        for yaml_file in yaml_files:
+            data = self.validate_yaml_format(yaml_file)
+            if data is None:
+                continue
+                
+            # Store data for cross-validation
+            if yaml_file.name == 'photos-data-public.yaml':
+                photos_data_public = data
+            elif yaml_file.name == 'photos-data-members.yaml':
+                photos_data_members = data
+            elif yaml_file.name == 'adventures-data-public.yaml':
+                adventures_data_public = data
+            elif yaml_file.name == 'adventures-data-members.yaml':
+                adventures_data_members = data
+            elif yaml_file.name == 'tips-data-public.yaml':
+                tips_data_public = data
+            elif yaml_file.name == 'tips-data-members.yaml':
+                tips_data_members = data
+            elif yaml_file.name == 'tips-category-counts.yaml':
+                category_counts = data
+                
+        # Cross-validation
+        print("\n🔗 Cross-validation...")
+        
+        # Check for new images in changed files
+        new_images = []
+        for changed_file in all_changed:
+            if changed_file.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
+                new_images.append(changed_file)
+            elif changed_file.endswith('.yaml'):
+                diff_content = self.get_git_diff_content(changed_file)
+                new_images.extend(self.find_new_images_in_diff(diff_content))
+                
+        if new_images:
+            print(f"🖼️  Found {len(new_images)} new images: {new_images}")
+            if photos_data_public:
+                self.validate_photos_data(photos_data_public, new_images)
+            if photos_data_members:
+                self.validate_photos_data(photos_data_members, new_images)
+                
+        # Validate data structures
+        if tips_data_public:
+            self.validate_tips_data(tips_data_public)
+        if tips_data_members:
+            self.validate_tips_data(tips_data_members)
+        if adventures_data_public:
+            self.validate_adventures_data(adventures_data_public)
+        if adventures_data_members:
+            self.validate_adventures_data(adventures_data_members)
+        if category_counts:
+            self.validate_category_counts(category_counts)
+            
+        # Validate photo-adventure tag matching
+        if photos_data_public and adventures_data_public:
+            self.validate_adventure_tags(adventures_data_public, photos_data_public)
+        if photos_data_members and adventures_data_members:
+            self.validate_adventure_tags(adventures_data_members, photos_data_members)
+            
+        # Summary
+        print("\n📊 Validation Summary")
+        print("=" * 30)
+        print(f"✅ Errors: {len(self.errors)}")
+        print(f"⚠️  Warnings: {len(self.warnings)}")
+        
+        if self.errors:
+            print("\n❌ ERRORS:")
+            for error in self.errors:
+                print(f"  {error}")
+                
+        if self.warnings:
+            print("\n⚠️  WARNINGS:")
+            for warning in self.warnings:
+                print(f"  {warning}")
+                
+        return len(self.errors) == 0
+
+def main():
+    parser = argparse.ArgumentParser(description='Validate YearAway YAML files')
+    parser.add_argument('--repo-root', default='.', help='Repository root directory')
+    parser.add_argument('--exit-on-error', action='store_true', help='Exit with error code if validation fails')
+    
+    args = parser.parse_args()
+    
+    validator = YAMLValidator(args.repo_root)
+    success = validator.run_validation()
+    
+    if not success and args.exit_on_error:
+        sys.exit(1)
+        
+    sys.exit(0 if success else 1)
+
+if __name__ == "__main__":
+    main()
