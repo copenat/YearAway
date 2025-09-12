@@ -178,12 +178,17 @@ class YAMLValidator:
                     self.log_warning(f"Photo {i+1} in {yaml_file_name}: isPublic=false but path doesn't contain 'members': '{path}'")
                 
     def validate_adventure_tags(self, adventures_data: Dict, photos_data: Dict) -> None:
-        """Validate that photo tags will make photos show up in adventure entries"""
+        """Validate that photo tags and adventure_ids will make photos show up in adventure entries"""
         if not adventures_data or 'adventures' not in adventures_data:
             return
             
         if not photos_data or 'photos' not in photos_data or not photos_data['photos']:
             return
+            
+        # Create a mapping of adventure IDs to titles
+        adventure_id_to_title = {}
+        for adventure in adventures_data['adventures']:
+            adventure_id_to_title[adventure.get('id', '')] = adventure.get('title', adventure.get('id', 'Unknown'))
             
         # Get all adventure tags
         adventure_tags = set()
@@ -191,22 +196,34 @@ class YAMLValidator:
             if 'tags' in adventure:
                 adventure_tags.update(adventure['tags'])
                 
-        # Check photo tags against adventure tags
+        # Check photo tags and adventure_ids against adventures
         for photo in photos_data['photos']:
-            if 'tags' in photo:
+            matching_adventures = []
+            
+            # Check adventure_ids first (more direct linking)
+            if 'adventure_ids' in photo and photo['adventure_ids']:
+                for adventure_id in photo['adventure_ids']:
+                    if adventure_id in adventure_id_to_title:
+                        matching_adventures.append(adventure_id_to_title[adventure_id])
+            
+            # Check photo tags against adventure tags (fallback)
+            if 'tags' in photo and not matching_adventures:
                 photo_tags = set(photo['tags'])
-                matching_adventures = []
-                
                 for adventure in adventures_data['adventures']:
                     if 'tags' in adventure:
                         adventure_tag_set = set(adventure['tags'])
                         if photo_tags.intersection(adventure_tag_set):
                             matching_adventures.append(adventure.get('title', adventure.get('id', 'Unknown')))
                             
-                if not matching_adventures:
-                    self.log_warning(f"Photo {photo.get('filename', photo.get('id', 'Unknown'))} tags {photo['tags']} don't match any adventure tags")
-                else:
-                    self.log_success(f"Photo {photo.get('filename', photo.get('id', 'Unknown'))} will appear in adventures: {', '.join(matching_adventures)}")
+            if not matching_adventures:
+                photo_name = photo.get('filename', photo.get('id', 'Unknown'))
+                if 'adventure_ids' in photo and photo['adventure_ids']:
+                    self.log_warning(f"Photo {photo_name} has adventure_ids {photo['adventure_ids']} but no matching adventures found")
+                elif 'tags' in photo:
+                    self.log_warning(f"Photo {photo_name} tags {photo['tags']} don't match any adventure tags")
+            else:
+                photo_name = photo.get('filename', photo.get('id', 'Unknown'))
+                self.log_success(f"Photo {photo_name} will appear in adventures: {', '.join(matching_adventures)}")
                     
     def validate_tips_data(self, tips_data: Dict) -> None:
         """Validate tips data structure"""
