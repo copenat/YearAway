@@ -1,7 +1,7 @@
 photos:
   - id: asia-planning-1
     filename: "asia-trip-1.jpg"
-    path: "content/images/adventures/"
+    path: "content/images/public/"
     caption: "Researching destinations for our Asia trip"
     date: "2025-09-10"
     tags: [asia, planning, china, thailand, laos, india, travel]
@@ -11,7 +11,7 @@ photos:
 
   - id: asia-planning-2
     filename: "asia-trip-2.jpg"
-    path: "content/images/adventures/"
+    path: "content/images/public/"
     caption: "Booking flights and accommodations"
     date: "2025-09-12"
     tags: [asia, planning, booking, travel, logistics]
@@ -21,7 +21,7 @@ photos:
 
   - id: site-development-1
     filename: "planning-1.jpg"
-    path: "content/images/adventures/"
+    path: "content/images/public/"
     caption: "Working on the new YearAway site development"
     date: "2025-09-08"
     tags: [development, website, planning, technical]

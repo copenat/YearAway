@@ -21,7 +21,7 @@ photos:
 
   - id: travel-cafe-2019
     filename: "IMG_20190921_101514.jpg"
-    path: "content/images/adventures/"
+    path: "content/images/public/"
     caption: "Travel-themed cafe interior with world map and guidebooks"
     date: "2019-09-21"
     tags: [cafe, travel, books, uk, interior, world-map, guidebooks]

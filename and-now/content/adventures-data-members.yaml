@@ -4,7 +4,7 @@ adventures:
     description: |
       We are currently planning a trip to Asia, specifically China, Thailand, Laos and finally India. We have been to all of them before but we are, as always, trying to find new places to visit.
       <div style="display: flex; gap: 20px; align-items: flex-start;">
-        <img src="content/images/adventures/IMG_20190921_101514.jpg" alt="Travel planning photo" title="Travel planning photo" style="width: 200px; height: auto; flex-shrink: 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <img src="content/images/public/IMG_20190921_101514.jpg" alt="Travel planning photo" title="Travel planning photo" style="width: 200px; height: auto; flex-shrink: 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
         <div style="flex: 1;">
           <p>This is a longer trip than we have been on in a while, so we are looking forward to it. We're excited to explore new destinations and revisit some of our favorite places.</p>
         </div>

@@ -43,10 +43,10 @@ adventures:
     title: Adventure with Photo
     description: |
       <div style="display: flex; gap: 20px; align-items: flex-start;">
-        <img src="content/images/adventures/example-photo.jpg" alt="Example photo" title="Example photo" style="width: 200px; height: auto; flex-shrink: 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <img src="content/images/public/example-photo.jpg" alt="Example photo" title="Example photo" style="width: 200px; height: auto; flex-shrink: 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
         <div style="flex: 1;">
           <p>This is an example of how to embed photos in your adventure descriptions using a newspaper-style layout. The image appears on the left with text flowing beside it.</p>
-          <p>You can use any image from your content/images/adventures/ or content/images/members/ directories. The layout is responsive and will look great on different screen sizes.</p>
+          <p>You can use any image from your content/images/public/ or content/images/members/ directories. The layout is responsive and will look great on different screen sizes.</p>
         </div>
       </div>
     date: "2025-09-10"
@@ -131,7 +131,7 @@ lastUpdated: '2025-09-08T21:30:00.000Z'       # REQUIRED: ISO timestamp of last 
 #   - Can embed images using <img> tags
 #   - Examples: "Working on the new YearAway site...", "Amazing trip to..."
 #   - Image embedding examples:
-#     * Simple: <img src="content/images/adventures/photo.jpg" alt="Description">
+#     * Simple: <img src="content/images/public/photo.jpg" alt="Description">
 #     * With hover tooltip: <img src="..." alt="..." title="Hover text">
 #     * Newspaper layout: <div style="display: flex; gap: 20px;"><img style="width: 200px;">...</div>
 #
