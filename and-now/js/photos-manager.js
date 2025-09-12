@@ -181,13 +181,47 @@ class PhotosManager {
                     currentItem[key] = value;
                     continue;
                 } else if (key === 'tags' || key === 'adventure_ids') {
-                    // Parse array format [item1, item2, item3]
-                    currentItem[key] = value.slice(1, -1).split(', ').map(item => item.trim());
+                    // Initialize array if it doesn't exist
+                    if (!currentItem[key]) {
+                        currentItem[key] = [];
+                    }
+                    // Parse array format [item1, item2, item3] or single item
+                    if (value.startsWith('[') && value.endsWith(']')) {
+                        currentItem[key] = value.slice(1, -1).split(', ').map(item => item.trim());
+                    } else if (value.trim()) {
+                        // Single item, add to array
+                        currentItem[key].push(value.trim());
+                    }
                 } else if (key === 'isPublic' || key === 'featured') {
                     currentItem[key] = value === 'true';
                 } else {
                     // Remove quotes from string values (common in YAML)
                     currentItem[key] = value.replace(/^["']|["']$/g, '');
+                }
+                continue;
+            }
+            
+            // Handle YAML array items (lines starting with -)
+            if (currentItem && trimmed.startsWith('- ')) {
+                const arrayValue = trimmed.substring(2).trim();
+                // Check if we're in a tags or adventure_ids context
+                if (currentItem.tags && !currentItem.tags.length) {
+                    currentItem.tags = [];
+                }
+                if (currentItem.adventure_ids && !currentItem.adventure_ids.length) {
+                    currentItem.adventure_ids = [];
+                }
+                
+                // Look at the previous line to determine which array this belongs to
+                if (i > 0) {
+                    const prevLine = lines[i - 1].trim();
+                    if (prevLine === 'tags:') {
+                        if (!currentItem.tags) currentItem.tags = [];
+                        currentItem.tags.push(arrayValue);
+                    } else if (prevLine === 'adventure_ids:') {
+                        if (!currentItem.adventure_ids) currentItem.adventure_ids = [];
+                        currentItem.adventure_ids.push(arrayValue);
+                    }
                 }
                 continue;
             }
@@ -217,20 +251,31 @@ class PhotosManager {
         if (!this.photosData || !this.photosData.photos) return [];
         
         const isMember = this.authSystem ? this.authSystem.isMember() : false;
+        console.log('🔍 getPhotosForAdventure called with adventureId:', adventureId);
+        console.log('🔍 Total photos available:', this.photosData.photos.length);
+        console.log('🔍 Is member:', isMember);
         
-        return this.photosData.photos.filter(photo => {
+        const result = this.photosData.photos.filter(photo => {
+            console.log('🔍 Checking photo:', photo.id, 'adventure_ids:', photo.adventure_ids, 'isPublic:', photo.isPublic);
+            
             // Check if photo is linked to this adventure
             if (!photo.adventure_ids || !photo.adventure_ids.includes(adventureId)) {
+                console.log('🔍 Photo', photo.id, 'not linked to adventure', adventureId);
                 return false;
             }
             
             // Filter based on authentication status
             if (!photo.isPublic && !isMember) {
+                console.log('🔍 Photo', photo.id, 'is private and user not member');
                 return false; // Hide private photos for non-members
             }
             
+            console.log('🔍 Photo', photo.id, 'matches criteria');
             return true;
         });
+        
+        console.log('🔍 Found', result.length, 'photos for adventure', adventureId);
+        return result;
     }
 
     /**

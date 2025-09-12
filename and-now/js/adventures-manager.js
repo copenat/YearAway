@@ -475,6 +475,10 @@ class AdventuresManager {
             return [];
         }
         
+        console.log('📸 PhotosManager data:', window.photosManager.photosData);
+        console.log('📸 All photos in PhotosManager:', window.photosManager.photosData.photos);
+        console.log('📸 Auth system status:', this.authSystem ? this.authSystem.isMember() : 'No auth system');
+        
         // First try to get photos by adventure ID
         let photos = window.photosManager.getPhotosForAdventure(adventure.id);
         console.log('📸 Photos for adventure', adventure.id, ':', photos.map(p => p.id));
