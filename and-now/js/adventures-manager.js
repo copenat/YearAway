@@ -427,7 +427,7 @@ class AdventuresManager {
     renderAdventureItem(adventure) {
         // Members-only adventures are those that come from the members file
         // We can identify them by checking if they have certain IDs or by tracking source
-        const membersOnlyAdventureIds = ['private-adventure-aug', 'members-only-trip-report'];
+        const membersOnlyAdventureIds = ['private-adventure-aug', 'members-only-trip-report', 'planning-a-trip-to-asia'];
         const isMembersOnly = membersOnlyAdventureIds.includes(adventure.id);
         
         const memberOnlyClass = isMembersOnly ? 'members-only' : '';
@@ -448,10 +448,12 @@ class AdventuresManager {
 
         return `
             <div class="adventure-item ${memberOnlyClass}">
-                ${memberIndicator}
-                <div class="adventure-date">
-                    <span class="month">${month}</span>
-                    <span class="year">${year}</span>
+                <div class="adventure-date-container">
+                    <div class="adventure-date">
+                        <span class="month">${month}</span>
+                        <span class="year">${year}</span>
+                    </div>
+                    ${memberIndicator}
                 </div>
                 <div class="adventure-content">
                     <h3>${adventure.title}</h3>
@@ -530,7 +532,7 @@ class AdventuresManager {
         
         const photosHtml = connectedPhotos.map(photo => {
             const memberOnlyClass = !photo.isPublic ? 'members-only' : '';
-            const memberIndicator = !photo.isPublic ? '<div class="member-indicator">🔒 Members Only</div>' : '';
+            const memberIndicator = '';
             
             return `
                 <div class="connected-photo ${memberOnlyClass}">

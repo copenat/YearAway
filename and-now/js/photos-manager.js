@@ -338,7 +338,7 @@ class PhotosManager {
         
         const photosHtml = photos.map(photo => {
             const memberOnlyClass = !photo.isPublic ? 'members-only' : '';
-            const memberIndicator = !photo.isPublic ? '<div class="member-indicator">🔒 Members Only</div>' : '';
+            const memberIndicator = '';
             
             return `
                 <div class="adventure-photo ${memberOnlyClass}">

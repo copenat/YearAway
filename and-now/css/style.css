@@ -619,28 +619,59 @@ input:focus {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.adventure-item.members-only {
+    /* Reverted to original styling - no special border or shadow */
+}
+
 .adventure-item:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
 
-.adventure-date {
+.adventure-date-container {
     flex-shrink: 0;
+    min-width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.adventure-date {
     text-align: center;
-    min-width: 80px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .adventure-date .month {
     display: block;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--primary-brown);
+    line-height: 1.2;
 }
 
 .adventure-date .year {
     display: block;
-    font-size: 14px;
-    color: var(--medium-gray);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary-brown);
+    line-height: 1.2;
+}
+
+.member-indicator {
+    font-size: 11px;
+    color: white;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+    border: 1px solid #1e7e34;
 }
 
 .adventure-content {
@@ -1255,12 +1286,12 @@ input:focus {
     padding: 1rem;
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
     border-radius: 12px;
-    border-left: 4px solid #007bff;
+    border-left: 4px solid #6c757d;
 }
 
 .connected-tips h4 {
     margin: 0 0 1rem 0;
-    color: #007bff;
+    color: #6c757d;
     font-size: 1rem;
     font-weight: 600;
 }
@@ -1281,7 +1312,7 @@ input:focus {
 
 .connected-tip:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+    box-shadow: var(--shadow-md);
 }
 
 .tip-header {
@@ -1350,12 +1381,12 @@ input:focus {
     padding: 1rem;
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
     border-radius: 12px;
-    border-left: 4px solid #28a745;
+    border-left: 4px solid #6c757d;
 }
 
 .connected-photos h4 {
     margin: 0 0 1rem 0;
-    color: #28a745;
+    color: #6c757d;
     font-size: 1rem;
     font-weight: 600;
     display: flex;
@@ -1380,11 +1411,11 @@ input:focus {
 
 .connected-photo:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
+    box-shadow: var(--shadow-md);
 }
 
 .connected-photo.members-only {
-    border-color: #ff6b6b;
+    /* Removed red border */
 }
 
 .connected-photo .photo-container {
