@@ -223,10 +223,18 @@ class YAMLValidator:
         changed_files = self.get_git_diff_files()
         all_changed = set(changed_files['staged'] + changed_files['unstaged'])
         
-        print(f"📁 Found {len(all_changed)} changed files")
+        # Filter for YAML files in content directory
+        yaml_changed = [f for f in all_changed if f.endswith('.yaml') and 'and-now/content/' in f]
         
-        # Validate all YAML files in content directory
-        yaml_files = list(self.content_dir.glob("*.yaml"))
+        if yaml_changed:
+            print(f"📁 Found {len(yaml_changed)} changed YAML files:")
+            for yaml_file in sorted(yaml_changed):
+                print(f"   📄 {yaml_file}")
+        else:
+            print(f"📁 Found {len(all_changed)} changed files (no YAML files changed)")
+        
+        # Validate all YAML files in content directory (alphabetical order)
+        yaml_files = sorted(list(self.content_dir.glob("*.yaml")))
         print(f"📄 Validating {len(yaml_files)} YAML files...")
         
         photos_data_public = None
