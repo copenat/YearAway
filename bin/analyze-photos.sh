@@ -90,6 +90,7 @@ AUTO_ADD=false
 VERBOSE=false
 QUIET=false
 REPO_ROOT=""
+IMAGE_PATHS=()
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -114,10 +115,14 @@ while [[ $# -gt 0 ]]; do
             REPO_ROOT="$2"
             shift 2
             ;;
-        *)
+        -*)
             echo -e "${RED}❌ Unknown option: $1${NC}"
             echo "Use --help for usage information"
             exit 1
+            ;;
+        *) # Positional arguments (image paths)
+            IMAGE_PATHS+=("$1")
+            shift
             ;;
     esac
 done
@@ -131,6 +136,13 @@ fi
 
 if [ -n "$REPO_ROOT" ]; then
     PYTHON_ARGS+=("--repo-root" "$REPO_ROOT")
+fi
+
+# Add image paths if provided
+if [ ${#IMAGE_PATHS[@]} -gt 0 ]; then
+    for img_path in "${IMAGE_PATHS[@]}"; do
+        PYTHON_ARGS+=("--image-path" "$img_path")
+    done
 fi
 
 # Show header

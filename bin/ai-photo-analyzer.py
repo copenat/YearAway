@@ -115,40 +115,48 @@ Respond with valid JSON in this exact format:
             return False
     
     def analyze_photo_with_ollama(self, image_path: Path) -> Optional[Dict]:
-        """Analyze photo using Ollama LLaVA model"""
+        """Analyze photo using Ollama LLaVA model via API"""
         try:
+            import base64
+            import requests
+            
             system_prompt = self.get_llava_system_prompt()
             
-            # Create a temporary prompt file
-            import tempfile
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-                f.write(system_prompt)
-                prompt_file = f.name
+            # Read and encode image
+            with open(image_path, 'rb') as f:
+                image_data = base64.b64encode(f.read()).decode('utf-8')
             
-            # Run Ollama with LLaVA
-            cmd = [
-                'ollama', 'run', 'llava',
-                '--image', str(image_path),
-                '--prompt', f'@{prompt_file}'
-            ]
+            # Prepare API request
+            api_url = "http://localhost:11434/api/generate"
+            payload = {
+                "model": "llava",
+                "prompt": system_prompt,
+                "images": [image_data],
+                "format": "json"
+            }
             
-            print(f"🤖 Analyzing {image_path.name} with Ollama LLaVA...")
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            print(f"🤖 Analyzing {image_path.name} with Ollama LLaVA API...")
+            response = requests.post(api_url, json=payload, timeout=120)
             
-            # Clean up temp file
-            os.unlink(prompt_file)
-            
-            if result.returncode == 0:
-                # Parse JSON response from Ollama
-                response_text = result.stdout.strip()
-                # Extract JSON from response (Ollama might add extra text)
+            if response.status_code == 200:
+                # Parse streaming response
+                response_text = ""
+                for line in response.text.strip().split('\n'):
+                    if line:
+                        try:
+                            data = json.loads(line)
+                            if 'response' in data:
+                                response_text += data['response']
+                        except json.JSONDecodeError:
+                            continue
+                
+                # Extract JSON from response
                 try:
-                    # Look for JSON in the response
                     import re
                     json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
                     if json_match:
-                        response = json.loads(json_match.group())
-                        return response
+                        result_data = json.loads(json_match.group())
+                        return result_data
                     else:
                         print(f"❌ No JSON found in Ollama response: {response_text}")
                         return None
@@ -157,11 +165,11 @@ Respond with valid JSON in this exact format:
                     print(f"Raw response: {response_text}")
                     return None
             else:
-                print(f"❌ Ollama analysis failed: {result.stderr}")
+                print(f"❌ Ollama API request failed: {response.status_code} - {response.text}")
                 return None
                 
-        except subprocess.TimeoutExpired:
-            print(f"❌ Ollama analysis timed out for {image_path.name}")
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Ollama API request failed: {e}")
             return None
         except Exception as e:
             print(f"❌ Error analyzing photo with Ollama: {e}")
@@ -232,13 +240,16 @@ Respond with valid JSON in this exact format:
         # Generate filename
         filename = image_path.name
         
+        # Extract date from EXIF data if possible, fallback to filename parsing
+        photo_date = self.extract_date_from_exif(image_path)
+        
         # Create YAML entry
         entry = {
             'id': analysis.get('id', filename.replace('.', '-').lower()),
             'filename': filename,
             'path': relative_path,
             'caption': analysis.get('caption', ''),
-            'date': datetime.now().strftime('%Y-%m-%d'),
+            'date': photo_date,
             'tags': analysis.get('tags', []),
             'adventure_ids': analysis.get('adventure_ids', []),
             'isPublic': is_public,
@@ -246,6 +257,92 @@ Respond with valid JSON in this exact format:
         }
         
         return entry
+    
+    def extract_date_from_exif(self, image_path: Path) -> str:
+        """Extract date from image EXIF data using exiftool"""
+        try:
+            # Try to get the creation date from EXIF data
+            result = subprocess.run([
+                'exiftool', '-CreateDate', '-d', '%Y-%m-%d', str(image_path)
+            ], capture_output=True, text=True, timeout=10)
+            
+            if result.returncode == 0 and result.stdout.strip():
+                # Parse exiftool output: "Create Date                     : 2019-09-21"
+                lines = result.stdout.strip().split('\n')
+                for line in lines:
+                    if 'Create Date' in line and ':' in line:
+                        date_part = line.split(':')[-1].strip()
+                        if date_part and date_part != '-':
+                            return date_part
+            
+            # Fallback: try DateTimeOriginal
+            result = subprocess.run([
+                'exiftool', '-DateTimeOriginal', '-d', '%Y-%m-%d', str(image_path)
+            ], capture_output=True, text=True, timeout=10)
+            
+            if result.returncode == 0 and result.stdout.strip():
+                lines = result.stdout.strip().split('\n')
+                for line in lines:
+                    if 'Date/Time Original' in line and ':' in line:
+                        date_part = line.split(':')[-1].strip()
+                        if date_part and date_part != '-':
+                            return date_part
+            
+            # Fallback: try FileModifyDate
+            result = subprocess.run([
+                'exiftool', '-FileModifyDate', '-d', '%Y-%m-%d', str(image_path)
+            ], capture_output=True, text=True, timeout=10)
+            
+            if result.returncode == 0 and result.stdout.strip():
+                lines = result.stdout.strip().split('\n')
+                for line in lines:
+                    if 'File Modification Date/Time' in line and ':' in line:
+                        date_part = line.split(':')[-1].strip()
+                        if date_part and date_part != '-':
+                            return date_part
+            
+        except (subprocess.TimeoutExpired, FileNotFoundError, subprocess.CalledProcessError):
+            pass
+        
+        # If exiftool fails or no date found, fall back to filename parsing
+        return self.extract_date_from_filename(image_path.name)
+    
+    def extract_date_from_filename(self, filename: str) -> str:
+        """Extract date from filename if it follows common patterns (fallback method)"""
+        import re
+        
+        # Pattern 1: IMG_YYYYMMDD_HHMMSS.jpg (e.g., IMG_20190921_101514.jpg)
+        match = re.search(r'IMG_(\d{4})(\d{2})(\d{2})_', filename)
+        if match:
+            year, month, day = match.groups()
+            return f"{year}-{month}-{day}"
+        
+        # Pattern 2: YYYY-MM-DD_HHMMSS.jpg
+        match = re.search(r'(\d{4})-(\d{2})-(\d{2})_', filename)
+        if match:
+            year, month, day = match.groups()
+            return f"{year}-{month}-{day}"
+        
+        # Pattern 3: YYYYMMDD_HHMMSS.jpg
+        match = re.search(r'(\d{4})(\d{2})(\d{2})_', filename)
+        if match:
+            year, month, day = match.groups()
+            return f"{year}-{month}-{day}"
+        
+        # Pattern 4: YYYY-MM-DD.jpg
+        match = re.search(r'(\d{4})-(\d{2})-(\d{2})\.', filename)
+        if match:
+            year, month, day = match.groups()
+            return f"{year}-{month}-{day}"
+        
+        # Pattern 5: YYYYMMDD.jpg
+        match = re.search(r'(\d{4})(\d{2})(\d{2})\.', filename)
+        if match:
+            year, month, day = match.groups()
+            return f"{year}-{month}-{day}"
+        
+        # If no date pattern found, use today's date
+        return datetime.now().strftime('%Y-%m-%d')
     
     def find_new_images(self) -> List[Tuple[Path, bool]]:
         """Find new images that aren't in photos data files"""
@@ -364,17 +461,74 @@ Respond with valid JSON in this exact format:
             print(f"\n✅ Successfully processed {success_count}/{len(new_images)} images")
         
         return True
+    
+    def run_analysis_for_specific_images(self, image_paths: List[str], auto_add: bool = False) -> bool:
+        """Run photo analysis for specific image paths"""
+        print("🤖 AI Photo Analyzer for YearAway (Specific Images)")
+        print("=" * 50)
+        
+        # Load adventures data
+        self.adventures_data = self.load_adventures_data()
+        print(f"📚 Loaded {len(self.adventures_data)} adventures for context")
+        
+        success_count = 0
+        
+        for image_path_str in image_paths:
+            image_path = Path(image_path_str)
+            
+            if not image_path.exists():
+                print(f"❌ Image not found: {image_path}")
+                continue
+            
+            # Determine if it's public or members based on path
+            is_public = 'public' in str(image_path)
+            
+            print(f"\n🔍 Analyzing {image_path.name}...")
+            
+            # Analyze with available LLaVA implementation
+            analysis = self.analyze_photo_with_llava(image_path)
+            if not analysis:
+                print(f"❌ Failed to analyze {image_path.name}")
+                continue
+            
+            # Generate YAML entry
+            entry = self.generate_yaml_entry(image_path, analysis, is_public)
+            
+            print(f"📝 Generated entry:")
+            print(f"   ID: {entry['id']}")
+            print(f"   Caption: {entry['caption']}")
+            print(f"   Tags: {entry['tags']}")
+            print(f"   Adventure IDs: {entry['adventure_ids']}")
+            print(f"   Directory: {'public' if is_public else 'members'}")
+            
+            if auto_add:
+                if self.add_photo_to_yaml(entry, is_public):
+                    success_count += 1
+            else:
+                print(f"💡 Use --auto-add to automatically add this entry to YAML files")
+        
+        if auto_add:
+            print(f"\n✅ Successfully processed {success_count}/{len(image_paths)} images")
+        
+        return True
 
 def main():
     parser = argparse.ArgumentParser(description='AI Photo Analyzer for YearAway')
     parser.add_argument('--repo-root', default='.', help='Repository root directory')
     parser.add_argument('--auto-add', action='store_true', 
                        help='Automatically add generated entries to YAML files')
+    parser.add_argument('--image-path', action='append', 
+                       help='Specific image path to analyze (can be used multiple times)')
     
     args = parser.parse_args()
     
     analyzer = AIPhotoAnalyzer(args.repo_root)
-    success = analyzer.run_analysis(auto_add=args.auto_add)
+    
+    # If specific image paths provided, analyze those instead of looking for new images
+    if args.image_path:
+        success = analyzer.run_analysis_for_specific_images(args.image_path, auto_add=args.auto_add)
+    else:
+        success = analyzer.run_analysis(auto_add=args.auto_add)
     
     sys.exit(0 if success else 1)
 

@@ -285,10 +285,8 @@ class YAMLValidator:
             if photos_data_members:
                 self.validate_photos_data(photos_data_members, new_images)
             
-            # Suggest AI analysis for new images
-            print(f"\n🤖 AI Photo Analysis Available:")
-            print(f"   Run: ./bin/ai-photo-analyzer.py --auto-add")
-            print(f"   This will analyze new images and generate YAML entries automatically")
+            # Run AI analysis for new images that don't have entries
+            self.run_ai_analysis_for_new_images(new_images)
                 
         # Validate data structures
         if tips_data_public:
@@ -325,6 +323,96 @@ class YAMLValidator:
                 print(f"  {warning}")
                 
         return len(self.errors) == 0
+    
+    def run_ai_analysis_for_new_images(self, new_images: List[str]) -> None:
+        """Run AI photo analysis for new images that don't have YAML entries"""
+        if not new_images:
+            return
+        
+        # Check which images actually need analysis (not already in YAML files)
+        images_needing_analysis = []
+        
+        # Load existing photos to check against
+        existing_photos = set()
+        
+        # Check public photos
+        public_file = self.content_dir / "photos-data-public.yaml"
+        if public_file.exists():
+            with open(public_file, 'r') as f:
+                data = yaml.safe_load(f)
+                if data and 'photos' in data:
+                    for photo in data['photos']:
+                        existing_photos.add(photo.get('filename', ''))
+        
+        # Check members photos
+        members_file = self.content_dir / "photos-data-members.yaml"
+        if members_file.exists():
+            with open(members_file, 'r') as f:
+                data = yaml.safe_load(f)
+                if data and 'photos' in data:
+                    for photo in data['photos']:
+                        existing_photos.add(photo.get('filename', ''))
+        
+        # Filter new images to only those not in existing YAML files
+        for image_path in new_images:
+            # Extract just the filename from the path
+            filename = Path(image_path).name
+            if filename not in existing_photos:
+                images_needing_analysis.append(image_path)
+        
+        if not images_needing_analysis:
+            print(f"✅ All new images already have YAML entries")
+            return
+        
+        print(f"\n🤖 Running AI analysis for {len(images_needing_analysis)} new images...")
+        
+        # Import and run the AI photo analyzer
+        try:
+            import subprocess
+            import sys
+            
+            # Build command to run AI photo analyzer
+            analyzer_script = self.repo_root / "bin" / "ai-photo-analyzer.py"
+            
+            if not analyzer_script.exists():
+                print(f"⚠️  AI photo analyzer not found at {analyzer_script}")
+                return
+            
+            # Run AI analysis for each image
+            for image_path in images_needing_analysis:
+                print(f"🔍 Analyzing {Path(image_path).name}...")
+                
+                cmd = [
+                    sys.executable, str(analyzer_script),
+                    "--image-path", image_path,
+                    "--auto-add"
+                ]
+                
+                try:
+                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+                    
+                    if result.returncode == 0:
+                        print(f"✅ Successfully analyzed {Path(image_path).name}")
+                        # Show the generated entry
+                        if result.stdout:
+                            lines = result.stdout.split('\n')
+                            for line in lines:
+                                if 'Generated entry:' in line or 'ID:' in line or 'Caption:' in line:
+                                    print(f"   {line.strip()}")
+                    else:
+                        print(f"❌ Failed to analyze {Path(image_path).name}: {result.stderr}")
+                        
+                except subprocess.TimeoutExpired:
+                    print(f"⏰ Analysis timed out for {Path(image_path).name}")
+                except Exception as e:
+                    print(f"❌ Error analyzing {Path(image_path).name}: {e}")
+            
+            print(f"🎉 AI analysis completed for {len(images_needing_analysis)} images")
+            
+        except ImportError as e:
+            print(f"⚠️  Could not import required modules for AI analysis: {e}")
+        except Exception as e:
+            print(f"⚠️  Error running AI photo analysis: {e}")
 
 def main():
     parser = argparse.ArgumentParser(description='Validate YearAway YAML files')
