@@ -20,7 +20,7 @@ cat > .git/hooks/pre-commit << 'EOF'
 echo "🔍 Running pre-commit validation..."
 
 # Run the YAML validation script
-./bin/validate-yaml --exit-on-error
+./bin/validate-yaml.sh --exit-on-error
 
 # Check if validation passed
 if [ $? -ne 0 ]; then
