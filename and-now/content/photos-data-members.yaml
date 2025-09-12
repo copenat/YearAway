@@ -1,27 +1,7 @@
 photos:
-  - id: family-moments-1
-    filename: "family-1.jpg"
-    path: "content/images/members/"
-    caption: "Private family moments during planning"
-    date: "2025-09-11"
-    tags: [family, private, planning, personal]
-    adventure_ids: ["planning-a-trip-to-asia"]
-    isPublic: false
-    featured: false
-
-  - id: exclusive-planning-1
-    filename: "private-1.jpg"
-    path: "content/images/members/"
-    caption: "Exclusive behind-the-scenes planning details"
-    date: "2025-09-13"
-    tags: [private, planning, exclusive, members-only]
-    adventure_ids: ["planning-a-trip-to-asia"]
-    isPublic: false
-    featured: true
-
   - id: travel-cafe-2019
     filename: "IMG_20190921_101514.jpg"
-    path: "content/images/public/"
+    path: "content/images/members/"
     caption: "Travel-themed cafe interior with world map and guidebooks"
     date: "2019-09-21"
     tags: [cafe, travel, books, uk, interior, world-map, guidebooks]
@@ -31,18 +11,6 @@ photos:
 
 
 categories:
-  - id: family-photos
-    name: Family Photos
-    icon: 👨‍👩‍👧‍👦
-    description: Private family moments and personal photos
-    count: 1
-
-  - id: exclusive-photos
-    name: Exclusive Photos
-    icon: 🔒
-    description: Members-only exclusive content and behind-the-scenes photos
-    count: 1
-
   - id: cafe-photos
     name: Cafe & Travel Spots
     icon: ☕

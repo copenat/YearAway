@@ -110,7 +110,7 @@ class YAMLValidator:
         
     def validate_photos_data(self, photos_data: Dict, new_images: List[str]) -> None:
         """Validate that new images are referenced in photos data"""
-        if not photos_data or 'photos' not in photos_data:
+        if not photos_data or 'photos' not in photos_data or not photos_data['photos']:
             return
             
         existing_photos = set()
@@ -123,13 +123,62 @@ class YAMLValidator:
         for image in new_images:
             if image not in existing_photos:
                 self.log_warning(f"New image {image} not found in photos-data files")
+    
+    def validate_photo_paths(self, photos_data: Dict, yaml_file_name: str) -> None:
+        """Validate that photo paths in YAML files point to existing files"""
+        if not photos_data or 'photos' not in photos_data or not photos_data['photos']:
+            return
+        
+        for i, photo in enumerate(photos_data['photos']):
+            if 'filename' not in photo or 'path' not in photo:
+                continue
+            
+            filename = photo['filename']
+            path = photo['path']
+            
+            # Construct the full path to the image file
+            # Remove 'content/images/' prefix if present since we're already in content_dir
+            if path.startswith('content/images/'):
+                relative_path = path[15:]  # Remove 'content/images/' prefix
+            else:
+                relative_path = path
+            
+            # Ensure path ends with /
+            if not relative_path.endswith('/'):
+                relative_path += '/'
+            
+            full_path = self.content_dir / "images" / relative_path / filename
+            
+            # Check if the file exists
+            if not full_path.exists():
+                self.log_error(f"Photo {i+1} in {yaml_file_name}: File not found at {full_path}")
+            else:
+                self.log_success(f"Photo {i+1} in {yaml_file_name}: File exists at {full_path}")
+            
+            # Validate path format
+            if not path.startswith('content/images/'):
+                self.log_warning(f"Photo {i+1} in {yaml_file_name}: Path should start with 'content/images/' but got '{path}'")
+            
+            # Check if path matches expected directory structure
+            if 'public' in path and 'members' in path:
+                self.log_error(f"Photo {i+1} in {yaml_file_name}: Path cannot contain both 'public' and 'members': '{path}'")
+            elif 'public' not in path and 'members' not in path:
+                self.log_warning(f"Photo {i+1} in {yaml_file_name}: Path should specify 'public' or 'members' directory: '{path}'")
+            
+            # Validate isPublic field matches path
+            if 'isPublic' in photo:
+                is_public = photo['isPublic']
+                if is_public and 'public' not in path:
+                    self.log_warning(f"Photo {i+1} in {yaml_file_name}: isPublic=true but path doesn't contain 'public': '{path}'")
+                elif not is_public and 'members' not in path:
+                    self.log_warning(f"Photo {i+1} in {yaml_file_name}: isPublic=false but path doesn't contain 'members': '{path}'")
                 
     def validate_adventure_tags(self, adventures_data: Dict, photos_data: Dict) -> None:
         """Validate that photo tags will make photos show up in adventure entries"""
         if not adventures_data or 'adventures' not in adventures_data:
             return
             
-        if not photos_data or 'photos' not in photos_data:
+        if not photos_data or 'photos' not in photos_data or not photos_data['photos']:
             return
             
         # Get all adventure tags
@@ -299,6 +348,12 @@ class YAMLValidator:
             self.validate_adventures_data(adventures_data_members)
         if category_counts:
             self.validate_category_counts(category_counts)
+        
+        # Validate photo paths
+        if photos_data_public:
+            self.validate_photo_paths(photos_data_public, 'photos-data-public.yaml')
+        if photos_data_members:
+            self.validate_photo_paths(photos_data_members, 'photos-data-members.yaml')
             
         # Validate photo-adventure tag matching
         if photos_data_public and adventures_data_public:
@@ -340,7 +395,7 @@ class YAMLValidator:
         if public_file.exists():
             with open(public_file, 'r') as f:
                 data = yaml.safe_load(f)
-                if data and 'photos' in data:
+                if data and 'photos' in data and data['photos']:
                     for photo in data['photos']:
                         existing_photos.add(photo.get('filename', ''))
         
@@ -349,7 +404,7 @@ class YAMLValidator:
         if members_file.exists():
             with open(members_file, 'r') as f:
                 data = yaml.safe_load(f)
-                if data and 'photos' in data:
+                if data and 'photos' in data and data['photos']:
                     for photo in data['photos']:
                         existing_photos.add(photo.get('filename', ''))
         
