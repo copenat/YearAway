@@ -23,6 +23,34 @@ if [ ! -f "$ANALYZER_SCRIPT" ]; then
     exit 1
 fi
 
+# Function to activate virtual environment
+activate_venv() {
+    local venv_path=""
+    
+    # Look for venv in current directory or parent directories
+    local current_dir="$(pwd)"
+    while [ "$current_dir" != "/" ]; do
+        if [ -d "$current_dir/venv" ]; then
+            venv_path="$current_dir/venv"
+            break
+        fi
+        current_dir="$(dirname "$current_dir")"
+    done
+    
+    if [ -n "$venv_path" ] && [ -f "$venv_path/bin/activate" ]; then
+        if [ "$VERBOSE" = true ]; then
+            echo -e "${BLUE}🐍 Activating virtual environment: $venv_path${NC}"
+        fi
+        source "$venv_path/bin/activate"
+        return 0
+    else
+        if [ "$QUIET" = false ]; then
+            echo -e "${YELLOW}⚠️  Warning: No virtual environment found. Using system Python.${NC}"
+        fi
+        return 1
+    fi
+}
+
 # Function to show usage
 show_usage() {
     echo "AI Photo Analyzer for YearAway"
@@ -33,6 +61,7 @@ show_usage() {
     echo "  -h, --help              Show this help message"
     echo "  -a, --auto-add          Automatically add generated entries to YAML files"
     echo "  -v, --verbose           Show verbose output"
+    echo "  -q, --quiet             Suppress non-error output"
     echo "  --repo-root DIR         Set repository root directory"
     echo ""
     echo "Examples:"
@@ -55,6 +84,7 @@ show_usage() {
 # Default options
 AUTO_ADD=false
 VERBOSE=false
+QUIET=false
 REPO_ROOT=""
 
 # Parse command line arguments
@@ -70,6 +100,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -v|--verbose)
             VERBOSE=true
+            shift
+            ;;
+        -q|--quiet)
+            QUIET=true
             shift
             ;;
         --repo-root)
@@ -98,6 +132,9 @@ fi
 # Show header
 echo -e "${BLUE}🤖 AI Photo Analyzer for YearAway${NC}"
 echo "=================================================="
+
+# Activate virtual environment
+activate_venv
 
 # Check if LLaVA is available
 if ! command -v llava-cli &> /dev/null; then
