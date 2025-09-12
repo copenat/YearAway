@@ -70,9 +70,13 @@ show_usage() {
     echo "  $0 --verbose            # Show detailed output"
     echo ""
     echo "Requirements:"
-    echo "  - LLaVA CLI installed and available in PATH"
+    echo "  - Ollama with LLaVA model (recommended) OR LLaVA CLI"
     echo "  - Python 3 with PyYAML"
     echo "  - Virtual environment activated (if using project venv)"
+    echo ""
+    echo "Installation options:"
+    echo "  Ollama: https://ollama.ai (easier, recommended)"
+    echo "  LLaVA CLI: https://github.com/haotian-liu/LLaVA"
     echo ""
     echo "The AI analyzer will:"
     echo "  - Detect new images in content/images/ directories"
@@ -136,14 +140,19 @@ echo "=================================================="
 # Activate virtual environment
 activate_venv
 
-# Check if LLaVA is available
-if ! command -v llava-cli &> /dev/null; then
-    echo -e "${YELLOW}⚠️  Warning: LLaVA CLI not found in PATH${NC}"
-    echo "Please install LLaVA to use AI photo analysis:"
-    echo "  https://github.com/haotian-liu/LLaVA"
+# Check if any LLaVA implementation is available
+if ! command -v ollama &> /dev/null && ! command -v llava-cli &> /dev/null; then
+    echo -e "${YELLOW}⚠️  Warning: No LLaVA implementation found${NC}"
+    echo "Please install one of the following:"
+    echo "  Ollama (recommended): https://ollama.ai"
+    echo "  LLaVA CLI: https://github.com/haotian-liu/LLaVA"
     echo ""
     echo "Continuing with analysis (will show error for each photo)..."
     echo ""
+elif command -v ollama &> /dev/null; then
+    echo -e "${GREEN}🦙 Ollama detected - will use Ollama LLaVA${NC}"
+elif command -v llava-cli &> /dev/null; then
+    echo -e "${GREEN}🔧 LLaVA CLI detected - will use direct LLaVA CLI${NC}"
 fi
 
 # Run the Python analysis script

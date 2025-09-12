@@ -87,23 +87,92 @@ Respond with valid JSON in this exact format:
     "adventure_ids": ["adventure-id-1", "adventure-id-2"]
 }}"""
     
-    def analyze_photo_with_llava(self, image_path: Path) -> Optional[Dict]:
-        """Analyze photo using LLaVA model"""
+    def check_ollama_available(self) -> bool:
+        """Check if Ollama is available and has LLaVA model"""
         try:
-            # Check if LLaVA is available
-            result = subprocess.run(['llava-cli', '--help'], 
+            # Check if ollama is installed
+            result = subprocess.run(['ollama', '--version'], 
                                   capture_output=True, text=True, timeout=5)
             if result.returncode != 0:
-                print(f"❌ LLaVA CLI not found. Please install LLaVA or use alternative model.")
-                return None
+                return False
+            
+            # Check if llava model is available
+            result = subprocess.run(['ollama', 'list'], 
+                                  capture_output=True, text=True, timeout=10)
+            if result.returncode == 0 and 'llava' in result.stdout.lower():
+                return True
+            return False
         except (subprocess.TimeoutExpired, FileNotFoundError):
-            print(f"❌ LLaVA CLI not found. Please install LLaVA or use alternative model.")
-            return None
-        
-        system_prompt = self.get_llava_system_prompt()
-        
+            return False
+    
+    def check_llava_cli_available(self) -> bool:
+        """Check if LLaVA CLI is available"""
         try:
-            # Run LLaVA analysis
+            result = subprocess.run(['llava-cli', '--help'], 
+                                  capture_output=True, text=True, timeout=5)
+            return result.returncode == 0
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            return False
+    
+    def analyze_photo_with_ollama(self, image_path: Path) -> Optional[Dict]:
+        """Analyze photo using Ollama LLaVA model"""
+        try:
+            system_prompt = self.get_llava_system_prompt()
+            
+            # Create a temporary prompt file
+            import tempfile
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+                f.write(system_prompt)
+                prompt_file = f.name
+            
+            # Run Ollama with LLaVA
+            cmd = [
+                'ollama', 'run', 'llava',
+                '--image', str(image_path),
+                '--prompt', f'@{prompt_file}'
+            ]
+            
+            print(f"🤖 Analyzing {image_path.name} with Ollama LLaVA...")
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            
+            # Clean up temp file
+            os.unlink(prompt_file)
+            
+            if result.returncode == 0:
+                # Parse JSON response from Ollama
+                response_text = result.stdout.strip()
+                # Extract JSON from response (Ollama might add extra text)
+                try:
+                    # Look for JSON in the response
+                    import re
+                    json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+                    if json_match:
+                        response = json.loads(json_match.group())
+                        return response
+                    else:
+                        print(f"❌ No JSON found in Ollama response: {response_text}")
+                        return None
+                except json.JSONDecodeError as e:
+                    print(f"❌ Failed to parse Ollama JSON response: {e}")
+                    print(f"Raw response: {response_text}")
+                    return None
+            else:
+                print(f"❌ Ollama analysis failed: {result.stderr}")
+                return None
+                
+        except subprocess.TimeoutExpired:
+            print(f"❌ Ollama analysis timed out for {image_path.name}")
+            return None
+        except Exception as e:
+            print(f"❌ Error analyzing photo with Ollama: {e}")
+            return None
+    
+    def analyze_photo_with_llava_cli(self, image_path: Path) -> Optional[Dict]:
+        """Analyze photo using LLaVA CLI directly"""
+        try:
+            system_prompt = self.get_llava_system_prompt()
+            
+            # Run LLaVA CLI
             cmd = [
                 'llava-cli',
                 '--image', str(image_path),
@@ -111,7 +180,7 @@ Respond with valid JSON in this exact format:
                 '--format', 'json'
             ]
             
-            print(f"🤖 Analyzing {image_path.name} with LLaVA...")
+            print(f"🤖 Analyzing {image_path.name} with LLaVA CLI...")
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
             
             if result.returncode == 0:
@@ -119,17 +188,37 @@ Respond with valid JSON in this exact format:
                 response = json.loads(result.stdout.strip())
                 return response
             else:
-                print(f"❌ LLaVA analysis failed: {result.stderr}")
+                print(f"❌ LLaVA CLI analysis failed: {result.stderr}")
                 return None
                 
         except subprocess.TimeoutExpired:
-            print(f"❌ LLaVA analysis timed out for {image_path.name}")
+            print(f"❌ LLaVA CLI analysis timed out for {image_path.name}")
             return None
         except json.JSONDecodeError as e:
-            print(f"❌ Failed to parse LLaVA response: {e}")
+            print(f"❌ Failed to parse LLaVA CLI response: {e}")
             return None
         except Exception as e:
-            print(f"❌ Error analyzing photo: {e}")
+            print(f"❌ Error analyzing photo with LLaVA CLI: {e}")
+            return None
+    
+    def analyze_photo_with_llava(self, image_path: Path) -> Optional[Dict]:
+        """Analyze photo using available LLaVA implementation"""
+        # Try Ollama first (easier to install)
+        if self.check_ollama_available():
+            print(f"🦙 Using Ollama LLaVA for analysis")
+            return self.analyze_photo_with_ollama(image_path)
+        
+        # Fall back to LLaVA CLI
+        elif self.check_llava_cli_available():
+            print(f"🔧 Using LLaVA CLI for analysis")
+            return self.analyze_photo_with_llava_cli(image_path)
+        
+        # Neither available
+        else:
+            print(f"❌ Neither Ollama LLaVA nor LLaVA CLI found.")
+            print(f"Please install one of the following:")
+            print(f"  Ollama: https://ollama.ai (recommended)")
+            print(f"  LLaVA CLI: https://github.com/haotian-liu/LLaVA")
             return None
     
     def generate_yaml_entry(self, image_path: Path, analysis: Dict, is_public: bool) -> Dict:
