@@ -284,6 +284,11 @@ class YAMLValidator:
                 self.validate_photos_data(photos_data_public, new_images)
             if photos_data_members:
                 self.validate_photos_data(photos_data_members, new_images)
+            
+            # Suggest AI analysis for new images
+            print(f"\n🤖 AI Photo Analysis Available:")
+            print(f"   Run: ./bin/ai-photo-analyzer.py --auto-add")
+            print(f"   This will analyze new images and generate YAML entries automatically")
                 
         # Validate data structures
         if tips_data_public:
