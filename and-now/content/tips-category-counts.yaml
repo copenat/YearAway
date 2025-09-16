@@ -53,10 +53,10 @@ categories:
   icon: ✈️
   description: Transportation tips and advice
   publicTips: 1
-  membersOnlyTips: 1
-  totalTips: 2
+  membersOnlyTips: 3
+  totalTips: 4
 lastUpdated: '2025-09-12T16:35:25.930589Z'
 totalStats:
   publicTips: 8
-  membersOnlyTips: 4
-  totalTips: 12
+  membersOnlyTips: 5
+  totalTips: 13

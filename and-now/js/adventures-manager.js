@@ -84,8 +84,9 @@ class AdventuresManager {
             console.log('📄 Parsed public adventures data:', publicData);
             
             // Initialize adventures data with public adventures
+            const publicAdventures = (publicData.adventures || []).map(adv => ({ ...adv, isPublic: true }));
             this.adventuresData = {
-                adventures: publicData.adventures || [],
+                adventures: publicAdventures,
                 categories: publicData.categories || []
             };
             
@@ -101,7 +102,9 @@ class AdventuresManager {
                         // Merge members-only adventures (avoid duplicates)
                         const existingIds = new Set(this.adventuresData.adventures.map(adv => adv.id));
                         const newMembersAdventures = (membersData.adventures || []).filter(adv => !existingIds.has(adv.id));
-                        this.adventuresData.adventures = [...this.adventuresData.adventures, ...newMembersAdventures];
+                        // Mark members-only adventures as not public
+                        const markedMembersAdventures = newMembersAdventures.map(adv => ({ ...adv, isPublic: false }));
+                        this.adventuresData.adventures = [...this.adventuresData.adventures, ...markedMembersAdventures];
                         
                         // Merge categories (update counts)
                         if (membersData.categories) {
@@ -444,10 +447,20 @@ class AdventuresManager {
 
         // Get connected photos
         const connectedPhotos = this.getConnectedPhotos(adventure);
-        const connectedPhotosHtml = this.renderConnectedPhotos(connectedPhotos);
+        const connectedPhotosHtml = this.renderConnectedPhotos(connectedPhotos, adventure.id);
+
+        // Truncate description if it's too long (limit to 200 characters)
+        const maxDescriptionLength = 200;
+        let descriptionHtml = adventure.description;
+        let showReadMore = false;
+        
+        if (adventure.description.length > maxDescriptionLength) {
+            descriptionHtml = adventure.description.substring(0, maxDescriptionLength) + '...';
+            showReadMore = true;
+        }
 
         return `
-            <div class="adventure-item ${memberOnlyClass}">
+            <div class="adventure-item ${memberOnlyClass}" onclick="window.location.href='adventure-detail.html?id=${adventure.id}'" style="cursor: pointer;">
                 <div class="adventure-date-container">
                     <div class="adventure-date">
                         <span class="month">${month}</span>
@@ -457,7 +470,8 @@ class AdventuresManager {
                 </div>
                 <div class="adventure-content">
                     <h3>${adventure.title}</h3>
-                    <div class="adventure-description">${adventure.description}</div>
+                    <div class="adventure-description">${descriptionHtml}</div>
+                    ${showReadMore ? '<div class="adventure-read-more"><span class="read-more-text">Click here to read more →</span></div>' : ''}
                     <div class="adventure-tags">
                         ${adventure.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
                     </div>
@@ -472,8 +486,11 @@ class AdventuresManager {
      * Get photos connected to an adventure
      */
     getConnectedPhotos(adventure) {
-        if (!window.photosManager || !window.photosManager.photosData) {
+        if (!window.photosManager || !window.photosManager.photosData || !window.photosManager.photosData.photos) {
             console.log('📸 No photos manager or data available');
+            console.log('📸 Photos manager exists:', !!window.photosManager);
+            console.log('📸 Photos data exists:', !!(window.photosManager && window.photosManager.photosData));
+            console.log('📸 Photos array exists:', !!(window.photosManager && window.photosManager.photosData && window.photosManager.photosData.photos));
             return [];
         }
         
@@ -525,12 +542,17 @@ class AdventuresManager {
     /**
      * Render connected photos section
      */
-    renderConnectedPhotos(connectedPhotos) {
+    renderConnectedPhotos(connectedPhotos, adventureId) {
         if (!connectedPhotos || connectedPhotos.length === 0) return '';
         
         const isMember = this.authSystem ? this.authSystem.isMember() : false;
         
-        const photosHtml = connectedPhotos.map(photo => {
+        // Limit to first 3 photos for summary view
+        const maxPhotos = 3;
+        const photosToShow = connectedPhotos.slice(0, maxPhotos);
+        const hasMorePhotos = connectedPhotos.length > maxPhotos;
+        
+        const photosHtml = photosToShow.map(photo => {
             const memberOnlyClass = !photo.isPublic ? 'members-only' : '';
             const memberIndicator = '';
             
@@ -552,12 +574,19 @@ class AdventuresManager {
             `;
         }).join('');
         
+        // Add "View more photos" link if there are more than 3 photos
+        const morePhotosLink = hasMorePhotos ? 
+            `<div class="more-photos-link">
+                <a href="adventure-detail.html?id=${adventureId}" class="view-more-photos">View all ${connectedPhotos.length} photos →</a>
+            </div>` : '';
+        
         return `
             <div class="connected-photos">
                 <h4>📸 Photos</h4>
                 <div class="connected-photos-grid">
                     ${photosHtml}
                 </div>
+                ${morePhotosLink}
             </div>
         `;
     }

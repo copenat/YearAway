@@ -75,7 +75,7 @@ class TipsManager {
     async loadTipsData() {
         try {
             // Always load public tips
-            const publicResponse = await fetch('content/tips-data-public.yaml');
+            const publicResponse = await fetch(`content/tips-data-public.yaml?t=${Date.now()}`);
             if (!publicResponse.ok) {
                 throw new Error(`Failed to load public tips data: ${publicResponse.status}`);
             }
@@ -93,7 +93,7 @@ class TipsManager {
             // Load members-only tips if authenticated
             if (this.authSystem && this.authSystem.isMember()) {
                 try {
-                    const membersResponse = await fetch('content/tips-data-members.yaml');
+                    const membersResponse = await fetch(`content/tips-data-members.yaml?t=${Date.now()}`);
                     if (membersResponse.ok) {
                         const membersYamlText = await membersResponse.text();
                         console.log('📄 Raw members YAML text length:', membersYamlText.length);
@@ -196,14 +196,23 @@ class TipsManager {
                 }
                 continue;
             }
+    }
+    
+    // Save last item
+    if (currentItem) {
+        if (descriptionLines.length > 0) {
+            currentItem.description = descriptionLines.join('\n').trim();
+            // Debug logging for International Driving Licence
+            if (currentItem.id === 'international-driving-licence') {
+                console.log('🔍 IDL Final Description:', currentItem.description);
+                console.log('🔍 IDL Description Lines Count:', descriptionLines.length);
+                console.log('🔍 IDL Description Lines:', descriptionLines);
+            }
         }
-        
-        // Save last item
-        if (currentItem) {
-            data.categories.push(currentItem);
-        }
-        
-        return data;
+        data[currentSection].push(currentItem);
+    }
+    
+    return data;
     }
 
     /**
@@ -224,6 +233,14 @@ class TipsManager {
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             const trimmed = line.trim();
+            
+            // Debug logging for International Driving Licence
+            if (currentItem && currentItem.id === 'international-driving-licence' && i >= 40 && i <= 50) {
+                console.log(`🔍 IDL Main Loop Line ${i + 1}: "${line}" (trimmed: "${trimmed}")`);
+                console.log(`🔍 IDL Current inDescription: ${inDescription}`);
+            } else if (i >= 40 && i <= 50) {
+                console.log(`🔍 IDL Main Loop Line ${i + 1}: "${line}" (trimmed: "${trimmed}") - NO CURRENT ITEM`);
+            }
             
             // Section headers
             if (trimmed === 'tips:') {
@@ -264,13 +281,14 @@ class TipsManager {
                 }
                 
                 // Start new item
-                currentItem = { id: trimmed.split(': ')[1] };
+                const newId = trimmed.split(': ')[1];
+                currentItem = { id: newId };
                 inDescription = false;
                 continue;
             }
             
             // Item properties
-            if (currentItem && trimmed.includes(': ')) {
+            if (currentItem && trimmed.includes(': ') && !inDescription) {
                 const [key, ...valueParts] = trimmed.split(': ');
                 const value = valueParts.join(': ');
                 
@@ -337,9 +355,66 @@ class TipsManager {
                 continue;
             }
             
-            // Description content (indented lines after description: |)
-            if (inDescription && trimmed) {
-                descriptionLines.push(trimmed);
+        // Description content (indented lines after description: |)
+        if (currentItem && currentItem.id === 'international-driving-licence' && i >= 40 && i <= 50) {
+            console.log(`🔍 IDL Before description check - Line ${i + 1}: inDescription=${inDescription}`);
+        }
+        if (inDescription) {
+            // Debug logging for International Driving Licence
+            if (currentItem && currentItem.id === 'international-driving-licence') {
+                console.log(`🔍 IDL Description Line ${i + 1}: "${line}" (trimmed: "${trimmed}")`);
+                console.log(`🔍 IDL Line starts with 6 spaces: ${line.startsWith('      ')}`);
+                console.log(`🔍 IDL Line includes colon: ${trimmed.includes(': ')}`);
+            }
+            
+            // Check if this line starts a new property (less indented than description content)
+            const isProperty = trimmed && !line.startsWith('      ') && trimmed.includes(': ');
+            if (currentItem && currentItem.id === 'international-driving-licence') {
+                console.log(`🔍 IDL Property check for line ${i + 1}: isProperty=${isProperty}, trimmed="${trimmed}", startsWith6=${line.startsWith('      ')}, includesColon=${trimmed.includes(': ')}`);
+            }
+            if (isProperty) {
+                // This is a new property, end description parsing
+                if (currentItem && currentItem.id === 'international-driving-licence') {
+                    console.log(`🔍 IDL Exiting description mode at line ${i + 1}: "${line}"`);
+                }
+                inDescription = false;
+                // Process this line as a property
+                if (currentItem && trimmed.includes(': ')) {
+                    const [key, ...valueParts] = trimmed.split(': ');
+                    const value = valueParts.join(': ');
+                    
+                    if (key === 'tags') {
+                        currentItem[key] = value.slice(1, -1).split(', ').map(tag => tag.trim());
+                    } else if (key === 'rating' || key === 'isPublic') {
+                        currentItem[key] = key === 'isPublic' ? value === 'true' : parseInt(value);
+                    } else if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                        currentItem[key] = parseInt(value);
+                    } else {
+                        currentItem[key] = value.replace(/^["']|["']$/g, '');
+                    }
+                }
+                continue;
+            }
+                
+            // This is still part of the description - ALWAYS add it
+            if (line.trim()) {
+                // For HTML content, we need to be more careful about whitespace
+                // The YAML multiline format uses 6 spaces for indentation
+                // We want to preserve the content but remove the YAML indentation
+                let content = line;
+                
+                // Remove YAML indentation (6 spaces) but preserve HTML formatting
+                if (content.startsWith('      ')) {
+                    content = content.substring(6);
+                }
+                
+                
+                descriptionLines.push(content);
+            } else {
+                // Add empty line to preserve formatting
+                descriptionLines.push('');
+            }
+                continue;
             }
         }
         
@@ -350,7 +425,6 @@ class TipsManager {
             }
             data[currentSection].push(currentItem);
         }
-        
         return data;
     }
 
@@ -388,9 +462,11 @@ class TipsManager {
     setupEventListeners() {
         // Category filter buttons
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('category-filter')) {
-                const category = e.target.dataset.category;
-                this.filterByCategory(category);
+            // Check if the clicked element or its parent has the category-filter class
+            const categoryCard = e.target.closest('.category-filter');
+            if (categoryCard) {
+                const category = categoryCard.dataset.category;
+                this.scrollToCategory(category);
             }
         });
 
@@ -571,7 +647,7 @@ class TipsManager {
                             <div class="tip-rating">${'⭐'.repeat(tip.rating)}</div>
                         </div>
                         <h3>${tip.title}</h3>
-                        <p>${tip.description}${testNote}</p>
+                        <div class="tip-description">${tip.description}${testNote}</div>
                         <div class="product-price">${tip.price}</div>
                         <div class="tip-tags">
                             ${tip.tags.map(tag => `<span class="tag tag-filter" data-tag="${tag}">${tag}</span>`).join('')}
@@ -589,13 +665,44 @@ class TipsManager {
                         <div class="tip-rating">${'⭐'.repeat(tip.rating)}</div>
                     </div>
                     <h3>${tip.title}</h3>
-                    <p>${tip.description}${testNote}</p>
+                    <div class="tip-description">${tip.description}${testNote}</div>
                     <div class="tip-tags">
                         ${tip.tags.map(tag => `<span class="tag tag-filter" data-tag="${tag}">${tag}</span>`).join('')}
                     </div>
                 </div>
             `;
         }
+    }
+
+    /**
+     * Scroll to a specific category section
+     */
+    scrollToCategory(category) {
+        // First, make sure all tips are shown
+        this.showAllTips();
+        
+        // Wait for the DOM to update, then scroll to the category
+        setTimeout(() => {
+            const categorySection = document.getElementById(`category-${category}`);
+            
+            if (categorySection) {
+                // Scroll to the category section with some offset for the header
+                const offsetTop = categorySection.offsetTop - 100;
+                
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+                
+                // Add a temporary highlight effect
+                categorySection.style.backgroundColor = '#f0f8ff';
+                categorySection.style.transition = 'background-color 0.3s ease';
+                
+                setTimeout(() => {
+                    categorySection.style.backgroundColor = '';
+                }, 2000);
+            }
+        }, 100);
     }
 
     /**

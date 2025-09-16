@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adventure Detail - YearAway</title>
+    <meta name="description" content="Detailed adventure entry from YearAway">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/auth-styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+</head>
+<body>
+    <!-- Authentication Header -->
+    <div class="auth-header">
+        <div class="auth-info">
+            <span>Status: <span id="auth-status" class="member-status guest">Guest</span></span>
+            <button id="logout-btn" style="display: none;">Logout</button>
+        </div>
+    </div>
+
+    <!-- Login Form (hidden when logged in) -->
+    <div id="login-form" class="login-form-container">
+        <form>
+            <h3>🔐 Member Access</h3>
+            <div class="form-group">
+                <label for="member-token">Member Token:</label>
+                <input type="text" id="member-token" placeholder="YEARAWAY-XXXX-XXXX-XXXX" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="index.html">YearAway</a>
+                <span class="nav-subtitle">And Now</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="adventures.html">Adventures</a></li>
+                <li><a href="hints-and-tips.html">Hints & Tips</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Adventure Detail Section -->
+        <section class="adventure-detail">
+            <div class="container">
+                <!-- Navigation Breadcrumb -->
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> > 
+                    <a href="adventures.html">Adventures</a> > 
+                    <span id="adventure-breadcrumb">Loading...</span>
+                </nav>
+
+                <!-- Adventure Content -->
+                <div id="adventure-content">
+                    <div class="loading-message">
+                        <h2>Loading Adventure...</h2>
+                        <p>Please wait while we load the adventure details.</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Between Adventures -->
+                <div class="adventure-navigation" id="adventure-navigation" style="display: none;">
+                    <div class="nav-buttons">
+                        <a href="#" id="prev-adventure" class="btn btn-outline">
+                            ← Previous Adventure
+                        </a>
+                        <a href="adventures.html" class="btn btn-secondary">
+                            All Adventures
+                        </a>
+                        <a href="#" id="next-adventure" class="btn btn-outline">
+                            Next Adventure →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>YearAway</h3>
+                    <p>Current adventures and experiences</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="adventures.html">Adventures</a></li>
+                        <li><a href="hints-and-tips.html">Hints & Tips</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Archive</h4>
+                    <ul>
+                        <li><a href="../that_was_then/">Then (2001-2011)</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 YearAway. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/auth-config.js?v=22"></script>
+    <script src="js/simple-auth-system.js?v=22"></script>
+    <script src="js/photos-manager.js?v=37"></script>
+    <script src="js/adventures-manager.js?v=44"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Adventure Detail Manager
+        class AdventureDetailManager {
+            constructor() {
+                this.adventuresManager = null;
+                this.currentAdventureId = null;
+                this.allAdventures = [];
+                this.currentIndex = -1;
+            }
+
+            async init() {
+                try {
+                    console.log('🚀 Starting adventure detail initialization...');
+                    
+                    // Wait for auth system to be ready
+                    if (window.yearawayAuth) {
+                        console.log('🔐 Waiting for auth system...');
+                        await window.yearawayAuth.ready;
+                        console.log('🔐 Auth system ready');
+                    } else {
+                        console.log('⚠️ No auth system found');
+                    }
+
+                    // Initialize photos manager first
+                    console.log('📸 Initializing photos manager...');
+                    window.photosManager = new PhotosManager();
+                    
+                    // Set auth system on photos manager
+                    if (window.yearawayAuth) {
+                        window.photosManager.setAuthSystem(window.yearawayAuth);
+                    }
+                    
+                    try {
+                        await window.photosManager.loadPhotosData();
+                        console.log('📸 Photos manager loaded:', window.photosManager.photosData);
+                        console.log('📸 Photos data structure:', {
+                            hasPhotosData: !!window.photosManager.photosData,
+                            hasPhotos: !!(window.photosManager.photosData && window.photosManager.photosData.photos),
+                            photosCount: window.photosManager.photosData?.photos?.length || 0
+                        });
+                    } catch (error) {
+                        console.error('❌ Error loading photos data:', error);
+                        // Initialize empty photos data to prevent errors
+                        window.photosManager.photosData = { photos: [], categories: [] };
+                    }
+
+                    // Initialize adventures manager
+                    console.log('🗺️ Initializing adventures manager...');
+                    this.adventuresManager = new AdventuresManager();
+                    
+                    // Set auth system before loading data
+                    if (window.yearawayAuth) {
+                        console.log('🔐 Setting auth system on adventures manager...');
+                        this.adventuresManager.setAuthSystem(window.yearawayAuth);
+                    }
+                    
+                    console.log('📄 Loading adventures data...');
+                    await this.adventuresManager.loadAdventuresData();
+                    console.log('💡 Loading tips data...');
+                    await this.adventuresManager.loadTipsData();
+
+                    // Get adventure ID from URL
+                    this.currentAdventureId = this.getAdventureIdFromUrl();
+                    console.log('🔍 Adventure ID from URL:', this.currentAdventureId);
+                    
+                    if (this.currentAdventureId) {
+                        await this.loadAdventureDetail();
+                    } else {
+                        this.showError('No adventure specified');
+                    }
+                } catch (error) {
+                    console.error('❌ Error initializing adventure detail:', error);
+                    console.error('❌ Error stack:', error.stack);
+                    this.showError('Failed to load adventure details: ' + error.message);
+                }
+            }
+
+            getAdventureIdFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('id');
+            }
+
+            async loadAdventureDetail() {
+                try {
+                    console.log('🔍 Loading adventure detail...');
+                    console.log('🔍 Adventures manager data:', this.adventuresManager.adventuresData);
+                    
+                    // Get all adventures and sort by date
+                    this.allAdventures = [...this.adventuresManager.adventuresData.adventures];
+                    this.allAdventures.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                    console.log('🔍 All adventures loaded:', this.allAdventures.length);
+                    console.log('🔍 Looking for adventure ID:', this.currentAdventureId);
+                    console.log('🔍 Available adventure IDs:', this.allAdventures.map(a => a.id));
+
+                    // Find current adventure
+                    const currentAdventure = this.allAdventures.find(adv => adv.id === this.currentAdventureId);
+                    console.log('🔍 Found adventure:', currentAdventure);
+                    
+                    if (!currentAdventure) {
+                        console.log('❌ Adventure not found');
+                        this.showError('Adventure not found');
+                        return;
+                    }
+
+                    // Check if user has access
+                    const isMember = window.yearawayAuth ? window.yearawayAuth.isMember() : false;
+                    console.log('🔐 User is member:', isMember);
+                    console.log('🔍 Adventure is public:', currentAdventure.isPublic);
+                    
+                    if (!currentAdventure.isPublic && !isMember) {
+                        console.log('🔒 Showing members only message');
+                        this.showMembersOnly();
+                        return;
+                    }
+
+                    // Find current index for navigation
+                    this.currentIndex = this.allAdventures.findIndex(adv => adv.id === this.currentAdventureId);
+                    console.log('🔍 Current index:', this.currentIndex);
+
+                    // Render adventure detail
+                    console.log('🎨 Rendering adventure detail...');
+                    const adventureHtml = this.renderAdventureDetail(currentAdventure, isMember);
+                    console.log('🎨 Adventure HTML length:', adventureHtml.length);
+                    console.log('🎨 Adventure HTML preview:', adventureHtml.substring(0, 200) + '...');
+                    this.renderNavigation();
+                    console.log('✅ Adventure detail loaded successfully');
+
+                } catch (error) {
+                    console.error('❌ Error loading adventure detail:', error);
+                    console.error('❌ Error stack:', error.stack);
+                    this.showError('Failed to load adventure details: ' + error.message);
+                }
+            }
+
+            renderAdventureDetail(adventure, isMember) {
+                const container = document.getElementById('adventure-content');
+                const breadcrumb = document.getElementById('adventure-breadcrumb');
+                
+                console.log('🎨 Container before rendering:', container);
+                console.log('🎨 Container innerHTML before:', container.innerHTML.length, 'characters');
+                
+                // Update breadcrumb
+                breadcrumb.textContent = adventure.title;
+
+                // Get connected tips
+                const connectedTips = this.adventuresManager.getConnectedTips(adventure.tags);
+                const connectedTipsHtml = this.adventuresManager.renderConnectedTips(connectedTips);
+
+                // Get photos for this adventure
+                const adventurePhotos = this.getAdventurePhotos(adventure);
+                const photosHtml = this.renderAdventurePhotos(adventurePhotos);
+
+                // Format date
+                const formattedDate = new Date(adventure.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                const adventureHtml = `
+                    <article class="adventure-entry ${!adventure.isPublic ? 'members-only member-visible' : ''}">
+                        ${!adventure.isPublic ? '<div class="member-indicator">🔒 Members Only</div>' : ''}
+                        
+                        <header class="adventure-header">
+                            <h1>${adventure.title}</h1>
+                            <div class="adventure-meta">
+                                <span class="adventure-date">${formattedDate}</span>
+                                ${adventure.location ? `<span class="adventure-location">${adventure.location}</span>` : ''}
+                            </div>
+                            <div class="adventure-tags">
+                                ${adventure.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                        </header>
+
+                        <div class="adventure-body">
+                            <div class="adventure-description">
+                                <p>${adventure.description}</p>
+                            </div>
+
+                            ${photosHtml}
+
+                            ${connectedTipsHtml}
+                        </div>
+                    </article>
+                `;
+                
+                container.innerHTML = adventureHtml;
+                console.log('🎨 Container after setting HTML:', container.innerHTML.length, 'characters');
+                console.log('🎨 Container element:', container);
+                console.log('🎨 Container visible:', container.offsetHeight > 0 ? 'YES' : 'NO');
+                return adventureHtml;
+            }
+
+            getAdventurePhotos(adventure) {
+                // Get photos that match this adventure's tags, location, or adventure_ids
+                if (!window.photosManager || !window.photosManager.photosData || !window.photosManager.photosData.photos) {
+                    console.log('📸 No photos data available for adventure photos');
+                    return [];
+                }
+                
+                const allPhotos = [...window.photosManager.photosData.photos];
+                console.log('📸 Filtering photos for adventure:', adventure.id);
+                console.log('📸 Total photos available:', allPhotos.length);
+                
+                const matchingPhotos = allPhotos.filter(photo => {
+                    // Match by adventure_ids (direct link)
+                    const hasMatchingAdventureId = photo.adventure_ids && 
+                        photo.adventure_ids.includes(adventure.id);
+                    
+                    // Match by tags
+                    const hasMatchingTag = adventure.tags.some(tag => 
+                        photo.tags && photo.tags.includes(tag)
+                    );
+                    
+                    // Match by location
+                    const hasMatchingLocation = photo.location && adventure.location &&
+                        photo.location.toLowerCase().includes(adventure.location.toLowerCase());
+                    
+                    const matches = hasMatchingAdventureId || hasMatchingTag || hasMatchingLocation;
+                    
+                    if (matches) {
+                        console.log('📸 Found matching photo:', photo.id, {
+                            adventureId: hasMatchingAdventureId,
+                            tagMatch: hasMatchingTag,
+                            locationMatch: hasMatchingLocation
+                        });
+                    }
+                    
+                    return matches;
+                });
+                
+                console.log('📸 Total matching photos:', matchingPhotos.length);
+                return matchingPhotos;
+            }
+
+            renderAdventurePhotos(photos) {
+                if (photos.length === 0) {
+                    console.log('📸 No photos to render');
+                    return '';
+                }
+
+                console.log('📸 Rendering photos:', photos.length);
+                const photosHtml = photos.map(photo => {
+                    // Construct image URL from path and filename
+                    const imageUrl = `${photo.path}${photo.filename}`;
+                    console.log('📸 Rendering photo:', photo.id, 'URL:', imageUrl);
+                    
+                    return `
+                        <div class="adventure-photo ${!photo.isPublic ? 'members-only member-visible' : ''}">
+                            ${!photo.isPublic ? '<div class="member-indicator">🔒</div>' : ''}
+                            <img src="${imageUrl}" alt="${photo.caption || 'Adventure photo'}" loading="lazy">
+                            ${photo.caption ? `<p class="photo-caption">${photo.caption}</p>` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="adventure-photos">
+                        <h3>Photos from this Adventure</h3>
+                        <div class="photos-grid">
+                            ${photosHtml}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderNavigation() {
+                const navContainer = document.getElementById('adventure-navigation');
+                const prevBtn = document.getElementById('prev-adventure');
+                const nextBtn = document.getElementById('next-adventure');
+
+                // Previous adventure
+                if (this.currentIndex > 0) {
+                    const prevAdventure = this.allAdventures[this.currentIndex - 1];
+                    prevBtn.href = `adventure-detail.html?id=${prevAdventure.id}`;
+                    prevBtn.style.display = 'inline-block';
+                } else {
+                    prevBtn.style.display = 'none';
+                }
+
+                // Next adventure
+                if (this.currentIndex < this.allAdventures.length - 1) {
+                    const nextAdventure = this.allAdventures[this.currentIndex + 1];
+                    nextBtn.href = `adventure-detail.html?id=${nextAdventure.id}`;
+                    nextBtn.style.display = 'inline-block';
+                } else {
+                    nextBtn.style.display = 'none';
+                }
+
+                navContainer.style.display = 'block';
+            }
+
+            showError(message) {
+                const container = document.getElementById('adventure-content');
+                container.innerHTML = `
+                    <div class="error-message">
+                        <h2>Error</h2>
+                        <p>${message}</p>
+                        <a href="adventures.html" class="btn btn-primary">Back to Adventures</a>
+                    </div>
+                `;
+            }
+
+            showMembersOnly() {
+                const container = document.getElementById('adventure-content');
+                container.innerHTML = `
+                    <div class="members-only-message">
+                        <h2>🔒 Members Only</h2>
+                        <p>This adventure is available to members only.</p>
+                        <p>Please <a href="#" onclick="document.getElementById('login-form').style.display='block'">login</a> to access this content, or <a href="adventures.html">view public adventures</a>.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', async function() {
+            const detailManager = new AdventureDetailManager();
+            await detailManager.init();
+        });
+    </script>
+</body>
+</html>

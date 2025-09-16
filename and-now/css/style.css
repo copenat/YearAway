@@ -852,6 +852,35 @@ input:focus {
     color: var(--medium-gray);
 }
 
+.tip-description {
+    margin-bottom: var(--spacing-md);
+    color: var(--medium-gray);
+    line-height: 1.5;
+}
+
+.tip-description p {
+    margin: 0.5rem 0;
+}
+
+.tip-description ul {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.tip-description li {
+    margin: 0.25rem 0;
+}
+
+.tip-description a {
+    color: var(--primary-brown);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.tip-description a:hover {
+    text-decoration: underline;
+}
+
 .tip-tags {
     display: flex;
     gap: var(--spacing-xs);
@@ -1438,18 +1467,21 @@ input:focus {
 
 .connected-photo .photo-overlay {
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
     right: 0;
+    bottom: 0;
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
     color: white;
     padding: 0.75rem;
     opacity: 0;
     transition: opacity 0.3s ease;
+    display: flex;
+    align-items: flex-end;
 }
 
 .connected-photo:hover .photo-overlay {
-    opacity: 1;
+    opacity: 0;
 }
 
 .connected-photo .photo-caption {
@@ -1473,6 +1505,29 @@ input:focus {
     font-weight: 500;
 }
 
+.more-photos-link {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.view-more-photos {
+    color: var(--primary-brown);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--primary-brown);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.view-more-photos:hover {
+    background: var(--primary-brown);
+    color: white;
+    text-decoration: none;
+}
+
 /* Members-only connected photos */
 .connected-photo.members-only .member-indicator {
     background: linear-gradient(135deg, #ff6b6b, #ee5a24);
@@ -1487,4 +1542,185 @@ input:focus {
     top: 0.5rem;
     left: 0.5rem;
     z-index: 10;
+}
+
+/* Adventure Detail Page Styles */
+.adventure-detail {
+    padding: var(--spacing-lg) 0;
+}
+
+.breadcrumb {
+    margin-bottom: var(--spacing-lg);
+    font-size: 14px;
+    color: var(--medium-gray);
+}
+
+.breadcrumb a {
+    color: var(--primary-brown);
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.adventure-entry {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.adventure-entry.members-only {
+    /* Reverted to original styling - no special border or shadow */
+}
+
+.adventure-header {
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.adventure-header h1 {
+    margin: 0 0 var(--spacing-sm) 0;
+    color: var(--primary-brown);
+    font-size: var(--font-size-3xl);
+}
+
+.adventure-meta {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-lg);
+    color: var(--medium-gray);
+}
+
+.adventure-location {
+    font-weight: 600;
+}
+
+.adventure-body {
+    line-height: 1.7;
+}
+
+.adventure-description {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-xl);
+    color: var(--dark-gray);
+}
+
+.adventure-photos {
+    margin: var(--spacing-xl) 0;
+}
+
+.adventure-photos h3 {
+    color: var(--primary-brown);
+    margin-bottom: var(--spacing-md);
+}
+
+.photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.adventure-photo {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.adventure-photo:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.adventure-photo img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.adventure-photo:hover img {
+    transform: scale(1.02);
+}
+
+.photo-caption {
+    padding: var(--spacing-sm);
+    background: var(--light-gray);
+    margin: 0;
+    font-size: 14px;
+    color: var(--medium-gray);
+}
+
+.adventure-navigation {
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 2px solid var(--light-gray);
+}
+
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.nav-buttons .btn {
+    flex: 1;
+    text-align: center;
+    max-width: 200px;
+}
+
+/* Adventure Item Clickable Styles */
+.adventure-item {
+    transition: all 0.3s ease;
+}
+
+.adventure-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.adventure-read-more {
+    margin-top: var(--spacing-sm);
+    text-align: right;
+}
+
+.read-more-text {
+    color: var(--primary-brown);
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.adventure-item:hover .read-more-text {
+    opacity: 1;
+}
+
+/* Loading and Error States */
+.loading-message,
+.error-message,
+.members-only-message {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.loading-message h2,
+.error-message h2,
+.members-only-message h2 {
+    color: var(--primary-brown);
+    margin-bottom: var(--spacing-md);
+}
+
+.members-only-message {
+    border: 2px solid var(--primary-brown);
+    background: var(--light-brown);
 }

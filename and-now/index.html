@@ -7,7 +7,7 @@
     <meta name="description" content="Current adventures and experiences from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=11">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -69,19 +69,14 @@
             </div>
         </section>
 
-        <!-- Current Status Section -->
-        <section class="current-status">
+        <!-- What are we doing now? Section -->
+        <section class="what-are-we-doing">
             <div class="container">
-                <h2>Current Status</h2>
-                <div class="status-card">
-                    <div class="status-info">
-                        <h3>📍 Current Location</h3>
-                        <p>Planning the next adventure...</p>
-                    </div>
-                    <div class="status-info">
-                        <h3>📅 Last Update</h3>
-                        <p>September 2025</p>
-                    </div>
+                <h2>What are we doing now?</h2>
+                <div class="intro-content">
+                    <p>Now that we're firmly into our mid-life phase, it's time to get back to the adventures of our 20s and 30s but maybe with a better quality hotel. Not that we haven't been traveling and living in different countries over the years, but we now plan to make the most of reducing our work life so we have more time to travel. Remote working also helps! 😊</p>
+                    <p>This section of YearAway captures our renewed commitment to adventure - from planning extended trips to sharing the lessons we've learned along the way. We're embracing this new chapter where work-life balance finally tips in favor of life, and we can pursue the kind of immersive travel experiences that shaped our earlier years.</p>
+                    <p>Whether you're looking for travel inspiration, practical tips for mid-life adventuring, or just want to follow along with our current story, you'll find it all here. Join us as we rediscover the world with the wisdom of experience and the freedom of reduced commitments.</p>
                 </div>
             </div>
         </section>
@@ -90,30 +85,8 @@
         <section class="recent-adventures">
             <div class="container">
                 <h2>Recent Adventures</h2>
-                <div class="adventures-grid">
-                    <div class="adventure-card">
-                        <div class="adventure-image">
-                            <img src="images/placeholder-adventure.jpg" alt="Adventure placeholder" loading="lazy">
-                        </div>
-                        <div class="adventure-content">
-                            <h3>Planning Phase</h3>
-                            <p>Getting ready for the next big adventure...</p>
-                            <a href="adventures.html" class="btn btn-outline">Read More</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Members-only adventure card -->
-                    <div class="adventure-card members-only">
-                        <div class="member-indicator">🔒 Members Only</div>
-                        <div class="adventure-image">
-                            <img src="images/placeholder-members.jpg" alt="Members adventure placeholder" loading="lazy">
-                        </div>
-                        <div class="adventure-content">
-                            <h3>Exclusive Adventure</h3>
-                            <p>This is a members-only adventure with detailed stories and personal reflections.</p>
-                            <a href="adventures.html" class="btn btn-outline">Read More</a>
-                        </div>
-                    </div>
+                <div class="adventures-grid" id="recent-adventures-container">
+                    <!-- Dynamic content will be loaded here -->
                 </div>
             </div>
         </section>
@@ -176,6 +149,75 @@
     <!-- JavaScript -->
     <script src="js/auth-config.js?v=22"></script>
     <script src="js/simple-auth-system.js?v=22"></script>
+    <script src="js/adventures-manager.js?v=43"></script>
     <script src="js/main.js"></script>
+    <script>
+        // Load the most recent adventure for the homepage
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Wait for auth system to be ready
+                if (window.yearawayAuth) {
+                    await window.yearawayAuth.ready;
+                }
+                
+                // Load adventures data
+                const adventuresManager = new AdventuresManager();
+                await adventuresManager.loadAdventuresData();
+                
+                // Get all adventures and sort by date (most recent first)
+                const allAdventures = [...adventuresManager.adventuresData.adventures];
+                allAdventures.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                // Get the most recent adventure
+                const latestAdventure = allAdventures[0];
+                
+                if (latestAdventure) {
+                    const container = document.getElementById('recent-adventures-container');
+                    const isMember = window.yearawayAuth ? window.yearawayAuth.isMember() : false;
+                    
+                    // Only show if it's public or user is a member
+                    if (latestAdventure.isPublic || isMember) {
+                        const adventureCard = adventuresManager.renderAdventureItem(latestAdventure);
+                        container.innerHTML = adventureCard;
+                    } else {
+                        // Show a generic "members only" message
+                        container.innerHTML = `
+                            <div class="adventure-card members-only">
+                                <div class="member-indicator">🔒 Members Only</div>
+                                <div class="adventure-content">
+                                    <h3>Latest Adventure Available</h3>
+                                    <p>Our most recent adventure is available to members. <a href="adventures.html">View all adventures</a> or <a href="#" onclick="document.getElementById('login-form').style.display='block'">login</a> to access.</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // No adventures available
+                    const container = document.getElementById('recent-adventures-container');
+                    container.innerHTML = `
+                        <div class="adventure-card">
+                            <div class="adventure-content">
+                                <h3>Adventures Coming Soon</h3>
+                                <p>We're planning our next adventure. Check back soon for updates!</p>
+                                <a href="adventures.html" class="btn btn-outline">View All Adventures</a>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading recent adventure:', error);
+                const container = document.getElementById('recent-adventures-container');
+                container.innerHTML = `
+                    <div class="adventure-card">
+                        <div class="adventure-content">
+                            <h3>Adventures</h3>
+                            <p>Explore our travel adventures and experiences.</p>
+                            <a href="adventures.html" class="btn btn-outline">View Adventures</a>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    </script>
 </body>
 </html>

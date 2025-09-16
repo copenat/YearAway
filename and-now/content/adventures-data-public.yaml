@@ -1,23 +1,5 @@
-adventures:
-  - id: site-development
-    title: Site Development
-    description: |
-      Working on the new YearAway "And Now" site to share current adventures and experiences.
-      This includes building the authentication system, tips management, and adventure tracking.
-    date: "2025-09-08"
-    category: Development
-    tags: [development, planning, website]
-    status: active
+adventures: []
 
-  - id: planning-future-travels
-    title: Planning Future Travels
-    description: |
-      Researching destinations and planning upcoming adventures. Exciting times ahead!
-      Looking into various locations, accommodations, and activities for the next big trip.
-    date: "2025-07-20"
-    category: Planning
-    tags: [planning, research, destinations, budget]
-    status: active
 
 categories:
   - id: outdoor-adventures
