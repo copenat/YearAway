@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Test</title>
+</head>
+<body>
+    <h1>Simple Test</h1>
+    
+    <section class="tips-categories">
+        <h2>Travel Categories</h2>
+        <div id="tips-categories-container">
+            <!-- Content loaded dynamically -->
+        </div>
+    </section>
+    
+    <div id="output"></div>
+    
+    <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            output.innerHTML += `<p>${message}</p>`;
+            console.log(message);
+        }
+        
+        // Simple test function
+        function simpleTest() {
+            log('Running simple test...');
+            
+            const container = document.getElementById('tips-categories-container');
+            if (container) {
+                log('Container found');
+                container.innerHTML = '<p>Test content loaded!</p>';
+                log('Test content added');
+            } else {
+                log('Container not found');
+            }
+        }
+        
+        // Test TipsManager
+        function testTipsManager() {
+            log('Testing TipsManager...');
+            
+            if (window.tipsManager) {
+                log('TipsManager exists');
+            } else {
+                log('TipsManager not found');
+            }
+        }
+        
+        // Run tests
+        document.addEventListener('DOMContentLoaded', () => {
+            log('DOM loaded');
+            simpleTest();
+            
+            setTimeout(testTipsManager, 2000);
+        });
+    </script>
+    
+    <!-- Load scripts -->
+    <script src="https://develop.yearaway.pages.dev/and-now/js/simple-auth-system.js"></script>
+    <script src="https://develop.yearaway.pages.dev/and-now/js/main.js"></script>
+    <script src="https://develop.yearaway.pages.dev/and-now/js/tips-manager.js"></script>
+</body>
+</html>

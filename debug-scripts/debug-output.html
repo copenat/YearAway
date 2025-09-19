@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Output</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .log { background: #f0f0f0; padding: 10px; margin: 5px 0; border-radius: 5px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        .info { background: #e3f2fd; color: #1565c0; }
+    </style>
+</head>
+<body>
+    <h1>Debug Output</h1>
+    <div id="logs"></div>
+    
+    <script>
+        const logs = document.getElementById('logs');
+        
+        function addLog(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logs.appendChild(div);
+            console.log(message);
+        }
+        
+        // Override console.log to capture all output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+        
+        // Test YAML loading directly
+        async function testYAMLLoading() {
+            try {
+                addLog('Testing YAML loading...', 'info');
+                
+                // Test tips-data.yaml
+                const tipsResponse = await fetch('https://develop.yearaway.pages.dev/and-now/content/tips-data.yaml');
+                addLog(`Tips response status: ${tipsResponse.status}`, tipsResponse.ok ? 'success' : 'error');
+                
+                if (tipsResponse.ok) {
+                    const tipsYaml = await tipsResponse.text();
+                    addLog(`Tips YAML loaded: ${tipsYaml.length} characters`, 'success');
+                }
+                
+                // Test category-counts.yaml
+                const categoryResponse = await fetch('https://develop.yearaway.pages.dev/and-now/content/category-counts.yaml');
+                addLog(`Category response status: ${categoryResponse.status}`, categoryResponse.ok ? 'success' : 'error');
+                
+                if (categoryResponse.ok) {
+                    const categoryYaml = await categoryResponse.text();
+                    addLog(`Category YAML loaded: ${categoryYaml.length} characters`, 'success');
+                }
+                
+            } catch (error) {
+                addLog(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test TipsManager
+        function testTipsManager() {
+            addLog('Testing TipsManager...', 'info');
+            
+            if (window.tipsManager) {
+                addLog('TipsManager exists', 'success');
+                addLog(`Tips data: ${window.tipsManager.tipsData ? 'loaded' : 'not loaded'}`, 'info');
+                addLog(`Category counts: ${window.tipsManager.categoryCounts ? 'loaded' : 'not loaded'}`, 'info');
+            } else {
+                addLog('TipsManager not found', 'error');
+            }
+        }
+        
+        // Run tests
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('DOM loaded, starting tests...', 'info');
+            testYAMLLoading();
+            
+            // Test TipsManager after a delay
+            setTimeout(testTipsManager, 3000);
+        });
+    </script>
+    
+    <!-- Load the actual scripts -->
+    <script src="https://develop.yearaway.pages.dev/and-now/js/simple-auth-system.js"></script>
+    <script src="https://develop.yearaway.pages.dev/and-now/js/main.js"></script>
+    <script src="https://develop.yearaway.pages.dev/and-now/js/tips-manager.js"></script>
+</body>
+</html>

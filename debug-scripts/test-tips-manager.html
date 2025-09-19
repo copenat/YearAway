@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test TipsManager</title>
+</head>
+<body>
+    <h1>Test TipsManager</h1>
+    <div id="output"></div>
+    
+    <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            output.innerHTML += `<p>${message}</p>`;
+            console.log(message);
+        }
+        
+        // Test if TipsManager can be loaded
+        function testTipsManager() {
+            try {
+                log('Testing TipsManager class...');
+                
+                if (typeof TipsManager !== 'undefined') {
+                    log('TipsManager class found', 'success');
+                    
+                    // Try to create an instance
+                    const manager = new TipsManager();
+                    log('TipsManager instance created', 'success');
+                    
+                } else {
+                    log('TipsManager class not found', 'error');
+                }
+                
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test when scripts are loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            log('DOM loaded, testing TipsManager...');
+            
+            // Wait a bit for scripts to load
+            setTimeout(testTipsManager, 1000);
+        });
+    </script>
+    
+    <!-- Load the actual scripts -->
+    <script src="https://develop.yearaway.pages.dev/and-now/js/simple-auth-system.js"></script>
+    <script src="https://develop.yearaway.pages.dev/and-now/js/main.js"></script>
+    <script src="https://develop.yearaway.pages.dev/and-now/js/tips-manager.js"></script>
+</body>
+</html>

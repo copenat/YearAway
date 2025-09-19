@@ -1,0 +1,44 @@
+# TIP TEMPLATE - Copy this structure for new tips
+- id: unique-tip-id
+  title: Your Tip Title
+  description: |
+    Your tip description goes here. Keep it concise but informative.
+    You can use multiple lines for longer descriptions.
+  category: Transportation
+  tags: [tag1, tag2, tag3]
+  rating: 5
+  isPublic: true
+
+# PRODUCT TEMPLATE - Copy this structure for new products
+- id: unique-product-id
+  name: Product Name
+  description: |
+    Product description goes here.
+    Can also be multiline if needed.
+  rating: 5
+  price: "$XX.XX"
+  icon: "📦"
+
+# AVAILABLE CATEGORIES & ICONS:
+# - Transportation: ✈️
+# - Accommodation: 🏨  
+# - Food & Dining: 🍽️
+# - Packing: 🎒
+# - Budget: 💰
+# - Technology: 📱
+
+# TAG EXAMPLES:
+# - flights, hotels, restaurants, packing, budget, apps
+# - exclusive, local, insider, personal, secret, hack
+# - deals, upgrades, space-saving, organization
+
+# TO ADD A NEW TIP:
+# 1. Copy the tip template above
+# 2. Fill in your details
+# 3. Add it to the "tips" array in tips-data.yaml
+# 4. The category counts will be auto-updated by GitHub Actions
+
+# TO ADD A NEW PRODUCT:
+# 1. Copy the product template above
+# 2. Fill in your details
+# 3. Add it to the "products" array in tips-data.yaml

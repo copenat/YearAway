@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Live</title>
+</head>
+<body>
+    <h1>Check Live Site</h1>
+    <div id="output"></div>
+    
+    <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            output.innerHTML += `<p>${message}</p>`;
+            console.log(message);
+        }
+        
+        // Test the live site
+        async function testLiveSite() {
+            try {
+                log('Testing live site...');
+                
+                // Test the actual page
+                const response = await fetch('https://develop.yearaway.pages.dev/and-now/hints-and-tips');
+                log(`Page response: ${response.status}`);
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    log(`Page HTML length: ${html.length}`);
+                    
+                    // Check if container exists
+                    if (html.includes('tips-categories-container')) {
+                        log('Container found in HTML');
+                    } else {
+                        log('Container NOT found in HTML');
+                    }
+                    
+                    // Check if scripts are loaded
+                    if (html.includes('tips-manager.js')) {
+                        log('tips-manager.js found in HTML');
+                    } else {
+                        log('tips-manager.js NOT found in HTML');
+                    }
+                }
+                
+            } catch (error) {
+                log(`Error: ${error.message}`);
+            }
+        }
+        
+        // Run test
+        document.addEventListener('DOMContentLoaded', testLiveSite);
+    </script>
+</body>
+</html>

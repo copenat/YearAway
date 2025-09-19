@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YearAway - Request Member Access</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #8B4513, #D2691E);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #8B4513;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #8B4513;
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+        }
+        
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #8B4513, #D2691E);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #8B4513;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .info-box h3 {
+            margin-top: 0;
+            color: #8B4513;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #8B4513;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Request Member Access</h1>
+        
+        <div class="info-box">
+            <h3>What is Member Access?</h3>
+            <p>Member access gives you exclusive access to:</p>
+            <ul>
+                <li>Private family photos and personal moments</li>
+                <li>Detailed trip reports and personal reflections</li>
+                <li>Exclusive travel recommendations and insider tips</li>
+                <li>High-resolution photo downloads</li>
+            </ul>
+        </div>
+        
+        <form id="access-request-form">
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="relationship">Relationship to Nathan *</label>
+                <select id="relationship" name="relationship" required>
+                    <option value="">Select relationship...</option>
+                    <option value="family">Family Member</option>
+                    <option value="friend">Friend</option>
+                    <option value="colleague">Colleague</option>
+                    <option value="travel-buddy">Travel Buddy</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="reason">Why would you like member access? *</label>
+                <textarea id="reason" name="reason" placeholder="Please tell us why you'd like access to the member-only content..." required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="how-did-you-hear">How did you hear about YearAway?</label>
+                <input type="text" id="how-did-you-hear" name="how-did-you-hear" placeholder="e.g., Nathan told me, found online, etc.">
+            </div>
+            
+            <button type="submit">Send Access Request</button>
+        </form>
+        
+        <div class="back-link">
+            <a href="index.html">← Back to Home</a>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('access-request-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // Here you would integrate with EmailJS or Formspree
+            console.log('Access request data:', data);
+            
+            // Show success message
+            alert('Thank you for your request! We\'ll review it and get back to you within 24-48 hours.');
+            
+            // Reset form
+            this.reset();
+        });
+    </script>
+</body>
+</html>

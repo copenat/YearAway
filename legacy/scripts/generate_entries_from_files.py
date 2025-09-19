@@ -55,7 +55,9 @@ def extract_entry_info(file_path):
 
 def generate_entries_html():
     """Generate entries.html from existing entry files"""
-    legacy_site_dir = Path('legacy_site')
+    # Get the project root directory (two levels up from this script)
+    project_root = Path(__file__).parent.parent.parent
+    legacy_site_dir = project_root / 'legacy_site'
     entries = []
     
     # Find all entry HTML files

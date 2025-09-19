@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YearAway - And Now</title>
+    <meta name="description" content="Current adventures and experiences from YearAway">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css?v=17">
+    <link rel="stylesheet" href="css/auth-styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+</head>
+<body>
+    <!-- Authentication Header -->
+    <div class="auth-header">
+        <div class="auth-info">
+            <span>Status: <span id="auth-status" class="member-status guest">Guest</span></span>
+            <button id="logout-btn" style="display: none;">Logout</button>
+        </div>
+    </div>
+
+    <!-- Login Form (hidden when logged in) -->
+    <div id="login-form" class="login-form-container">
+        <form>
+            <h3>🔐 Member Access</h3>
+            <div class="form-group">
+                <label for="member-token">Member Token:</label>
+                <input type="text" id="member-token" placeholder="YEARAWAY-XXXX-XXXX-XXXX" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="index.html">YearAway</a>
+                <span class="nav-subtitle">And Now</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="adventures.html">Adventures</a></li>
+                <li><a href="hints-and-tips.html">Hints & Tips</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Welcome to YearAway - And Now</h1>
+                <p class="hero-subtitle">Current adventures, travel stories, and life updates</p>
+                <div class="hero-actions">
+                    <a href="adventures.html" class="btn btn-primary">Explore Adventures</a>
+                    <a href="gallery.html" class="btn btn-secondary">View Gallery</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- What are we doing now? Section -->
+        <section class="what-are-we-doing">
+            <div class="container">
+                <h2>What are we doing now?</h2>
+                <div class="intro-content">
+                    <p>Now that we're firmly into our mid-life phase, it's time to get back to the adventures of our 20s and 30s but with slightly better quality hotels. Not that we haven't been traveling and living in different countries over the years, but we now plan to make the most of reducing our work life so we have more time to travel. Remote working also helps! 😊</p>
+                    <p>This section of YearAway captures our renewed commitment to adventure - from planning extended trips to sharing the lessons we've learned along the way. We're embracing this new chapter where work-life balance finally tips in favor of life, and we can pursue the kind of immersive travel experiences that shaped our earlier years.</p>
+                    <p>Whether you're looking for travel inspiration, practical tips for mid-life adventuring, or just want to follow along with our current story, you'll find it all here. Join us as we rediscover the world with the wisdom of experience and the freedom of reduced commitments.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Adventures Preview -->
+        <section class="recent-adventures">
+            <div class="container">
+                <h2>Recent Adventures</h2>
+                <div class="adventures-grid" id="recent-adventures-container">
+                    <!-- Dynamic content will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Links -->
+        <section class="quick-links">
+            <div class="container">
+                <h2>Quick Links</h2>
+                <div class="links-grid">
+                    <a href="adventures.html" class="link-card">
+                        <div class="link-icon">🗺️</div>
+                        <h3>Latest Adventures</h3>
+                        <p>Ongoing travels and experiences</p>
+                    </a>
+                    <a href="hints-and-tips.html" class="link-card">
+                        <div class="link-icon">💡</div>
+                        <h3>Hints & Tips</h3>
+                        <p>Travel advice and recommendations</p>
+                    </a>
+                    <a href="gallery.html" class="link-card">
+                        <div class="link-icon">📸</div>
+                        <h3>Photo Gallery</h3>
+                        <p>Current photos and memories</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>YearAway</h3>
+                    <p>Current adventures and experiences</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="adventures.html">Adventures</a></li>
+                        <li><a href="hints-and-tips.html">Hints & Tips</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Archive</h4>
+                    <ul>
+                        <li><a href="../that_was_then/">Then (2001-2011)</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 YearAway. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/auth-config.js?v=22"></script>
+    <script src="js/simple-auth-system.js?v=22"></script>
+    <script src="js/adventures-manager.js?v=43"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Load the most recent adventure for the homepage
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Wait for auth system to be ready
+                if (window.yearawayAuth) {
+                    await window.yearawayAuth.ready;
+                }
+                
+                // Load adventures data
+                const adventuresManager = new AdventuresManager();
+                await adventuresManager.loadAdventuresData();
+                
+                // Get all adventures and sort by date (most recent first)
+                const allAdventures = [...adventuresManager.adventuresData.adventures];
+                allAdventures.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                // Get the most recent adventure
+                const latestAdventure = allAdventures[0];
+                
+                if (latestAdventure) {
+                    const container = document.getElementById('recent-adventures-container');
+                    const isMember = window.yearawayAuth ? window.yearawayAuth.isMember() : false;
+                    
+                    // Only show if it's public or user is a member
+                    if (latestAdventure.isPublic || isMember) {
+                        const adventureCard = adventuresManager.renderAdventureItem(latestAdventure);
+                        container.innerHTML = adventureCard;
+                    } else {
+                        // Show a generic "members only" message
+                        container.innerHTML = `
+                            <div class="adventure-card members-only">
+                                <div class="member-indicator">🔒 Members Only</div>
+                                <div class="adventure-content">
+                                    <h3>Latest Adventure Available</h3>
+                                    <p>Our most recent adventure is available to members. <a href="adventures.html">View all adventures</a> or <a href="#" onclick="document.getElementById('login-form').style.display='block'">login</a> to access.</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // No adventures available
+                    const container = document.getElementById('recent-adventures-container');
+                    container.innerHTML = `
+                        <div class="adventure-card">
+                            <div class="adventure-content">
+                                <h3>Adventures Coming Soon</h3>
+                                <p>We're planning our next adventure. Check back soon for updates!</p>
+                                <a href="adventures.html" class="btn btn-outline">View All Adventures</a>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading recent adventure:', error);
+                const container = document.getElementById('recent-adventures-container');
+                container.innerHTML = `
+                    <div class="adventure-card">
+                        <div class="adventure-content">
+                            <h3>Adventures</h3>
+                            <p>Explore our travel adventures and experiences.</p>
+                            <a href="adventures.html" class="btn btn-outline">View Adventures</a>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

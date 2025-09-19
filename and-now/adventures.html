@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latest Adventures - YearAway</title>
+    <meta name="description" content="Current travel adventures and experiences from YearAway">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css?v=25">
+    <link rel="stylesheet" href="css/auth-styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+</head>
+<body>
+    <!-- Authentication Header -->
+    <div class="auth-header">
+        <div class="auth-info">
+            <span>Status: <span id="auth-status" class="member-status guest">Guest</span></span>
+            <button id="logout-btn" style="display: none;">Logout</button>
+        </div>
+    </div>
+
+    <!-- Login Form (hidden when logged in) -->
+    <div id="login-form" class="login-form-container">
+        <form>
+            <h3>🔐 Member Access</h3>
+            <div class="form-group">
+                <label for="member-token">Member Token:</label>
+                <input type="text" id="member-token" placeholder="YEARAWAY-XXXX-XXXX-XXXX" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="index.html">YearAway</a>
+                <span class="nav-subtitle">And Now</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="adventures.html" class="active">Adventures</a></li>
+                <li><a href="hints-and-tips.html">Hints & Tips</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <section class="page-header">
+            <div class="container">
+                <h1>Latest Adventures</h1>
+                <p class="page-subtitle">Travel stories, experiences, and ongoing adventures</p>
+            </div>
+        </section>
+
+        <!-- Current Location -->
+ 
+
+        <!-- Recent Adventures -->
+        <section class="recent-adventures">
+            <div class="container">
+                <h2>Recent Adventures</h2>
+                <div id="adventures-timeline">
+                    <!-- Adventures loaded from content/adventures-data.yaml -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Adventure Categories -->
+        <section class="adventure-categories">
+            <div class="container">
+                <h2>Adventure Categories</h2>
+                <div id="categories-grid">
+                    <!-- Categories loaded from content/adventures-data.yaml -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Want to Follow Along?</h2>
+                    <p>Get exclusive access to detailed trip reports, personal reflections, and private photos.</p>
+                    <a href="index.html" class="btn btn-primary">Request Member Access</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>YearAway</h3>
+                    <p>Current adventures and experiences</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="adventures.html">Adventures</a></li>
+                        <li><a href="hints-and-tips.html">Hints & Tips</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Archive</h4>
+                    <ul>
+                        <li><a href="../that_was_then/">Then (2001-2011)</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 YearAway. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/auth-config.js?v=33"></script>
+    <script src="js/simple-auth-system.js?v=33"></script>
+    <script src="js/main.js?v=33"></script>
+    <script src="js/photos-manager.js?v=37"></script>
+    <script src="js/adventures-manager.js?v=45"></script>
+    
+    <!-- Force grid layout script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const grid = document.getElementById('categories-grid');
+                if (grid) {
+                    // Force the grid layout
+                    grid.style.display = 'grid';
+                    grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(180px, 1fr))';
+                    grid.style.gap = 'var(--spacing-sm)';
+                }
+            }, 2000); // Wait 2 seconds for everything to load
+        });
+    </script>
+</body>
+</html>

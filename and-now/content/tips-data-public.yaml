@@ -1,0 +1,82 @@
+tips:
+  - id: flight-tuesday
+    title: Book Flights on Tuesday
+    description: |
+      Airline prices are typically lowest on Tuesdays, especially for domestic flights.
+      Set up price alerts and book when you see a good deal.
+    category: Transport
+    tags: [flights, budget, booking]
+    rating: 5
+    testNote: "TEST: This tip was updated via the NEW YAML system! (Triggering workflow for YAML - v3 - Final Test)"
+
+  - id: roll-clothes
+    title: Roll Your Clothes
+    description: |
+      Rolling clothes instead of folding saves space and reduces wrinkles.
+      Use packing cubes to organize and compress your items even more.
+    category: Packing
+    tags: [packing, space-saving, organization]
+    rating: 5
+
+  - id: offline-maps
+    title: Offline Maps for Travel
+    description: |
+      In China you cannot access anything Google. So for maps we use maps.me.
+    category: Technology
+    tags: [china, maps, offline, technology]
+    rating: 5
+
+  - id: budget-tracking
+    title: Track Daily Expenses
+    description: |
+      Use a simple app to track every expense while traveling.
+      It helps you stay within budget and identify where your money goes.
+    category: Budget
+    tags: [budget, tracking, money]
+    rating: 4
+
+  - id: travel-insurance
+    title: Always Get Travel Insurance
+    description: |
+      Don't skip travel insurance.
+      It's saved us thousands of dollars on medical emergencies and trip cancellations.
+    category: Budget
+    tags: [insurance, safety, budget]
+    rating: 5
+
+  - id: travel-backpack
+    title: Travel Backpack
+    description: |
+      Lightweight, durable backpack perfect for carry-on travel.
+      Features multiple compartments and comfortable straps for long journeys.
+    category: Products
+    tags: [backpack, luggage, carry-on]
+    rating: 5
+    price: "$89.99"
+    icon: "📦"
+
+  - id: universal-adapter
+    title: Universal Adapter
+    description: |
+      Works in 150+ countries with USB ports.
+      Essential for keeping your devices charged while traveling internationally.
+    category: Products
+    tags: [adapter, charging, electronics]
+    rating: 5
+    price: "$24.99"
+    icon: "🔌"
+
+  - id: noise-canceling-headphones
+    title: Noise-Canceling Headphones
+    description: |
+      Perfect for long flights and noisy environments.
+      High-quality sound and excellent noise cancellation for comfortable travel.
+    category: Products
+    tags: [headphones, audio, comfort]
+    rating: 5
+    price: "$199.99"
+    icon: "🎧"
+# Test pre-commit hook
+# Test
+# Test wrapper
+# Test rename

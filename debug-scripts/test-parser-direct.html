@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Parser Test</title>
+</head>
+<body>
+    <h1>Direct Parser Test</h1>
+    <div id="output"></div>
+    
+    <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            output.innerHTML += `<p>${message}</p>`;
+            console.log(message);
+        }
+        
+        // Copy the parseYAML function from tips-manager.js
+        function parseYAML(yamlText) {
+            const data = { tips: [], products: [], categories: [] };
+            const lines = yamlText.split('\n');
+            let currentSection = null;
+            let currentItem = null;
+            let descriptionLines = [];
+            let inDescription = false;
+            let inTotalStats = false;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                const trimmed = line.trim();
+                
+                // Section headers
+                if (trimmed === 'tips:') {
+                    currentSection = 'tips';
+                    continue;
+                } else if (trimmed === 'products:') {
+                    currentSection = 'products';
+                    continue;
+                } else if (trimmed === 'categories:') {
+                    currentSection = 'categories';
+                    continue;
+                }
+                
+                // New item (for tips and products)
+                if (trimmed.startsWith('- id:')) {
+                    // Save previous item
+                    if (currentItem) {
+                        if (descriptionLines.length > 0) {
+                            currentItem.description = descriptionLines.join('\n').trim();
+                            descriptionLines = [];
+                        }
+                        data[currentSection].push(currentItem);
+                    }
+                    
+                    // Start new item
+                    currentItem = { id: trimmed.split(': ')[1] };
+                    inDescription = false;
+                    continue;
+                }
+                
+                // New category item (different format)
+                if (currentSection === 'categories' && trimmed.startsWith('- id:')) {
+                    // Save previous item
+                    if (currentItem) {
+                        data[currentSection].push(currentItem);
+                    }
+                    
+                    // Start new category item
+                    currentItem = { id: trimmed.split(': ')[1] };
+                    continue;
+                }
+                
+                // Item properties
+                if (currentItem && trimmed.includes(': ')) {
+                    const [key, ...valueParts] = trimmed.split(': ');
+                    const value = valueParts.join(': ');
+                    
+                    if (key === 'description' && value === '|') {
+                        inDescription = true;
+                        continue;
+                    } else if (key === 'description') {
+                        currentItem[key] = value;
+                        continue;
+                    } else if (key === 'tags') {
+                        // Parse array format [item1, item2, item3]
+                        currentItem[key] = value.slice(1, -1).split(', ').map(tag => tag.trim());
+                    } else if (key === 'rating' || key === 'isPublic') {
+                        currentItem[key] = key === 'isPublic' ? value === 'true' : parseInt(value);
+                    } else if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                        currentItem[key] = parseInt(value);
+                    } else {
+                        currentItem[key] = value;
+                    }
+                    continue;
+                }
+                
+                // Top-level properties (like lastUpdated, totalStats)
+                if (trimmed.includes('totalStats')) {
+                    // Save the last item before processing totalStats
+                    if (currentItem) {
+                        if (descriptionLines.length > 0) {
+                            currentItem.description = descriptionLines.join('\n').trim();
+                            descriptionLines = [];
+                        }
+                        data[currentSection].push(currentItem);
+                        currentItem = null;
+                    }
+                }
+                if (!currentItem && trimmed.includes(': ')) {
+                    const [key, ...valueParts] = trimmed.split(': ');
+                    const value = valueParts.join(': ');
+                    
+                    if (key === 'totalStats') {
+                        // Initialize totalStats object
+                        data.totalStats = {};
+                        inTotalStats = true;
+                        continue;
+                    } else if (key === 'lastUpdated') {
+                        data[key] = value.replace(/'/g, ''); // Remove quotes
+                    } else if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                        if (!data.totalStats) data.totalStats = {};
+                        data.totalStats[key] = parseInt(value);
+                    }
+                    continue;
+                }
+                
+                // Handle indented properties under totalStats
+                if (inTotalStats && line.startsWith('  ') && trimmed.includes(': ')) {
+                    const [key, ...valueParts] = trimmed.split(': ');
+                    const value = valueParts.join(': ');
+                    
+                    if (key === 'publicTips' || key === 'membersOnlyTips' || key === 'totalTips') {
+                        if (!data.totalStats) data.totalStats = {};
+                        data.totalStats[key] = parseInt(value);
+                    }
+                    continue;
+                }
+                
+                // Description content (indented lines after description: |)
+                if (inDescription && trimmed) {
+                    descriptionLines.push(trimmed);
+                }
+            }
+            
+            // Save last item
+            if (currentItem) {
+                if (descriptionLines.length > 0) {
+                    currentItem.description = descriptionLines.join('\n').trim();
+                }
+                data[currentSection].push(currentItem);
+            }
+            
+            return data;
+        }
+        
+        async function testParser() {
+            try {
+                log('Testing YAML parser...');
+                
+                // Test category-counts.yaml
+                const response = await fetch('https://develop.yearaway.pages.dev/and-now/content/category-counts.yaml');
+                log(`Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const yamlText = await response.text();
+                    log(`YAML text length: ${yamlText.length}`);
+                    log(`YAML preview: ${yamlText.substring(0, 200)}...`);
+                    
+                    const result = parseYAML(yamlText);
+                    log(`Parse result: ${JSON.stringify(result, null, 2)}`);
+                }
+                
+            } catch (error) {
+                log(`Error: ${error.message}`);
+            }
+        }
+        
+        // Run test
+        document.addEventListener('DOMContentLoaded', testParser);
+    </script>
+</body>
+</html>

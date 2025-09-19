@@ -1,0 +1,233 @@
+# YearAway Adventures Template
+# This file documents the structure and options for adventure entries
+# Copy this template and modify the values for new adventures
+
+adventures:
+  # Adventure Entry Template
+  - id: unique-adventure-id                    # REQUIRED: Unique identifier (lowercase, hyphens)
+    title: Adventure Title                     # REQUIRED: Display title
+    description: |                            # REQUIRED: Multi-line description
+      This is a detailed description of the adventure.
+      You can use multiple lines with the pipe (|) syntax.
+      Each line will be preserved as written.
+    date: "2025-09-08"                        # REQUIRED: Date in YYYY-MM-DD format
+    category: Category Name                    # REQUIRED: Must match a category in categories section
+    tags: [tag1, tag2, tag3]                  # REQUIRED: Array of tags (lowercase, hyphens)
+    status: active                            # REQUIRED: active, completed, planning, cancelled
+
+  # Example Adventure Entry
+  - id: example-adventure
+    title: Example Adventure
+    description: |
+      This is an example adventure entry showing all the available fields.
+      The description can span multiple lines and will be displayed
+      exactly as written in the YAML file.
+    date: "2025-09-08"
+    category: Travel
+    tags: [example, template, documentation]
+    status: completed
+
+  # Example Adventure with Country Tag (will show 💡 indicator if tips exist)
+  - id: china-travel-example
+    title: Exploring China
+    description: |
+      A comprehensive trip through China visiting Beijing, Shanghai, and Xi'an.
+      Experienced the Great Wall, Forbidden City, and local cuisine.
+    date: "2025-08-15"
+    category: Travel
+    tags: [china, travel, culture, food-dining, budget]
+    status: completed
+
+  # Example Adventure with Embedded Image (Newspaper-style layout)
+  - id: adventure-with-photo
+    title: Adventure with Photo
+    description: |
+      <div style="display: flex; gap: 20px; align-items: flex-start;">
+        <img src="content/images/public/example-photo.jpg" alt="Example photo" title="Example photo" style="width: 200px; height: auto; flex-shrink: 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div style="flex: 1;">
+          <p>This is an example of how to embed photos in your adventure descriptions using a newspaper-style layout. The image appears on the left with text flowing beside it.</p>
+          <p>You can use any image from your content/images/public/ or content/images/members/ directories. The layout is responsive and will look great on different screen sizes.</p>
+        </div>
+      </div>
+    date: "2025-09-10"
+    category: Travel
+    tags: [example, photo, layout]
+    status: active
+
+categories:
+  # Category Entry Template
+  - id: category-id                           # REQUIRED: Unique identifier (lowercase, hyphens)
+    name: Category Name                       # REQUIRED: Display name
+    icon: 🏔️                                  # REQUIRED: Emoji icon
+    description: Category description         # REQUIRED: Brief description
+    count: 0                                  # REQUIRED: Number of adventures in this category
+
+  # Example Categories
+  - id: outdoor-adventures
+    name: Outdoor Adventures
+    icon: 🏔️
+    description: Hiking, camping, and nature exploration
+    count: 0
+
+  - id: cultural-experiences
+    name: Cultural Experiences
+    icon: 🏛️
+    description: Museums, historical sites, and local culture
+    count: 0
+
+  - id: food-dining
+    name: Food & Dining
+    icon: 🍽️
+    description: Local cuisine and dining experiences
+    count: 0
+
+  - id: accommodations
+    name: Accommodations
+    icon: 🏨
+    description: Hotels, hostels, and unique stays
+    count: 0
+
+  - id: development
+    name: Development
+    icon: 💻
+    description: Website development and technical projects
+    count: 1
+
+  - id: planning
+    name: Planning
+    icon: 📋
+    description: Trip planning and research
+    count: 1
+
+  - id: travel
+    name: Travel
+    icon: ✈️
+    description: Travel experiences and adventures
+    count: 2
+
+# Metadata
+lastUpdated: '2025-09-08T21:30:00.000Z'       # REQUIRED: ISO timestamp of last update
+
+# =============================================================================
+# FIELD DESCRIPTIONS AND RULES
+# =============================================================================
+
+# ADVENTURE FIELDS:
+# -----------------
+# id: 
+#   - Must be unique across all adventure files
+#   - Use lowercase letters, numbers, and hyphens only
+#   - Examples: "site-development", "trip-to-japan", "hiking-mt-fuji"
+#
+# title:
+#   - Display name for the adventure
+#   - Can contain any characters
+#   - Examples: "Site Development", "Trip to Japan", "Hiking Mt. Fuji"
+#
+# description:
+#   - Multi-line description using pipe (|) syntax
+#   - Each line is preserved exactly as written
+#   - Can include HTML tags for rich formatting
+#   - Can embed images using <img> tags
+#   - Examples: "Working on the new YearAway site...", "Amazing trip to..."
+#   - Image embedding examples:
+#     * Simple: <img src="content/images/public/photo.jpg" alt="Description">
+#     * With hover tooltip: <img src="..." alt="..." title="Hover text">
+#     * Newspaper layout: <div style="display: flex; gap: 20px;"><img style="width: 200px;">...</div>
+#
+# date:
+#   - Must be in YYYY-MM-DD format
+#   - Used for sorting and display
+#   - Examples: "2025-09-08", "2025-12-25", "2025-01-01"
+#
+# category:
+#   - Must match the 'name' field of a category in the categories section
+#   - Case-sensitive
+#   - Examples: "Travel", "Development", "Planning"
+#
+# tags:
+#   - Array of tags in square brackets
+#   - Use lowercase letters, numbers, and hyphens
+#   - Separate multiple tags with commas
+#   - Examples: [travel, hiking, japan], [development, website]
+#   - Tags that match Hints & Tips entries will show a special indicator
+#   - Common Hints & Tips tags: flights, budget, packing, maps, insurance, 
+#     hotels, restaurants, backpack, adapter, headphones, etc.
+#
+# status:
+#   - Must be one of: active, completed, planning, cancelled
+#   - Used for filtering and display
+#   - Examples: "active", "completed", "planning"
+
+# CATEGORY FIELDS:
+# ----------------
+# id:
+#   - Must be unique across all category files
+#   - Use lowercase letters, numbers, and hyphens only
+#   - Examples: "outdoor-adventures", "food-dining", "travel"
+#
+# name:
+#   - Display name for the category
+#   - Must match the 'category' field in adventures
+#   - Examples: "Outdoor Adventures", "Food & Dining", "Travel"
+#
+# icon:
+#   - Single emoji character
+#   - Used in category cards and adventure headers
+#   - Examples: 🏔️, 🍽️, ✈️, 🏨, 💻
+#
+# description:
+#   - Brief description of what this category contains
+#   - Used in category cards
+#   - Examples: "Hiking, camping, and nature exploration"
+#
+# count:
+#   - Number of adventures in this category
+#   - Must be updated when adding/removing adventures
+#   - Examples: 0, 1, 5, 12
+
+# FILE ORGANIZATION:
+# ------------------
+# adventures-data-public.yaml:
+#   - Contains adventures visible to all users (guests and members)
+#   - Categories should have counts for public adventures only
+#   - No isPublic field needed (all are public)
+#
+# adventures-data-members.yaml:
+#   - Contains adventures visible only to authenticated members
+#   - Categories should have counts for members-only adventures
+#   - No isPublic field needed (all are members-only)
+#   - Category counts will be merged with public file counts
+
+# TAG INTEGRATION WITH HINTS & TIPS:
+# -----------------------------------
+# When you use tags that match existing Hints & Tips entries, those tags will
+# automatically show a special indicator (💡) on the adventures page, linking
+# users to relevant travel advice.
+#
+# Current Hints & Tips tags that will show indicators:
+# - flights, budget, packing, maps, insurance (public tips)
+# - hotels, restaurants (members-only tips)
+# - backpack, adapter, headphones (product recommendations)
+#
+# Example: If you tag an adventure with "flights", users will see a 💡 icon
+# indicating there are flight-related tips available in the Hints & Tips section.
+#
+# To add new tag integration:
+# 1. Add the tag to your adventure entry
+# 2. Ensure there's a corresponding tip with the same tag in tips-data-public.yaml
+#    or tips-data-members.yaml
+# 3. The system will automatically detect the match and show the indicator
+
+# BEST PRACTICES:
+# ---------------
+# 1. Keep adventure IDs descriptive but concise
+# 2. Use consistent date formatting (YYYY-MM-DD)
+# 3. Update category counts when adding/removing adventures
+# 4. Use meaningful tags that could be used for filtering
+# 5. Keep descriptions informative but not too long
+# 6. Choose appropriate status for each adventure
+# 7. Use emojis that clearly represent the category
+# 8. Test changes by refreshing the adventures page
+# 9. Consider using tags that match existing Hints & Tips for cross-linking
+# 10. Use country/region tags (e.g., "china", "japan", "europe") for location-based tips

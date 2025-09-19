@@ -1,0 +1,56 @@
+photos:
+- id: travel-cafe-2019
+  filename: IMG_20190921_101514.jpg
+  path: content/images/members/
+  caption: Travel-themed cafe interior with world map and guidebooks
+  date: '2019-09-21'
+  tags:
+  - cafe
+  - travel
+  - books
+  - uk
+  - interior
+  - world-map
+  - guidebooks
+  adventure_ids:
+  - planning-a-trip-to-asia
+  isPublic: false
+  featured: false
+- id: nature-mountain-pathway
+  filename: IMG_20191102_084141.jpg
+  path: content/images/members/
+  caption: Nature's pathway leading to a picturesque village in the mountains.
+  date: '2019-11-02'
+  tags:
+  - nature
+  - mountains
+  - village
+  - travel
+  - landscape
+  adventure_ids:
+  - planning-a-trip-to-asia
+  isPublic: false
+  featured: false
+- id: vietnameselagoon-paddleboats
+  filename: IMG_20191030_133226.jpg
+  path: content/images/members/
+  caption: A serene view of a Vietnamese lagoon with paddle boats and palm trees
+  date: '2019-10-30'
+  tags:
+  - lagoon
+  - paddleboat
+  - nature
+  - tourism
+  - vietnam
+  - water
+  adventure_ids:
+  - planning-a-trip-to-asia
+  isPublic: false
+  featured: false
+categories:
+- id: cafe-photos
+  name: Cafe & Travel Spots
+  icon: "\u2615"
+  description: Photos from cafes, bookshops, and travel-themed locations
+  count: 1
+lastUpdated: '2025-09-08T21:30:00.000Z'

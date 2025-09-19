@@ -15,7 +15,11 @@ def extract_database_data():
     """Extract diary entries and photos from MySQL dump with better parsing"""
     print("Extracting data from database dump...")
     
-    with open('legacy/dumps/db.20111027', 'r', encoding='utf-8') as f:
+    # Get the project root directory (two levels up from this script)
+    project_root = Path(__file__).parent.parent.parent
+    db_path = project_root / 'legacy' / 'dumps' / 'db.20111027'
+    
+    with open(db_path, 'r', encoding='utf-8') as f:
         content = f.read()
     
     # Function to decode escape sequences in text
@@ -353,6 +357,9 @@ def extract_database_data():
 
 def find_photo_file(user_name, diary_name, filename, photo_type):
     """Find the actual photo file based on the database entry"""
+    # Get the project root directory
+    project_root = Path(__file__).parent.parent.parent
+    
     # Try different possible filename patterns
     possible_names = [
         f"{diary_name}_{filename}.{photo_type}",
@@ -361,7 +368,7 @@ def find_photo_file(user_name, diary_name, filename, photo_type):
         f"{filename}.jpeg"
     ]
     
-    photo_dir = Path(f'legacy_site/photos/{user_name}')
+    photo_dir = project_root / 'legacy_site' / 'photos' / user_name
     if photo_dir.exists():
         for name in possible_names:
             photo_path = photo_dir / name
@@ -375,19 +382,24 @@ def copy_photos(photos):
     """Copy photos to static site directory"""
     print("Copying photos...")
     
+    # Get the project root directory
+    project_root = Path(__file__).parent.parent.parent
+    
     # Create photos directory
-    os.makedirs('legacy_site/photos', exist_ok=True)
+    legacy_site_photos = project_root / 'legacy_site' / 'photos'
+    os.makedirs(legacy_site_photos, exist_ok=True)
     
     # Copy photos from legacy directory
-    legacy_photos_dir = Path('legacy/v2.0/photos')
+    legacy_photos_dir = project_root / 'legacy' / 'v2.0' / 'photos'
     if legacy_photos_dir.exists():
-        shutil.copytree(legacy_photos_dir, 'legacy_site/photos', dirs_exist_ok=True)
+        shutil.copytree(legacy_photos_dir, legacy_site_photos, dirs_exist_ok=True)
         print(f"Copied photos from {legacy_photos_dir}")
     
     # Also copy graphics
-    legacy_graphics_dir = Path('legacy/v2.0/graphics')
+    legacy_graphics_dir = project_root / 'legacy' / 'v2.0' / 'graphics'
+    legacy_site_graphics = project_root / 'legacy_site' / 'graphics'
     if legacy_graphics_dir.exists():
-        shutil.copytree(legacy_graphics_dir, 'legacy_site/graphics', dirs_exist_ok=True)
+        shutil.copytree(legacy_graphics_dir, legacy_site_graphics, dirs_exist_ok=True)
         print(f"Copied graphics from {legacy_graphics_dir}")
 
 def generate_css():
@@ -584,7 +596,11 @@ body {
 }
 """
     
-    with open('legacy_site/style.css', 'w') as f:
+    # Get the project root directory
+    project_root = Path(__file__).parent.parent.parent
+    css_path = project_root / 'legacy_site' / 'style.css'
+    
+    with open(css_path, 'w') as f:
         f.write(css_content)
 
 def generate_homepage(diary_entries):
@@ -650,7 +666,11 @@ def generate_homepage(diary_entries):
 </body>
 </html>"""
     
-    with open('legacy_site/index.html', 'w', encoding='utf-8') as f:
+    # Get the project root directory
+    project_root = Path(__file__).parent.parent.parent
+    index_path = project_root / 'legacy_site' / 'index.html'
+    
+    with open(index_path, 'w', encoding='utf-8') as f:
         f.write(html_content)
 
 def generate_entries_page(diary_entries):
@@ -711,7 +731,11 @@ def generate_entries_page(diary_entries):
 </body>
 </html>"""
     
-    with open('legacy_site/entries.html', 'w', encoding='utf-8') as f:
+    # Get the project root directory
+    project_root = Path(__file__).parent.parent.parent
+    entries_path = project_root / 'legacy_site' / 'entries.html'
+    
+    with open(entries_path, 'w', encoding='utf-8') as f:
         f.write(html_content)
 
 def generate_individual_entry(entry, all_entries, photos):
@@ -803,8 +827,12 @@ def generate_individual_entry(entry, all_entries, photos):
 </body>
 </html>"""
     
+    # Get the project root directory
+    project_root = Path(__file__).parent.parent.parent
     filename = f"entry_{entry['user_name']}_{entry['diary_name']}_{entry['start_date'].replace(' ', '_').replace(':', '-')}.html"
-    with open(f'legacy_site/{filename}', 'w', encoding='utf-8') as f:
+    entry_path = project_root / 'legacy_site' / filename
+    
+    with open(entry_path, 'w', encoding='utf-8') as f:
         f.write(html_content)
 
 def generate_photos_page(photos):
@@ -853,15 +881,23 @@ def generate_photos_page(photos):
 </body>
 </html>"""
     
-    with open('legacy_site/photos.html', 'w', encoding='utf-8') as f:
+    # Get the project root directory
+    project_root = Path(__file__).parent.parent.parent
+    photos_path = project_root / 'legacy_site' / 'photos.html'
+    
+    with open(photos_path, 'w', encoding='utf-8') as f:
         f.write(html_content)
 
 def main():
     """Main function to generate the static site"""
     print("Starting YearAway static site generation (v2)...")
     
+    # Get the project root directory
+    project_root = Path(__file__).parent.parent.parent
+    
     # Create output directory
-    os.makedirs('legacy_site', exist_ok=True)
+    legacy_site_dir = project_root / 'legacy_site'
+    os.makedirs(legacy_site_dir, exist_ok=True)
     
     # Extract data
     diary_entries, photos = extract_database_data()
@@ -885,7 +921,8 @@ def main():
     print(f"Static site generation complete!")
     print(f"Generated {len(diary_entries)} diary entry pages")
     print(f"Site files are in the 'legacy_site' directory")
-    print(f"You can now serve the site with: python3 -m http.server 8000")
+    print(f"Full path: {legacy_site_dir}")
+    print(f"You can now serve the site with: cd {legacy_site_dir} && python3 -m http.server 8000")
 
 if __name__ == "__main__":
     main()

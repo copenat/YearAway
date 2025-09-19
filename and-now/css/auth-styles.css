@@ -1,0 +1,262 @@
+/**
+ * YearAway Authentication Styles
+ * Styles for login form, member status, and content visibility
+ */
+
+/* Authentication Status */
+.member-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.member-status.member {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+}
+
+.member-status.guest {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+}
+
+/* Login Form */
+#login-form {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 20px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 2px solid #8B4513;
+}
+
+#login-form h3 {
+    color: #8B4513;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.3rem;
+}
+
+#login-form .form-group {
+    margin-bottom: 20px;
+}
+
+#login-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+}
+
+#login-form input[type="text"],
+#login-form input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+#login-form input[type="text"]:focus,
+#login-form input[type="password"]:focus {
+    outline: none;
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+#login-form button {
+    width: 100%;
+    background: linear-gradient(135deg, #8B4513, #D2691E);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#login-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+}
+
+#login-form button:active {
+    transform: translateY(0);
+}
+
+/* Logout Button */
+#logout-btn {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+}
+
+#logout-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(244, 67, 54, 0.3);
+}
+
+/* Member-Only Content */
+.members-only {
+    display: none;
+    position: relative;
+}
+
+.members-only.member-visible {
+    display: block;
+}
+
+.member-indicator {
+    display: none;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 10px;
+}
+
+.member-indicator::before {
+    content: "🔒 ";
+}
+
+/* Member-Only Overlay */
+.member-content-overlay {
+    position: relative;
+}
+
+.member-content-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 10;
+    display: none;
+}
+
+.member-content-overlay:not(.member-visible)::before {
+    display: block;
+}
+
+.member-content-overlay:not(.member-visible)::after {
+    content: '🔒 Members Only';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #8B4513, #D2691E);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 16px;
+    z-index: 11;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Notifications */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    max-width: 300px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-success {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+.notification-error {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+}
+
+.notification-info {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+}
+
+/* Authentication Header */
+.auth-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 20px;
+}
+
+.auth-header .auth-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #login-form {
+        margin: 15px;
+        padding: 20px;
+    }
+    
+    .auth-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+/* Animation for member content reveal */
+@keyframes memberReveal {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.members-only.member-visible {
+    animation: memberReveal 0.5s ease-out;
+}

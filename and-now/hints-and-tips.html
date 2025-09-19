@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hints & Tips - YearAway</title>
+    <meta name="description" content="Travel tips, recommendations, and advice from YearAway">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css?v=26">
+    <link rel="stylesheet" href="css/auth-styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+</head>
+<body>
+    <!-- Authentication Header -->
+    <div class="auth-header">
+        <div class="auth-info">
+            <span>Status: <span id="auth-status" class="member-status guest">Guest</span></span>
+            <button id="logout-btn" style="display: none;">Logout</button>
+        </div>
+    </div>
+
+    <!-- Login Form (hidden when logged in) -->
+    <div id="login-form" class="login-form-container">
+        <form>
+            <h3>🔐 Member Access</h3>
+            <div class="form-group">
+                <label for="member-token">Member Token:</label>
+                <input type="text" id="member-token" placeholder="YEARAWAY-XXXX-XXXX-XXXX" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="index.html">YearAway</a>
+                <span class="nav-subtitle">And Now</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="adventures.html">Adventures</a></li>
+                <li><a href="hints-and-tips.html" class="active">Hints & Tips</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <section class="page-header">
+            <div class="container">
+                <h1>Hints & Tips</h1>
+                <p class="page-subtitle">Travel advice, recommendations, and insider tips</p>
+            </div>
+        </section>
+
+        <!-- Tips Categories -->
+        <section class="tips-categories">
+            <div class="container">
+                <h2>Travel Categories</h2>
+                <div id="tips-categories-container">
+                    <!-- Content loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- All Tips by Category -->
+        <section class="all-tips">
+            <div class="container">
+                <div class="section-header">
+                    <h2>All Travel Tips</h2>
+                    <button class="btn btn-secondary back-to-categories">Back to Categories</button>
+                </div>
+                <div id="all-tips-container">
+                    <!-- Tips organized by category -->
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Call to Action -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Want More Exclusive Tips?</h2>
+                    <p>Get access to detailed recommendations, personal experiences, and insider knowledge.</p>
+                    <a href="index.html" class="btn btn-primary">Request Member Access</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>YearAway</h3>
+                    <p>Current adventures and experiences</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="adventures.html">Adventures</a></li>
+                        <li><a href="hints-and-tips.html">Hints & Tips</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Archive</h4>
+                    <ul>
+                        <li><a href="../that_was_then/">Then (2001-2011)</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 YearAway. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/auth-config.js?v=33"></script>
+    <script src="js/simple-auth-system.js?v=33"></script>
+    <script src="js/main.js?v=33"></script>
+    <script src="js/tips-manager.js?v=79"></script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YearAway - Authentication Test</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+    <link rel="stylesheet" href="auth-styles.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 50%, #CD853F 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .entry {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #8B4513;
+        }
+
+        .entry h3 {
+            color: #8B4513;
+            margin-bottom: 10px;
+        }
+
+        .entry .date {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .entry .content {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .public-content {
+            border-left-color: #4CAF50;
+        }
+
+        .member-content {
+            border-left-color: #ff9800;
+        }
+
+        .test-tokens {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .test-tokens h4 {
+            margin-top: 0;
+            color: #8B4513;
+        }
+
+        .test-tokens code {
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 YearAway Authentication Test</h1>
+        
+        <!-- Authentication Header -->
+        <div class="auth-header">
+            <div class="auth-info">
+                <span>Status: <span id="auth-status" class="member-status guest">Guest</span></span>
+                <button id="logout-btn" style="display: none;">Logout</button>
+            </div>
+        </div>
+
+        <!-- Test Tokens Info -->
+        <div class="test-tokens">
+            <h4>🧪 Test Tokens (try these):</h4>
+            <code>YEARAWAY-ULZE-1SVR-Z0JG</code>
+            <code>YEARAWAY-I80B-HJ7Y-FKNO</code>
+            <code>YEARAWAY-Q2FZ-KID3-ISML</code>
+            <code>YEARAWAY-9ND6-6QMU-KYW7</code>
+            <code>YEARAWAY-1G9L-Q9I4-4AMQ</code>
+        </div>
+
+        <!-- Login Form (shown when not authenticated) -->
+        <div id="login-form">
+            <h3>🔐 Member Access</h3>
+            <p>Enter your member token to access exclusive content:</p>
+            <form>
+                <div class="form-group">
+                    <label for="member-token">Member Token:</label>
+                    <input type="text" id="member-token" placeholder="YEARAWAY-XXXX-XXXX-XXXX" required>
+                </div>
+                <button type="submit">Access Member Content</button>
+            </form>
+        </div>
+
+        <!-- Public Content -->
+        <div class="entry public-content">
+            <h3>🌍 Welcome to YearAway</h3>
+            <div class="date">September 5, 2025</div>
+            <div class="content">
+                <p>Welcome to our travel adventures! This content is visible to everyone. 
+                We're currently working on some amazing new features for our members.</p>
+                <p>Stay tuned for updates about our latest travels and adventures around the world!</p>
+            </div>
+        </div>
+
+        <!-- Member-Only Content -->
+        <div class="entry member-content members-only">
+            <h3>🏖️ Secret Beach Discovery <span class="member-indicator">Members Only</span></h3>
+            <div class="date">September 4, 2025</div>
+            <div class="content">
+                <p>We found the most incredible hidden beach yesterday! The water was crystal clear 
+                and we had the entire place to ourselves. Here are some photos from our adventure:</p>
+                <p><em>This content is only visible to members with a valid token.</em></p>
+                <p>📍 Location: Secret coordinates shared with members only</p>
+                <p>📸 Photos: Amazing sunset shots and underwater footage</p>
+            </div>
+        </div>
+
+        <!-- Another Public Entry -->
+        <div class="entry public-content">
+            <h3>🍜 Amazing Street Food</h3>
+            <div class="date">September 3, 2025</div>
+            <div class="content">
+                <p>Today we discovered some incredible street food vendors. The flavors were 
+                absolutely amazing! Here's what we tried:</p>
+                <ul>
+                    <li>Spicy noodle soup</li>
+                    <li>Grilled fish with herbs</li>
+                    <li>Fresh tropical fruits</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Another Member-Only Entry -->
+        <div class="entry member-content members-only">
+            <h3>🏨 Exclusive Hotel Review <span class="member-indicator">Members Only</span></h3>
+            <div class="date">September 2, 2025</div>
+            <div class="content">
+                <p>We stayed at this incredible boutique hotel last night. The service was 
+                outstanding and the views were breathtaking. Here's our detailed review:</p>
+                <p><strong>Rating:</strong> 5/5 stars</p>
+                <p><strong>Best feature:</strong> The infinity pool overlooking the ocean</p>
+                <p><strong>Price:</strong> $200/night (member discount available)</p>
+                <p><strong>Booking:</strong> Contact details shared with members</p>
+                <p><em>This detailed review is only available to our members.</em></p>
+            </div>
+        </div>
+
+        <!-- Member-Only Travel Tips -->
+        <div class="entry member-content members-only">
+            <h3>💡 Insider Travel Tips <span class="member-indicator">Members Only</span></h3>
+            <div class="date">September 1, 2025</div>
+            <div class="content">
+                <p>Here are some exclusive travel tips we've learned along the way:</p>
+                <ul>
+                    <li>Best time to visit popular destinations (avoid crowds)</li>
+                    <li>Hidden gems and local recommendations</li>
+                    <li>Money-saving tips and budget hacks</li>
+                    <li>Safety advice for solo travelers</li>
+                </ul>
+                <p><em>These tips are only shared with our valued members!</em></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Simple Authentication System -->
+    <script src="simple-auth-system.js"></script>
+</body>
+</html>

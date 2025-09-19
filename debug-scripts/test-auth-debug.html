@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 15px; margin: 5px; }
+        input { padding: 8px; margin: 5px; width: 300px; }
+    </style>
+</head>
+<body>
+    <h1>🔐 YearAway Authentication Debug</h1>
+    
+    <div class="debug-section">
+        <h3>Current Status</h3>
+        <div id="status">Loading...</div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>Test Login</h3>
+        <input type="text" id="tokenInput" placeholder="Enter member token" value="YEARAWAY-ULZE-1SVR-Z0JG">
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="testLogout()">Test Logout</button>
+    </div>
+    
+    <div class="debug-section">
+        <h3>LocalStorage Check</h3>
+        <div id="localStorageInfo">Loading...</div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>Tips Manager Test</h3>
+        <button onclick="testTipsManager()">Test Tips Manager</button>
+        <div id="tipsManagerInfo">Not tested yet</div>
+    </div>
+
+    <script src="../and-now/js/simple-auth-system.js?v=19"></script>
+    <script src="../and-now/js/tips-manager.js?v=19"></script>
+    
+    <script>
+        function updateStatus() {
+            const statusDiv = document.getElementById('status');
+            const localStorageDiv = document.getElementById('localStorageInfo');
+            
+            if (window.yearawayAuth) {
+                const isMember = window.yearawayAuth.isMember();
+                const token = localStorage.getItem('yearaway_member_token');
+                
+                statusDiv.innerHTML = `
+                    <div class="${isMember ? 'success' : 'error'}">
+                        Auth System: ✅ Loaded<br>
+                        Member Status: ${isMember ? '✅ Member' : '❌ Guest'}<br>
+                        Token: ${token || 'None'}
+                    </div>
+                `;
+                
+                localStorageDiv.innerHTML = `
+                    <div class="info">
+                        yearaway_member_token: ${localStorage.getItem('yearaway_member_token') || 'None'}<br>
+                        yearaway_member_status: ${localStorage.getItem('yearaway_member_status') || 'None'}
+                    </div>
+                `;
+            } else {
+                statusDiv.innerHTML = '<div class="error">Auth System: ❌ Not Loaded</div>';
+            }
+        }
+        
+        function testLogin() {
+            const token = document.getElementById('tokenInput').value;
+            if (window.yearawayAuth) {
+                window.yearawayAuth.login(token);
+                updateStatus();
+            } else {
+                alert('Auth system not loaded');
+            }
+        }
+        
+        function testLogout() {
+            if (window.yearawayAuth) {
+                window.yearawayAuth.logout();
+                updateStatus();
+            } else {
+                alert('Auth system not loaded');
+            }
+        }
+        
+        function testTipsManager() {
+            const tipsDiv = document.getElementById('tipsManagerInfo');
+            
+            if (window.tipsManager) {
+                const authSystem = window.tipsManager.authSystem;
+                const tipsData = window.tipsManager.tipsData;
+                
+                tipsDiv.innerHTML = `
+                    <div class="info">
+                        Tips Manager: ✅ Loaded<br>
+                        Auth System Connected: ${authSystem ? '✅ Yes' : '❌ No'}<br>
+                        Tips Data: ${tipsData ? `${tipsData.tips.length} tips` : '❌ None'}<br>
+                        Is Member: ${authSystem ? authSystem.isMember() : 'Unknown'}
+                    </div>
+                `;
+            } else {
+                tipsDiv.innerHTML = '<div class="error">Tips Manager: ❌ Not Loaded</div>';
+            }
+        }
+        
+        // Update status every second
+        setInterval(updateStatus, 1000);
+        updateStatus();
+    </script>
+</body>
+</html>
