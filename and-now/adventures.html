@@ -7,7 +7,7 @@
     <meta name="description" content="Current travel adventures and experiences from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=15">
+    <link rel="stylesheet" href="css/style.css?v=25">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -136,5 +136,20 @@
     <script src="js/main.js?v=33"></script>
     <script src="js/photos-manager.js?v=37"></script>
     <script src="js/adventures-manager.js?v=45"></script>
+    
+    <!-- Force grid layout script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const grid = document.getElementById('categories-grid');
+                if (grid) {
+                    // Force the grid layout
+                    grid.style.display = 'grid';
+                    grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(180px, 1fr))';
+                    grid.style.gap = 'var(--spacing-sm)';
+                }
+            }, 2000); // Wait 2 seconds for everything to load
+        });
+    </script>
 </body>
 </html>

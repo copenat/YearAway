@@ -458,6 +458,215 @@ section:nth-child(even) {
         padding: 0 var(--spacing-sm);
     }
     
+    /* Extra small screen optimizations */
+    .category-card {
+        padding: var(--spacing-sm);
+        border-radius: var(--radius-md);
+    }
+    
+    .category-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .category-card p {
+        font-size: 0.85rem;
+    }
+    
+    .tip-card {
+        padding: var(--spacing-md);
+    }
+    
+    .tip-card h3 {
+        font-size: 1rem;
+    }
+    
+    .tip-description {
+        font-size: 0.85rem;
+    }
+    
+    .adventure-item {
+        padding: var(--spacing-md);
+    }
+    
+    .adventure-item h3 {
+        font-size: 1rem;
+    }
+    
+    .adventure-description {
+        font-size: 0.85rem;
+    }
+    
+    /* Navigation for very small screens */
+    .nav-logo {
+        font-size: 1.1rem;
+    }
+    
+    .nav-menu a {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.9rem;
+    }
+    
+    /* Section headers for small screens */
+    .section-header h2 {
+        font-size: 1.25rem;
+    }
+    
+    .section-header p {
+        font-size: 0.85rem;
+    }
+    
+    /* Button adjustments for small screens */
+    .btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.85rem;
+        min-height: 40px;
+    }
+    
+    /* Hero section adjustments */
+    .hero-content h1 {
+        font-size: 1.75rem;
+        line-height: 1.2;
+    }
+    
+    .hero-content p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    /* Footer adjustments */
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-lg);
+    }
+    
+    .footer-section {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    /* Photo improvements for small screens */
+    .adventure-photo {
+        min-height: 150px;
+    }
+    
+    /* Connected tips for small screens */
+    .connected-tip {
+        padding: var(--spacing-sm);
+    }
+    
+    .connected-tip h4 {
+        font-size: 0.9rem;
+    }
+    
+    .connected-tip p {
+        font-size: 0.8rem;
+    }
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+    /* Improve touch targets */
+    .category-card,
+    .tip-card,
+    .adventure-item {
+        cursor: pointer;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .category-card:active,
+    .tip-card:active,
+    .adventure-item:active {
+        transform: scale(0.98);
+    }
+    
+    /* Smooth scrolling for mobile */
+    html {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Prevent horizontal scroll */
+    body {
+        overflow-x: hidden;
+    }
+    
+    /* Improve text readability */
+    .tip-description,
+    .adventure-description {
+        word-wrap: break-word;
+        hyphens: auto;
+    }
+    
+    /* Better spacing for touch interfaces */
+    .category-card,
+    .tip-card,
+    .adventure-item {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    /* Improve button spacing */
+    .btn {
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    /* Better form spacing */
+    .form-group {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    /* Improve navigation touch targets */
+    .nav-menu a {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Better tag display on mobile */
+    .tip-tags .tag {
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    /* Improve photo loading */
+    .adventure-photo {
+        object-fit: cover;
+        background-color: var(--light-gray);
+    }
+    
+    /* Better connected tips layout */
+    .connected-tips-list {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Improve scroll indicators */
+    .category-section {
+        scroll-margin-top: 80px; /* Account for fixed header */
+    }
+}
+
+/* Landscape mobile optimizations */
+@media (max-width: 768px) and (orientation: landscape) {
+    .hero-content h1 {
+        font-size: 1.5rem;
+    }
+    
+    .hero-content p {
+        font-size: 0.9rem;
+    }
+    
+    .section-header h2 {
+        font-size: 1.25rem;
+    }
+    
+    .category-card,
+    .tip-card,
+    .adventure-item {
+        padding: var(--spacing-md);
+    }
+}
+    
     section {
         padding: var(--spacing-xl) 0;
     }
@@ -704,15 +913,15 @@ input:focus {
 
 /* Adventure Categories */
 .categories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--spacing-lg);
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+    gap: var(--spacing-sm) !important;
     margin-top: var(--spacing-lg);
 }
 
 .category-card {
     background: var(--white);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-md);
     border-radius: var(--radius-lg);
     text-align: center;
     box-shadow: var(--shadow-sm);
@@ -727,17 +936,25 @@ input:focus {
 }
 
 .category-icon {
-    font-size: 48px;
-    margin-bottom: var(--spacing-md);
+    font-size: 28px;
+    margin-bottom: var(--spacing-xs);
 }
 
 .category-card h3 {
     margin-bottom: var(--spacing-sm);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.2;
 }
 
 .category-card p {
     color: var(--medium-gray);
     margin-bottom: var(--spacing-md);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.4;
 }
 
 .category-count {
@@ -786,9 +1003,6 @@ input:focus {
         justify-content: center;
     }
     
-    .categories-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 /* Tips & Hints Page Styles */
@@ -1107,7 +1321,7 @@ input:focus {
 }
 
 /* Responsive adjustments for tips and gallery pages */
-@media (max-width: 768px) {
+@media (max-width: 400px) {
     .tips-grid,
     .products-grid {
         grid-template-columns: 1fr;
@@ -1129,6 +1343,135 @@ input:focus {
     .filter-btn {
         width: 100%;
         max-width: 200px;
+    }
+    
+    /* Category cards mobile improvements - keep multiple columns even on mobile */
+    .categories-grid {
+        gap: var(--spacing-sm);
+    }
+    
+    .category-card {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-sm);
+        border-radius: var(--radius-md);
+    }
+    
+    .category-card h3 {
+        font-size: 1.25rem;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .category-card p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    /* Tip cards mobile improvements */
+    .tip-card {
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .tip-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .tip-description {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    .tip-tags {
+        flex-wrap: wrap;
+        gap: var(--spacing-xs);
+    }
+    
+    .tip-tags .tag {
+        font-size: 0.75rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    /* Adventure cards mobile improvements */
+    .adventure-item {
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .adventure-item h3 {
+        font-size: 1.1rem;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .adventure-description {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    /* Navigation improvements */
+    .nav-container {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .nav-logo {
+        font-size: 1.25rem;
+    }
+    
+    /* Section headers mobile */
+    .section-header h2 {
+        font-size: 1.5rem;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .section-header p {
+        font-size: 0.9rem;
+    }
+    
+    /* Button improvements */
+    .btn {
+        padding: var(--spacing-md) var(--spacing-lg);
+        font-size: 0.9rem;
+        min-height: 44px; /* iOS touch target minimum */
+    }
+    
+    /* Form improvements */
+    .form-group input,
+    .form-group textarea {
+        padding: var(--spacing-md);
+        font-size: 1rem; /* Prevents zoom on iOS */
+    }
+    
+    /* Photo grid improvements */
+    .photos-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .adventure-photo {
+        width: 100%;
+        height: auto;
+        min-height: 200px;
+    }
+    
+    /* Connected tips mobile */
+    .connected-tips {
+        margin-top: var(--spacing-lg);
+    }
+    
+    .connected-tips-list {
+        gap: var(--spacing-sm);
+    }
+    
+    .connected-tip {
+        padding: var(--spacing-md);
+    }
+    
+    .connected-tip h4 {
+        font-size: 1rem;
+    }
+    
+    .connected-tip p {
+        font-size: 0.85rem;
     }
 }
 

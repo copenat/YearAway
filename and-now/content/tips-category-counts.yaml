@@ -49,9 +49,9 @@ categories:
   membersOnlyTips: 0
   totalTips: 1
 - id: transportation
-  name: Transportation
+  name: Transport
   icon: ✈️
-  description: Transportation tips and advice
+  description: Transport tips and advice
   publicTips: 1
   membersOnlyTips: 3
   totalTips: 4

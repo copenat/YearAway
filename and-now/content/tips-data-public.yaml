@@ -4,7 +4,7 @@ tips:
     description: |
       Airline prices are typically lowest on Tuesdays, especially for domestic flights.
       Set up price alerts and book when you see a good deal.
-    category: Transportation
+    category: Transport
     tags: [flights, budget, booking]
     rating: 5
     testNote: "TEST: This tip was updated via the NEW YAML system! (Triggering workflow for YAML - v3 - Final Test)"
