@@ -7,7 +7,7 @@
     <meta name="description" content="Current adventures and experiences from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=29">
+    <link rel="stylesheet" href="css/style.css?v=32">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -152,39 +152,54 @@
     <script src="js/adventures-manager.js?v=44"></script>
     <script src="js/main.js"></script>
     <script>
+        console.log('🔧 Script loaded - starting debug...');
+        
+        // Test if container exists
+        const testContainer = document.getElementById('recent-adventures-container');
+        console.log('🎯 Container test:', !!testContainer);
+        
         // Function to load and display recent adventures
         async function loadRecentAdventures() {
+            console.log('🎯 loadRecentAdventures() called');
             try {
                 if (!window.yearawayAuth) {
-                    console.error('Auth system not available');
+                    console.error('❌ Auth system not available in loadRecentAdventures');
                     return;
                 }
                 
+                console.log('📦 Creating AdventuresManager...');
                 // Load adventures data with proper auth system connection
                 const adventuresManager = new AdventuresManager();
+                console.log('🔗 Setting auth system...');
                 await adventuresManager.setAuthSystem(window.yearawayAuth);
+                console.log('📊 Adventures data:', adventuresManager.adventuresData);
                 
                 // Get all adventures and sort by date (most recent first)
                 const allAdventures = [...adventuresManager.adventuresData.adventures];
                 allAdventures.sort((a, b) => new Date(b.date) - new Date(a.date));
                 
-                console.log('Recent adventures loading - Total adventures:', allAdventures.length);
-                console.log('Recent adventures loading - Is member:', window.yearawayAuth.isMember());
+                console.log('📈 Recent adventures loading - Total adventures:', allAdventures.length);
+                console.log('👤 Recent adventures loading - Is member:', window.yearawayAuth.isMember());
+                console.log('📋 All adventures:', allAdventures.map(a => ({ title: a.title, isPublic: a.isPublic, date: a.date })));
                 
                 // Get the most recent adventure
                 const latestAdventure = allAdventures[0];
                 
+                const container = document.getElementById('recent-adventures-container');
+                console.log('🎯 Container found:', !!container);
+                
                 if (latestAdventure) {
-                    const container = document.getElementById('recent-adventures-container');
                     const isMember = window.yearawayAuth.isMember();
                     
-                    console.log('Latest adventure:', latestAdventure.title, 'isPublic:', latestAdventure.isPublic, 'isMember:', isMember);
+                    console.log('🏆 Latest adventure:', latestAdventure.title, 'isPublic:', latestAdventure.isPublic, 'isMember:', isMember);
                     
                     // Only show if it's public or user is a member
                     if (latestAdventure.isPublic || isMember) {
+                        console.log('✅ Showing latest adventure');
                         const adventureCard = adventuresManager.renderAdventureItem(latestAdventure);
                         container.innerHTML = adventureCard;
                     } else {
+                        console.log('🔒 Showing members only message');
                         // Show a generic "members only" message
                         container.innerHTML = `
                             <div class="adventure-card members-only">
@@ -197,8 +212,8 @@
                         `;
                     }
                 } else {
+                    console.log('📭 No adventures available');
                     // No adventures available
-                    const container = document.getElementById('recent-adventures-container');
                     container.innerHTML = `
                         <div class="adventure-card">
                             <div class="adventure-content">
@@ -225,52 +240,68 @@
 
         // Load the most recent adventure for the homepage
         document.addEventListener('DOMContentLoaded', async function() {
-            // Wait for auth system to be ready
-            let attempts = 0;
-            const maxAttempts = 50; // Wait up to 5 seconds
-            
-            while (!window.yearawayAuth && attempts < maxAttempts) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                attempts++;
-            }
-            
-            if (!window.yearawayAuth) {
-                console.error('Auth system not available after waiting');
-                // Show default content
-                const container = document.getElementById('recent-adventures-container');
-                container.innerHTML = `
-                    <div class="adventure-card">
-                        <div class="adventure-content">
-                            <h3>Adventures Coming Soon</h3>
-                            <p>We're planning our next adventure. Check back soon for updates!</p>
-                            <a href="adventures.html" class="btn btn-outline">View All Adventures</a>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Load initial content
-            await loadRecentAdventures();
-            
-            // Listen for authentication status changes and reload content
-            document.addEventListener('yearaway:authStatusChanged', async function() {
-                console.log('Auth status changed, reloading recent adventures...');
+            try {
+                console.log('🚀 DOMContentLoaded event fired');
+                
+                // Wait for auth system to be ready
+                let attempts = 0;
+                const maxAttempts = 50; // Wait up to 5 seconds
+                
+                console.log('⏳ Waiting for auth system...');
+                while (!window.yearawayAuth && attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                console.log('🔍 Auth system check:', {
+                    authSystemExists: !!window.yearawayAuth,
+                    attempts: attempts,
+                    maxAttempts: maxAttempts
+                });
+                
+                if (!window.yearawayAuth) {
+                    console.error('❌ Auth system not available after waiting');
+                    // Show default content
+                    const container = document.getElementById('recent-adventures-container');
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="adventure-card">
+                                <div class="adventure-content">
+                                    <h3>Adventures Coming Soon</h3>
+                                    <p>We're planning our next adventure. Check back soon for updates!</p>
+                                    <a href="adventures.html" class="btn btn-outline">View All Adventures</a>
+                                </div>
+                            </div>
+                        `;
+                        console.log('📝 Set default content - no auth system');
+                    } else {
+                        console.error('❌ Recent adventures container not found');
+                    }
+                    return;
+                }
+                
+                console.log('✅ Auth system found, loading recent adventures...');
+                // Load initial content
                 await loadRecentAdventures();
-            });
-            
-            // Also listen for login/logout events
-            document.addEventListener('yearaway:login', async function() {
-                console.log('User logged in, reloading recent adventures...');
-                await loadRecentAdventures();
-            });
-            
-            document.addEventListener('yearaway:logout', async function() {
-                console.log('User logged out, reloading recent adventures...');
-                await loadRecentAdventures();
-            });
-            
-        } catch (error) {
+                
+                // Listen for authentication status changes and reload content
+                document.addEventListener('yearaway:authStatusChanged', async function() {
+                    console.log('Auth status changed, reloading recent adventures...');
+                    await loadRecentAdventures();
+                });
+                
+                // Also listen for login/logout events
+                document.addEventListener('yearaway:login', async function() {
+                    console.log('User logged in, reloading recent adventures...');
+                    await loadRecentAdventures();
+                });
+                
+                document.addEventListener('yearaway:logout', async function() {
+                    console.log('User logged out, reloading recent adventures...');
+                    await loadRecentAdventures();
+                });
+                
+            } catch (error) {
             console.error('Error loading recent adventure:', error);
             const container = document.getElementById('recent-adventures-container');
             container.innerHTML = `
