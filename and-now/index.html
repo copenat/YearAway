@@ -7,7 +7,7 @@
     <meta name="description" content="Current adventures and experiences from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=34">
+    <link rel="stylesheet" href="css/style.css?v=37">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -159,6 +159,9 @@
         console.log('🎯 Container test:', !!testContainer);
         
         // Function to load and display recent adventures
+        let loadRetryCount = 0;
+        const MAX_RETRIES = 3;
+        
         async function loadRecentAdventures() {
             console.log('🎯 loadRecentAdventures() called');
             try {
@@ -172,7 +175,16 @@
                 const adventuresManager = new AdventuresManager();
                 console.log('🔗 Setting auth system...');
                 await adventuresManager.setAuthSystem(window.yearawayAuth);
+                
+                // Wait a moment for the auth system to fully initialize
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
                 console.log('📊 Adventures data:', adventuresManager.adventuresData);
+                console.log('🔐 Auth system status:', {
+                    exists: !!window.yearawayAuth,
+                    isMember: window.yearawayAuth ? window.yearawayAuth.isMember() : 'N/A',
+                    token: window.yearawayAuth ? window.yearawayAuth.getCurrentToken() : 'N/A'
+                });
                 
                 // Get all adventures and sort by date (most recent first)
                 const allAdventures = [...adventuresManager.adventuresData.adventures];
@@ -185,13 +197,24 @@
                 
                 // Double-check auth status
                 if (isMemberStatus === null || isMemberStatus === undefined) {
-                    console.log('⚠️ Auth status is null/undefined, waiting for auth system to be ready...');
-                    // Wait a bit more and try again
-                    setTimeout(async () => {
-                        await loadRecentAdventures();
-                    }, 200);
+                    console.log('⚠️ Auth status is null/undefined, showing coming soon message...');
+                    // Instead of retrying immediately, just show the "coming soon" message
+                    const container = document.getElementById('recent-adventures-container');
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="adventure-card">
+                                <div class="adventure-content">
+                                    <h3>Adventures Coming Soon</h3>
+                                    <p>We're planning our next adventure. Check back soon for updates!</p>
+                                    <a href="adventures.html" class="btn btn-outline">View All Adventures</a>
+                                </div>
+                            </div>
+                        `;
+                    }
                     return;
                 }
+                
+                console.log('✅ Auth status is valid:', isMemberStatus);
                 
                 // Get the most recent adventure
                 const latestAdventure = allAdventures[0];
@@ -338,6 +361,7 @@
                 // Listen for authentication status changes and reload content
                 document.addEventListener('yearaway:authStatusChanged', async function() {
                     console.log('🔔 Auth status changed, reloading recent adventures...');
+                    loadRetryCount = 0; // Reset retry count on auth change
                     // Add a small delay to ensure auth system is fully updated
                     setTimeout(async () => {
                         await loadRecentAdventures();
@@ -347,6 +371,7 @@
                 // Also listen for login/logout events
                 document.addEventListener('yearaway:login', async function() {
                     console.log('🔔 User logged in, reloading recent adventures...');
+                    loadRetryCount = 0; // Reset retry count on login
                     // Add a small delay to ensure auth system is fully updated
                     setTimeout(async () => {
                         await loadRecentAdventures();
@@ -355,6 +380,7 @@
                 
                 document.addEventListener('yearaway:logout', async function() {
                     console.log('🔔 User logged out, reloading recent adventures...');
+                    loadRetryCount = 0; // Reset retry count on logout
                     // Add a small delay to ensure auth system is fully updated
                     setTimeout(async () => {
                         await loadRecentAdventures();
