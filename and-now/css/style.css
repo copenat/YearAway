@@ -220,6 +220,7 @@ a:hover {
     height: 3px;
     background: var(--primary-brown);
     transition: all 0.3s ease;
+    transform-origin: center;
 }
 
 /* Hero Section */
@@ -417,8 +418,33 @@ section:nth-child(even) {
         display: none;
     }
     
+    .nav-menu.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--white);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        padding: 1rem;
+    }
+    
     .nav-toggle {
         display: flex;
+    }
+    
+    .nav-toggle.active span:nth-child(1) {
+        transform: rotate(45deg) translate(6px, 6px);
+    }
+    
+    .nav-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .nav-toggle.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px);
     }
     
     .hero-actions {
@@ -881,6 +907,10 @@ input:focus {
     white-space: nowrap;
     box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
     border: 1px solid #1e7e34;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
 }
 
 .adventure-content {

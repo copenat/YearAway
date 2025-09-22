@@ -135,6 +135,11 @@
     margin-left: 10px;
 }
 
+/* Show member indicator when content is visible to members */
+.member-visible .member-indicator {
+    display: inline-block;
+}
+
 .member-indicator::before {
     content: "🔒 ";
 }

@@ -7,7 +7,7 @@
     <meta name="description" content="Current adventures and experiences from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=39">
+    <link rel="stylesheet" href="css/style.css?v=48">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -85,7 +85,7 @@
         <section class="recent-adventures">
             <div class="container">
                 <h2>Recent Adventures</h2>
-                <div class="adventures-grid" id="recent-adventures-container">
+                <div id="adventures-timeline">
                     <!-- Dynamic content will be loaded here -->
                 </div>
             </div>
@@ -150,12 +150,13 @@
     <script src="js/auth-config.js?v=23"></script>
     <script src="js/simple-auth-system.js?v=23"></script>
     <script src="js/adventures-manager.js?v=44"></script>
+    <script src="js/photos-manager.js?v=44"></script>
     <script src="js/main.js"></script>
     <script>
         console.log('🔧 Script loaded - starting debug...');
         
         // Test if container exists
-        const testContainer = document.getElementById('recent-adventures-container');
+        const testContainer = document.getElementById('adventures-timeline');
         console.log('🎯 Container test:', !!testContainer);
         
         // Function to load and display recent adventures
@@ -199,10 +200,10 @@
                 if (isMemberStatus === null || isMemberStatus === undefined) {
                     console.log('⚠️ Auth status is null/undefined, showing coming soon message...');
                     // Instead of retrying immediately, just show the "coming soon" message
-                    const container = document.getElementById('recent-adventures-container');
+                    const container = document.getElementById('adventures-timeline');
                     if (container) {
                         container.innerHTML = `
-                            <div class="adventure-card">
+                            <div class="adventure-item">
                                 <div class="adventure-content">
                                     <h3>Adventures Coming Soon</h3>
                                     <p>We're planning our next adventure. Check back soon for updates!</p>
@@ -219,7 +220,7 @@
                 // Get the most recent adventure
                 const latestAdventure = allAdventures[0];
                 
-                const container = document.getElementById('recent-adventures-container');
+                const container = document.getElementById('adventures-timeline');
                 console.log('🎯 Container found:', !!container);
                 console.log('🎯 Container element:', container);
                 console.log('🎯 Container innerHTML before:', container ? container.innerHTML : 'N/A');
@@ -234,42 +235,104 @@
                         console.log('✅ Showing latest adventure');
                         
                         // Create a simpler card structure for the homepage
-                        const isMembersOnly = latestAdventure.id === 'planning-a-trip-to-asia';
+                        // Check if this adventure is member-only (not public)
+                        const isMembersOnly = !latestAdventure.isPublic;
                         const memberOnlyClass = isMembersOnly ? 'members-only member-visible' : '';
-                        const memberIndicator = isMembersOnly ? '<div class="member-indicator">🔒 Members Only</div>' : '';
+                        const memberIndicator = isMembersOnly ? '<div class="member-indicator">Members Only</div>' : '';
                         
                         // Format date
                         const date = new Date(latestAdventure.date);
                         const month = date.toLocaleDateString('en-US', { month: 'short' });
                         const year = date.getFullYear();
                         
-                        // Truncate description if it's too long (limit to 200 characters)
-                        const maxDescriptionLength = 200;
+                        // For the homepage, show full description for member-only content,
+                        // truncate public content to keep it concise
                         let descriptionHtml = latestAdventure.description;
                         let showReadMore = false;
                         
-                        if (latestAdventure.description.length > maxDescriptionLength) {
-                            descriptionHtml = latestAdventure.description.substring(0, maxDescriptionLength) + '...';
-                            showReadMore = true;
+                        if (isMembersOnly) {
+                            // Show full description for member-only adventures (they have richer content)
+                            descriptionHtml = latestAdventure.description;
+                        } else {
+                            // For public adventures, truncate if too long
+                            const maxDescriptionLength = 200;
+                            if (latestAdventure.description.length > maxDescriptionLength) {
+                                descriptionHtml = latestAdventure.description.substring(0, maxDescriptionLength) + '...';
+                                showReadMore = true;
+                            }
                         }
                         
-                        const adventureCard = `
-                            <div class="adventure-card ${memberOnlyClass}" onclick="window.location.href='adventure-detail.html?id=${latestAdventure.id}'" style="cursor: pointer;">
-                                ${memberIndicator}
-                                <div class="adventure-content">
-                                    <div class="adventure-date">
-                                        <span class="month">${month}</span>
-                                        <span class="year">${year}</span>
-                                    </div>
-                                    <h3>${latestAdventure.title}</h3>
-                                    <div class="adventure-description">${descriptionHtml}</div>
-                                    ${showReadMore ? '<div class="adventure-read-more"><span class="read-more-text">Click here to read more →</span></div>' : ''}
-                                    <div class="adventure-tags">
-                                        ${latestAdventure.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+                        // Get connected photos for this adventure - wait for photos manager to be ready
+                        let connectedPhotos = [];
+                        let connectedPhotosHtml = '';
+                        
+                        console.log('📸 Checking photos manager status...');
+                        console.log('📸 window.photosManager exists:', !!window.photosManager);
+                        console.log('📸 window.photosManager.photosData exists:', !!(window.photosManager && window.photosManager.photosData));
+                        console.log('📸 window.photosManager.photosData.photos exists:', !!(window.photosManager && window.photosManager.photosData && window.photosManager.photosData.photos));
+                        
+                        if (window.photosManager && window.photosManager.photosData && window.photosManager.photosData.photos) {
+                            console.log('📸 Photos manager is ready, getting connected photos...');
+                            connectedPhotos = adventuresManager.getConnectedPhotos(latestAdventure);
+                            console.log('📸 Connected photos result:', connectedPhotos);
+                            connectedPhotosHtml = adventuresManager.renderConnectedPhotos(connectedPhotos, latestAdventure.id);
+                            
+                            // Ensure photo cards are visible to members by adding member-visible class
+                            if (connectedPhotosHtml && isMember) {
+                                connectedPhotosHtml = connectedPhotosHtml.replace(/class="connected-photo members-only"/g, 'class="connected-photo members-only member-visible"');
+                            }
+                            
+                            console.log('📸 Connected photos HTML:', connectedPhotosHtml);
+                            console.log('📸 Connected photos found:', connectedPhotos.length);
+                        } else {
+                            console.log('📸 Photos manager not ready yet, skipping photo cards');
+                            console.log('📸 Will try to load photos after a delay...');
+                            
+                            // Try to load photos after a short delay
+                            setTimeout(() => {
+                                if (window.photosManager && window.photosManager.photosData && window.photosManager.photosData.photos) {
+                                    console.log('📸 Photos manager ready after delay, updating photos...');
+                                    const delayedPhotos = adventuresManager.getConnectedPhotos(latestAdventure);
+                                    const delayedPhotosHtml = adventuresManager.renderConnectedPhotos(delayedPhotos, latestAdventure.id);
+                                    
+                                    if (delayedPhotos.length > 0) {
+                                        console.log('📸 Adding photos after delay...');
+                                        const container = document.getElementById('adventures-timeline');
+                                        if (container) {
+                                            const adventureItem = container.querySelector('.adventure-item');
+                                            if (adventureItem) {
+                                                const adventureContent = adventureItem.querySelector('.adventure-content');
+                                                if (adventureContent) {
+                                                    adventureContent.insertAdjacentHTML('beforeend', delayedPhotosHtml);
+                                                    console.log('📸 Photos added successfully!');
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }, 1000);
+                        }
+                        
+                             const adventureCard = `
+                                 <div class="adventure-item ${memberOnlyClass}" onclick="window.location.href='adventure-detail.html?id=${latestAdventure.id}'" style="cursor: pointer;">
+                                     ${memberIndicator}
+                                     <div class="adventure-date-container">
+                                         <div class="adventure-date">
+                                             <span class="month">${month}</span>
+                                             <span class="year">${year}</span>
+                                         </div>
+                                     </div>
+                                     <div class="adventure-content">
+                                         <h3>${latestAdventure.title}</h3>
+                                         <div class="adventure-description">${descriptionHtml}</div>
+                                         ${showReadMore ? '<div class="adventure-read-more"><span class="read-more-text">Click here to read more →</span></div>' : ''}
+                                         <div class="adventure-tags">
+                                             ${latestAdventure.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                                         </div>
+                                         ${connectedPhotosHtml}
+                                     </div>
+                                 </div>
+                             `;
                         
                         console.log('🎨 Generated adventure card HTML:', adventureCard);
                         container.innerHTML = adventureCard;
@@ -280,21 +343,21 @@
                     } else {
                         console.log('🔒 Showing members only message');
                         // Show a generic "members only" message
-                        container.innerHTML = `
-                            <div class="adventure-card members-only">
-                                <div class="member-indicator">🔒 Members Only</div>
-                                <div class="adventure-content">
-                                    <h3>Latest Adventure Available</h3>
-                                    <p>Our most recent adventure is available to members. <a href="adventures.html">View all adventures</a> or <a href="#" onclick="document.getElementById('login-form').style.display='block'">login</a> to access.</p>
-                                </div>
-                            </div>
-                        `;
+                             container.innerHTML = `
+                                 <div class="adventure-item members-only">
+                                     <div class="member-indicator">🔒 Members Only</div>
+                                     <div class="adventure-content">
+                                         <h3>Latest Adventure Available</h3>
+                                         <p>Our most recent adventure is available to members. <a href="adventures.html">View all adventures</a> or <a href="#" onclick="document.getElementById('login-form').style.display='block'">login</a> to access.</p>
+                                     </div>
+                                 </div>
+                             `;
                     }
                 } else {
                     console.log('📭 No adventures available');
                     // No adventures available
                     container.innerHTML = `
-                        <div class="adventure-card">
+                        <div class="adventure-item">
                             <div class="adventure-content">
                                 <h3>Adventures Coming Soon</h3>
                                 <p>We're planning our next adventure. Check back soon for updates!</p>
@@ -305,9 +368,9 @@
                 }
             } catch (error) {
                 console.error('Error loading recent adventure:', error);
-                const container = document.getElementById('recent-adventures-container');
+                const container = document.getElementById('adventures-timeline');
                 container.innerHTML = `
-                    <div class="adventure-card">
+                    <div class="adventure-item">
                         <div class="adventure-content">
                             <h3>Error Loading Adventures</h3>
                             <p>Sorry, there was an error loading the adventures. Please try refreshing the page.</p>
@@ -341,7 +404,7 @@
                 if (!window.yearawayAuth) {
                     console.error('❌ Auth system not available after waiting');
                     // Show default content
-                    const container = document.getElementById('recent-adventures-container');
+                    const container = document.getElementById('adventures-timeline');
                     if (container) {
                         container.innerHTML = `
                             <div class="adventure-card">
@@ -394,9 +457,9 @@
                 
             } catch (error) {
             console.error('Error loading recent adventure:', error);
-            const container = document.getElementById('recent-adventures-container');
+            const container = document.getElementById('adventures-timeline');
             container.innerHTML = `
-                <div class="adventure-card">
+                <div class="adventure-item">
                     <div class="adventure-content">
                         <h3>Adventures</h3>
                         <p>Explore our travel adventures and experiences.</p>
