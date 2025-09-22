@@ -7,7 +7,7 @@
     <meta name="description" content="Current adventures and experiences from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=32">
+    <link rel="stylesheet" href="css/style.css?v=33">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -196,8 +196,48 @@
                     // Only show if it's public or user is a member
                     if (latestAdventure.isPublic || isMember) {
                         console.log('✅ Showing latest adventure');
-                        const adventureCard = adventuresManager.renderAdventureItem(latestAdventure);
+                        
+                        // Create a simpler card structure for the homepage
+                        const isMembersOnly = latestAdventure.id === 'planning-a-trip-to-asia';
+                        const memberOnlyClass = isMembersOnly ? 'members-only' : '';
+                        const memberIndicator = isMembersOnly ? '<div class="member-indicator">🔒 Members Only</div>' : '';
+                        
+                        // Format date
+                        const date = new Date(latestAdventure.date);
+                        const month = date.toLocaleDateString('en-US', { month: 'short' });
+                        const year = date.getFullYear();
+                        
+                        // Truncate description if it's too long (limit to 200 characters)
+                        const maxDescriptionLength = 200;
+                        let descriptionHtml = latestAdventure.description;
+                        let showReadMore = false;
+                        
+                        if (latestAdventure.description.length > maxDescriptionLength) {
+                            descriptionHtml = latestAdventure.description.substring(0, maxDescriptionLength) + '...';
+                            showReadMore = true;
+                        }
+                        
+                        const adventureCard = `
+                            <div class="adventure-card ${memberOnlyClass}" onclick="window.location.href='adventure-detail.html?id=${latestAdventure.id}'" style="cursor: pointer;">
+                                ${memberIndicator}
+                                <div class="adventure-content">
+                                    <div class="adventure-date">
+                                        <span class="month">${month}</span>
+                                        <span class="year">${year}</span>
+                                    </div>
+                                    <h3>${latestAdventure.title}</h3>
+                                    <div class="adventure-description">${descriptionHtml}</div>
+                                    ${showReadMore ? '<div class="adventure-read-more"><span class="read-more-text">Click here to read more →</span></div>' : ''}
+                                    <div class="adventure-tags">
+                                        ${latestAdventure.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        console.log('🎨 Generated adventure card HTML:', adventureCard);
                         container.innerHTML = adventureCard;
+                        console.log('📝 Container innerHTML set, checking content:', container.innerHTML.substring(0, 100) + '...');
                     } else {
                         console.log('🔒 Showing members only message');
                         // Show a generic "members only" message
