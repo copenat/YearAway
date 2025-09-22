@@ -7,7 +7,7 @@
     <meta name="description" content="Current adventures and experiences from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=33">
+    <link rel="stylesheet" href="css/style.css?v=34">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -179,8 +179,19 @@
                 allAdventures.sort((a, b) => new Date(b.date) - new Date(a.date));
                 
                 console.log('📈 Recent adventures loading - Total adventures:', allAdventures.length);
-                console.log('👤 Recent adventures loading - Is member:', window.yearawayAuth.isMember());
+                const isMemberStatus = window.yearawayAuth.isMember();
+                console.log('👤 Recent adventures loading - Is member:', isMemberStatus);
                 console.log('📋 All adventures:', allAdventures.map(a => ({ title: a.title, isPublic: a.isPublic, date: a.date })));
+                
+                // Double-check auth status
+                if (isMemberStatus === null || isMemberStatus === undefined) {
+                    console.log('⚠️ Auth status is null/undefined, waiting for auth system to be ready...');
+                    // Wait a bit more and try again
+                    setTimeout(async () => {
+                        await loadRecentAdventures();
+                    }, 200);
+                    return;
+                }
                 
                 // Get the most recent adventure
                 const latestAdventure = allAdventures[0];
@@ -326,19 +337,28 @@
                 
                 // Listen for authentication status changes and reload content
                 document.addEventListener('yearaway:authStatusChanged', async function() {
-                    console.log('Auth status changed, reloading recent adventures...');
-                    await loadRecentAdventures();
+                    console.log('🔔 Auth status changed, reloading recent adventures...');
+                    // Add a small delay to ensure auth system is fully updated
+                    setTimeout(async () => {
+                        await loadRecentAdventures();
+                    }, 100);
                 });
                 
                 // Also listen for login/logout events
                 document.addEventListener('yearaway:login', async function() {
-                    console.log('User logged in, reloading recent adventures...');
-                    await loadRecentAdventures();
+                    console.log('🔔 User logged in, reloading recent adventures...');
+                    // Add a small delay to ensure auth system is fully updated
+                    setTimeout(async () => {
+                        await loadRecentAdventures();
+                    }, 100);
                 });
                 
                 document.addEventListener('yearaway:logout', async function() {
-                    console.log('User logged out, reloading recent adventures...');
-                    await loadRecentAdventures();
+                    console.log('🔔 User logged out, reloading recent adventures...');
+                    // Add a small delay to ensure auth system is fully updated
+                    setTimeout(async () => {
+                        await loadRecentAdventures();
+                    }, 100);
                 });
                 
             } catch (error) {
