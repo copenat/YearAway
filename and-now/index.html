@@ -7,7 +7,7 @@
     <meta name="description" content="Current adventures and experiences from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=37">
+    <link rel="stylesheet" href="css/style.css?v=39">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -221,6 +221,8 @@
                 
                 const container = document.getElementById('recent-adventures-container');
                 console.log('🎯 Container found:', !!container);
+                console.log('🎯 Container element:', container);
+                console.log('🎯 Container innerHTML before:', container ? container.innerHTML : 'N/A');
                 
                 if (latestAdventure) {
                     const isMember = window.yearawayAuth.isMember();
@@ -233,7 +235,7 @@
                         
                         // Create a simpler card structure for the homepage
                         const isMembersOnly = latestAdventure.id === 'planning-a-trip-to-asia';
-                        const memberOnlyClass = isMembersOnly ? 'members-only' : '';
+                        const memberOnlyClass = isMembersOnly ? 'members-only member-visible' : '';
                         const memberIndicator = isMembersOnly ? '<div class="member-indicator">🔒 Members Only</div>' : '';
                         
                         // Format date
@@ -272,6 +274,9 @@
                         console.log('🎨 Generated adventure card HTML:', adventureCard);
                         container.innerHTML = adventureCard;
                         console.log('📝 Container innerHTML set, checking content:', container.innerHTML.substring(0, 100) + '...');
+                        console.log('🔍 Container children count:', container.children.length);
+                        console.log('🔍 Container first child:', container.firstElementChild);
+                        console.log('🔍 Container classes:', container.className);
                     } else {
                         console.log('🔒 Showing members only message');
                         // Show a generic "members only" message
