@@ -7,7 +7,7 @@
     <meta name="description" content="Current adventures and experiences from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=17">
+    <link rel="stylesheet" href="css/style.css?v=27">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -156,24 +156,38 @@
         document.addEventListener('DOMContentLoaded', async function() {
             try {
                 // Wait for auth system to be ready
-                if (window.yearawayAuth) {
-                    await window.yearawayAuth.ready;
+                let attempts = 0;
+                const maxAttempts = 50; // Wait up to 5 seconds
+                
+                while (!window.yearawayAuth && attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
                 }
                 
-                // Load adventures data
+                if (!window.yearawayAuth) {
+                    console.error('Auth system not available after waiting');
+                    return;
+                }
+                
+                // Load adventures data with proper auth system connection
                 const adventuresManager = new AdventuresManager();
-                await adventuresManager.loadAdventuresData();
+                await adventuresManager.setAuthSystem(window.yearawayAuth);
                 
                 // Get all adventures and sort by date (most recent first)
                 const allAdventures = [...adventuresManager.adventuresData.adventures];
                 allAdventures.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                console.log('Recent adventures loading - Total adventures:', allAdventures.length);
+                console.log('Recent adventures loading - Is member:', window.yearawayAuth.isMember());
                 
                 // Get the most recent adventure
                 const latestAdventure = allAdventures[0];
                 
                 if (latestAdventure) {
                     const container = document.getElementById('recent-adventures-container');
-                    const isMember = window.yearawayAuth ? window.yearawayAuth.isMember() : false;
+                    const isMember = window.yearawayAuth.isMember();
+                    
+                    console.log('Latest adventure:', latestAdventure.title, 'isPublic:', latestAdventure.isPublic, 'isMember:', isMember);
                     
                     // Only show if it's public or user is a member
                     if (latestAdventure.isPublic || isMember) {
