@@ -73,7 +73,7 @@ class AdventuresManager {
     async loadAdventuresData() {
         try {
             // Load public adventures first
-            const publicResponse = await fetch('content/adventures-data-public.yaml');
+            const publicResponse = await fetch(`content/adventures-data-public.yaml?t=${Date.now()}`);
             if (!publicResponse.ok) {
                 throw new Error(`HTTP error! status: ${publicResponse.status}`);
             }
@@ -93,7 +93,7 @@ class AdventuresManager {
             // Load members-only adventures if authenticated
             if (this.authSystem && this.authSystem.isMember()) {
                 try {
-                    const membersResponse = await fetch('content/adventures-data-members.yaml');
+                    const membersResponse = await fetch(`content/adventures-data-members.yaml?t=${Date.now()}`);
                     if (membersResponse.ok) {
                         const membersYamlText = await membersResponse.text();
                         const membersData = this.parseYAML(membersYamlText);
