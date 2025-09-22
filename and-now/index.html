@@ -7,7 +7,7 @@
     <meta name="description" content="Current adventures and experiences from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=28">
+    <link rel="stylesheet" href="css/style.css?v=29">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -269,19 +269,20 @@
                 console.log('User logged out, reloading recent adventures...');
                 await loadRecentAdventures();
             });
-            } catch (error) {
-                console.error('Error loading recent adventure:', error);
-                const container = document.getElementById('recent-adventures-container');
-                container.innerHTML = `
-                    <div class="adventure-card">
-                        <div class="adventure-content">
-                            <h3>Adventures</h3>
-                            <p>Explore our travel adventures and experiences.</p>
-                            <a href="adventures.html" class="btn btn-outline">View Adventures</a>
-                        </div>
+            
+        } catch (error) {
+            console.error('Error loading recent adventure:', error);
+            const container = document.getElementById('recent-adventures-container');
+            container.innerHTML = `
+                <div class="adventure-card">
+                    <div class="adventure-content">
+                        <h3>Adventures</h3>
+                        <p>Explore our travel adventures and experiences.</p>
+                        <a href="adventures.html" class="btn btn-outline">View Adventures</a>
                     </div>
-                `;
-            }
+                </div>
+            `;
+        }
         });
     </script>
 </body>
