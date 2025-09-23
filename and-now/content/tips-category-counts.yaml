@@ -43,7 +43,7 @@ categories:
   totalTips: 1
 - id: technology
   name: Technology
-  icon: 📱
+  icon: 💻
   description: Technology tips and advice
   publicTips: 1
   membersOnlyTips: 0

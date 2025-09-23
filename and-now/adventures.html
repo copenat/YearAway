@@ -7,7 +7,7 @@
     <meta name="description" content="Current travel adventures and experiences from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=48">
+    <link rel="stylesheet" href="css/style.css?v=68">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -94,7 +94,7 @@
                 <div class="cta-content">
                     <h2>Want to Follow Along?</h2>
                     <p>Get exclusive access to detailed trip reports, personal reflections, and private photos.</p>
-                    <a href="index.html" class="btn btn-primary">Request Member Access</a>
+                    <a href="#" class="btn btn-primary" id="request-access-btn" onclick="handleRequestMemberAccess(); return false;">Request Member Access</a>
                 </div>
             </div>
         </section>
@@ -135,7 +135,8 @@
     <script src="js/simple-auth-system.js?v=33"></script>
     <script src="js/main.js?v=33"></script>
     <script src="js/photos-manager.js?v=37"></script>
-    <script src="js/adventures-manager.js?v=46"></script>
+    <script src="js/adventures-manager.js?v=68"></script>
+    <script src="js/access-request.js?v=1"></script>
     
     <!-- Force grid layout script -->
     <script>
@@ -149,6 +150,27 @@
                     grid.style.gap = 'var(--spacing-sm)';
                 }
             }, 2000); // Wait 2 seconds for everything to load
+        });
+
+        // Handle access request section visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            function updateAccessSectionVisibility() {
+                const ctaSection = document.querySelector('.cta-section');
+                if (ctaSection && window.yearawayAuth) {
+                    if (window.yearawayAuth.isMember()) {
+                        ctaSection.style.display = 'none';
+                    } else {
+                        ctaSection.style.display = 'block';
+                    }
+                }
+            }
+
+            // Check on page load
+            setTimeout(updateAccessSectionVisibility, 1000);
+
+            // Listen for auth status changes
+            document.addEventListener('yearaway:login', updateAccessSectionVisibility);
+            document.addEventListener('yearaway:logout', updateAccessSectionVisibility);
         });
     </script>
 </body>

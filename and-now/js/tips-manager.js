@@ -433,7 +433,7 @@ class TipsManager {
      */
     async loadCategoryCounts() {
         try {
-            const response = await fetch('content/tips-category-counts.yaml');
+            const response = await fetch(`content/tips-category-counts.yaml?t=${Date.now()}`);
             if (!response.ok) {
                 console.warn('⚠️ Category counts file not found, using fallback counts');
                 this.categoryCounts = null;
@@ -643,8 +643,7 @@ class TipsManager {
                     </div>
                     <div class="product-content">
                         <div class="tip-header">
-                            <div class="tip-category">${categoryIcon} ${tip.category}</div>
-                            <div class="tip-rating">${'⭐'.repeat(tip.rating)}</div>
+                            <div class="tip-category"></div>
                         </div>
                         <h3>${tip.title}</h3>
                         <div class="tip-description">${tip.description}${testNote}</div>
@@ -661,8 +660,7 @@ class TipsManager {
                 <div class="tip-card ${memberOnlyClass}">
                     ${memberIndicator}
                     <div class="tip-header">
-                        <div class="tip-category">${categoryIcon} ${tip.category}</div>
-                        <div class="tip-rating">${'⭐'.repeat(tip.rating)}</div>
+                        <div class="tip-category"></div>
                     </div>
                     <h3>${tip.title}</h3>
                     <div class="tip-description">${tip.description}${testNote}</div>

@@ -47,7 +47,7 @@ class PhotosManager {
     async loadPhotosData() {
         try {
             // Load public photos first
-            const publicResponse = await fetch('content/photos-data-public.yaml');
+            const publicResponse = await fetch(`content/photos-data-public.yaml?t=${Date.now()}`);
             if (!publicResponse.ok) {
                 throw new Error(`HTTP error! status: ${publicResponse.status}`);
             }
@@ -66,9 +66,10 @@ class PhotosManager {
             // Load members-only photos if authenticated
             if (this.authSystem && this.authSystem.isMember()) {
                 try {
-                    const membersResponse = await fetch('content/photos-data-members.yaml');
+                    const membersResponse = await fetch(`content/photos-data-members.yaml?t=${Date.now()}`);
                     if (membersResponse.ok) {
                         const membersYamlText = await membersResponse.text();
+                        console.log('📸 Raw members YAML text:', membersYamlText.substring(0, 500) + '...');
                         const membersData = this.parsePhotosYAML(membersYamlText);
                         console.log('📸 Parsed members photos data:', membersData);
                         
@@ -99,14 +100,50 @@ class PhotosManager {
                 } catch (membersError) {
                     console.warn('⚠️ Could not load members-only photos:', membersError);
                 }
-            }
-            
-            console.log('📸 Photos data loaded:', this.photosData);
-        } catch (error) {
+        }
+        
+        console.log('📸 Photos data loaded:', this.photosData);
+        // Debug: Log each photo's tags
+        if (this.photosData && this.photosData.photos) {
+            this.photosData.photos.forEach(photo => {
+                console.log('📸 Photo', photo.id, 'tags:', photo.tags);
+            });
+        }
+    } catch (error) {
             console.error('❌ Error loading photos data:', error);
             // Fallback to empty data structure
             this.photosData = { photos: [], categories: [] };
         }
+    }
+
+    /**
+     * Parse YAML list in all valid formats
+     * Supports: [item1, item2], ["item1", "item2"], [item1,item2], and single items
+     */
+    parseYamlList(value) {
+        if (!value || !value.trim()) {
+            return [];
+        }
+
+        const trimmed = value.trim();
+        
+        // Handle inline array format: [item1, item2, item3] or ["item1", "item2", "item3"]
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+            const content = trimmed.slice(1, -1).trim();
+            if (!content) {
+                return [];
+            }
+            
+            // Split by comma and handle quoted/unquoted items
+            return content.split(',').map(item => {
+                const cleanItem = item.trim();
+                // Remove quotes if present
+                return cleanItem.replace(/^["']|["']$/g, '');
+            }).filter(item => item.length > 0);
+        }
+        
+        // Handle single item (not in brackets)
+        return [trimmed.replace(/^["']|["']$/g, '')];
     }
 
     /**
@@ -181,17 +218,8 @@ class PhotosManager {
                     currentItem[key] = value;
                     continue;
                 } else if (key === 'tags' || key === 'adventure_ids') {
-                    // Initialize array if it doesn't exist
-                    if (!currentItem[key]) {
-                        currentItem[key] = [];
-                    }
-                    // Parse array format [item1, item2, item3] or single item
-                    if (value.startsWith('[') && value.endsWith(']')) {
-                        currentItem[key] = value.slice(1, -1).split(', ').map(item => item.trim());
-                    } else if (value.trim()) {
-                        // Single item, add to array
-                        currentItem[key].push(value.trim());
-                    }
+                    // Parse all valid YAML list formats
+                    currentItem[key] = this.parseYamlList(value);
                 } else if (key === 'isPublic' || key === 'featured') {
                     currentItem[key] = value === 'true';
                 } else {
@@ -201,27 +229,36 @@ class PhotosManager {
                 continue;
             }
             
-            // Handle YAML array items (lines starting with -)
+            // Handle YAML block sequence items (lines starting with -)
             if (currentItem && trimmed.startsWith('- ')) {
                 const arrayValue = trimmed.substring(2).trim();
-                // Check if we're in a tags or adventure_ids context
-                if (currentItem.tags && !currentItem.tags.length) {
-                    currentItem.tags = [];
-                }
-                if (currentItem.adventure_ids && !currentItem.adventure_ids.length) {
-                    currentItem.adventure_ids = [];
+                
+                // Look backwards to find the most recent array context (tags: or adventure_ids:)
+                let arrayContext = null;
+                for (let j = i - 1; j >= 0; j--) {
+                    const prevLine = lines[j].trim();
+                    if (prevLine === 'tags:' || prevLine === 'adventure_ids:') {
+                        arrayContext = prevLine;
+                        break;
+                    }
+                    // Stop looking if we hit a non-indented line or another item
+                    if (prevLine && !prevLine.startsWith(' ') && !prevLine.startsWith('-')) {
+                        break;
+                    }
                 }
                 
-                // Look at the previous line to determine which array this belongs to
-                if (i > 0) {
-                    const prevLine = lines[i - 1].trim();
-                    if (prevLine === 'tags:') {
-                        if (!currentItem.tags) currentItem.tags = [];
-                        currentItem.tags.push(arrayValue);
-                    } else if (prevLine === 'adventure_ids:') {
-                        if (!currentItem.adventure_ids) currentItem.adventure_ids = [];
-                        currentItem.adventure_ids.push(arrayValue);
-                    }
+                console.log('📸 Processing line:', i, 'content:', trimmed, 'arrayContext:', arrayContext, 'currentItem:', currentItem?.id);
+                
+                if (arrayContext === 'tags:') {
+                    if (!currentItem.tags) currentItem.tags = [];
+                    currentItem.tags.push(arrayValue.replace(/^["']|["']$/g, ''));
+                    console.log('📸 Added tag:', arrayValue, 'to photo:', currentItem.id, 'tags now:', currentItem.tags);
+                } else if (arrayContext === 'adventure_ids:') {
+                    if (!currentItem.adventure_ids) currentItem.adventure_ids = [];
+                    currentItem.adventure_ids.push(arrayValue.replace(/^["']|["']$/g, ''));
+                    console.log('📸 Added adventure_id:', arrayValue, 'to photo:', currentItem.id, 'adventure_ids now:', currentItem.adventure_ids);
+                } else {
+                    console.log('📸 No matching array context found for:', trimmed);
                 }
                 continue;
             }
@@ -337,7 +374,8 @@ class PhotosManager {
         const isMember = this.authSystem ? this.authSystem.isMember() : false;
         
         const photosHtml = photos.map(photo => {
-            const memberOnlyClass = !photo.isPublic ? 'members-only' : '';
+            // Don't show member indicator on adventure detail page since the page itself is member-only
+            const memberOnlyClass = '';
             const memberIndicator = '';
             
             return `
