@@ -4,3 +4,4 @@ This is temporary while we build the real website.# Build trigger Thu  4 Sep 202
 # Testing develop branch deployment Thu  4 Sep 2025 18:45:48 BST
 # Testing with Python build command Thu  4 Sep 2025 18:47:55 BST
 # Testing main branch auto-deployment to Cloudflare - $(date)
+# Testing automatic build triggers - $(date)
