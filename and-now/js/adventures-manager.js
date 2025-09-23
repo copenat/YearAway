@@ -71,9 +71,18 @@ class AdventuresManager {
      * Load adventures data from YAML files
      */
     async loadAdventuresData() {
+        // Prevent multiple simultaneous calls
+        if (this._loadingAdventures) {
+            return;
+        }
+        this._loadingAdventures = true;
+        
         try {
+            // Reset adventures data to prevent contamination
+            this.adventuresData = { adventures: [], categories: [] };
+            
             // Load public adventures first
-            const publicResponse = await fetch('content/adventures-data-public.yaml');
+            const publicResponse = await fetch(`content/adventures-data-public.yaml?t=${Date.now()}`);
             if (!publicResponse.ok) {
                 throw new Error(`HTTP error! status: ${publicResponse.status}`);
             }
@@ -87,13 +96,13 @@ class AdventuresManager {
             const publicAdventures = (publicData.adventures || []).map(adv => ({ ...adv, isPublic: true }));
             this.adventuresData = {
                 adventures: publicAdventures,
-                categories: publicData.categories || []
+                categories: [...(publicData.categories || [])] // Create a fresh copy
             };
             
             // Load members-only adventures if authenticated
             if (this.authSystem && this.authSystem.isMember()) {
                 try {
-                    const membersResponse = await fetch('content/adventures-data-members.yaml');
+                    const membersResponse = await fetch(`content/adventures-data-members.yaml?t=${Date.now()}`);
                     if (membersResponse.ok) {
                         const membersYamlText = await membersResponse.text();
                         const membersData = this.parseYAML(membersYamlText);
@@ -108,17 +117,24 @@ class AdventuresManager {
                         
                         // Merge categories (update counts)
                         if (membersData.categories) {
+                            console.log('📊 Members categories before merge:', membersData.categories.map(cat => `${cat.name}: ${cat.count}`));
+                            console.log('📊 Public categories before merge:', this.adventuresData.categories.map(cat => `${cat.name}: ${cat.count}`));
+                            
                             membersData.categories.forEach(memberCategory => {
                                 const existingCategory = this.adventuresData.categories.find(cat => cat.id === memberCategory.id);
                                 if (existingCategory) {
+                                    console.log(`📊 Merging ${memberCategory.name}: ${existingCategory.count} + ${memberCategory.count} = ${existingCategory.count + memberCategory.count}`);
                                     existingCategory.count += memberCategory.count;
                                 } else {
+                                    console.log(`📊 Adding new category: ${memberCategory.name}: ${memberCategory.count}`);
                                     this.adventuresData.categories.push(memberCategory);
                                 }
                             });
                         }
                         
                         console.log('📄 Combined adventures data:', this.adventuresData);
+                        console.log('📊 Category counts after merge:', this.adventuresData.categories.map(cat => `${cat.name}: ${cat.count}`));
+                        console.log('🔍 DEBUGGING: Full Travel category object:', this.adventuresData.categories.find(cat => cat.name === 'Travel'));
                     }
                 } catch (membersError) {
                     console.warn('⚠️ Could not load members-only adventures:', membersError);
@@ -130,6 +146,8 @@ class AdventuresManager {
             console.error('❌ Error loading adventures data:', error);
             // Fallback to empty data structure
             this.adventuresData = { adventures: [], categories: [] };
+        } finally {
+            this._loadingAdventures = false;
         }
     }
 
@@ -141,7 +159,7 @@ class AdventuresManager {
             console.log('💡 Loading tips data for tag integration...');
             
             // Load public tips
-            const publicResponse = await fetch('content/tips-data-public.yaml');
+            const publicResponse = await fetch(`content/tips-data-public.yaml?t=${Date.now()}`);
             const publicYamlText = await publicResponse.text();
             const publicTipsData = this.parseTipsYAML(publicYamlText);
             
@@ -149,7 +167,7 @@ class AdventuresManager {
             let membersTipsData = { tips: [] };
             if (this.authSystem && this.authSystem.isMember()) {
                 try {
-                    const membersResponse = await fetch('content/tips-data-members.yaml');
+                    const membersResponse = await fetch(`content/tips-data-members.yaml?t=${Date.now()}`);
                     const membersYamlText = await membersResponse.text();
                     membersTipsData = this.parseTipsYAML(membersYamlText);
                 } catch (error) {
@@ -163,6 +181,9 @@ class AdventuresManager {
             };
             
             console.log('💡 Tips data loaded:', this.tipsData);
+            
+            // Load category counts for icons
+            await this.loadCategoryCounts();
         } catch (error) {
             console.error('❌ Error loading tips data:', error);
             this.tipsData = { tips: [] };
@@ -170,9 +191,62 @@ class AdventuresManager {
     }
 
     /**
+     * Load category counts from YAML file
+     */
+    async loadCategoryCounts() {
+        try {
+            const response = await fetch(`content/tips-category-counts.yaml?t=${Date.now()}`);
+            if (!response.ok) {
+                console.warn('⚠️ Category counts file not found, using fallback counts');
+                this.categoryCounts = null;
+                return;
+            }
+            const yamlText = await response.text();
+            this.categoryCounts = this.parseCategoryCountsYAML(yamlText);
+            console.log('📊 Category counts loaded:', this.categoryCounts);
+        } catch (error) {
+            console.error('❌ Error loading category counts:', error);
+            this.categoryCounts = null;
+        }
+    }
+
+    /**
+     * Parse category counts YAML content
+     */
+    parseCategoryCountsYAML(yamlText) {
+        const data = { categories: [] };
+        const lines = yamlText.split('\n');
+        let currentCategory = null;
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            if (line.startsWith('- id:')) {
+                if (currentCategory) {
+                    data.categories.push(currentCategory);
+                }
+                currentCategory = { id: line.split(':')[1].trim() };
+            } else if (line.startsWith('name:') && currentCategory) {
+                currentCategory.name = line.split(':')[1].trim();
+            } else if (line.startsWith('icon:') && currentCategory) {
+                currentCategory.icon = line.split(':')[1].trim();
+            } else if (line.startsWith('description:') && currentCategory) {
+                currentCategory.description = line.split(':')[1].trim();
+            }
+        }
+        
+        if (currentCategory) {
+            data.categories.push(currentCategory);
+        }
+        
+        return data;
+    }
+
+    /**
      * Parse tips YAML content (simplified parser)
      */
     parseTipsYAML(yamlText) {
+        console.log('🔍 Starting parseTipsYAML with YAML text length:', yamlText.length);
         const data = { tips: [] };
         const lines = yamlText.split('\n');
         let currentItem = null;
@@ -227,7 +301,11 @@ class AdventuresManager {
                 
                 if (key === 'description') {
                     inDescription = true;
-                    if (value) {
+                    // Handle YAML literal block syntax (description: |)
+                    if (value === '|') {
+                        // This is a literal block, content will be on following indented lines
+                        descriptionLines = [];
+                    } else if (value) {
                         descriptionLines.push(value);
                     }
                 } else if (key === 'tags') {
@@ -246,6 +324,7 @@ class AdventuresManager {
                 // Use original line content to preserve HTML formatting
                 // Remove only the YAML indentation (6 spaces) but preserve HTML content
                 const content = line.replace(/^\s{6}/, '');
+                console.log('📝 Processing description line:', JSON.stringify(line), '-> processed:', JSON.stringify(content));
                 descriptionLines.push(content);
                 continue;
             }
@@ -254,7 +333,13 @@ class AdventuresManager {
         // Save the last item
         if (currentItem) {
             if (descriptionLines.length > 0) {
-                currentItem.description = descriptionLines.join('\n').trim();
+                let description = descriptionLines.join('\n').trim();
+                // Remove any leading "|" character that might have been incorrectly parsed
+                if (description.startsWith('|')) {
+                    description = description.substring(1).trim();
+                }
+                currentItem.description = description;
+                console.log('📝 Final description for', currentItem.id, ':', JSON.stringify(currentItem.description));
             }
             data.tips.push(currentItem);
         }
@@ -329,6 +414,8 @@ class AdventuresManager {
                 
                 if (key === 'description' && value === '|') {
                     inDescription = true;
+                    // Initialize description array for this item
+                    descriptionLines = [];
                     continue;
                 } else if (key === 'description') {
                     currentItem[key] = value;
@@ -378,6 +465,7 @@ class AdventuresManager {
                         content = content.substring(6);
                     }
                     
+                    console.log('📝 Processing description line:', JSON.stringify(line), '-> processed:', JSON.stringify(content));
                     descriptionLines.push(content);
                 }
                 continue;
@@ -387,11 +475,18 @@ class AdventuresManager {
         // Save the last item
         if (currentItem) {
             if (descriptionLines.length > 0) {
-                currentItem.description = descriptionLines.join('\n').trim();
+                let description = descriptionLines.join('\n').trim();
+                // Remove any leading "|" character that might have been incorrectly parsed
+                if (description.startsWith('|')) {
+                    description = description.substring(1).trim();
+                }
+                currentItem.description = description;
+                console.log('📝 Final description for', currentItem.id, ':', JSON.stringify(currentItem.description));
             }
             data[currentSection].push(currentItem);
         }
         
+        console.log('🔍 Finished parseTipsYAML, found', data.tips ? data.tips.length : 0, 'tips');
         return data;
     }
 
@@ -449,8 +544,8 @@ class AdventuresManager {
         const connectedPhotos = this.getConnectedPhotos(adventure);
         const connectedPhotosHtml = this.renderConnectedPhotos(connectedPhotos, adventure.id);
 
-        // Truncate description if it's too long (limit to 200 characters)
-        const maxDescriptionLength = 200;
+        // Truncate description if it's too long (limit to ~20 lines or 1500 characters)
+        const maxDescriptionLength = 1500;
         let descriptionHtml = adventure.description;
         let showReadMore = false;
         
@@ -519,14 +614,18 @@ class AdventuresManager {
         
         const isMember = this.authSystem ? this.authSystem.isMember() : false;
         
+        // Ensure adventureTags is an array
+        const tags = Array.isArray(adventureTags) ? adventureTags : [];
+        if (tags.length === 0) return []; // No tags to match
+        
         // List of members-only tip IDs (from tips-data-members.yaml)
         const membersOnlyTipIds = ['hotel-secret', 'airline-upgrades', 'hidden-restaurants'];
         
         return this.tipsData.tips.filter(tip => {
-            if (!tip.tags) return false;
+            if (!tip.tags || !Array.isArray(tip.tags)) return false;
             
             // Check if tip shares tags with adventure
-            const hasMatchingTag = tip.tags.some(tag => adventureTags.includes(tag));
+            const hasMatchingTag = tip.tags.some(tag => tags.includes(tag));
             if (!hasMatchingTag) return false;
             
             // Filter based on authentication status
@@ -553,7 +652,8 @@ class AdventuresManager {
         const hasMorePhotos = connectedPhotos.length > maxPhotos;
         
         const photosHtml = photosToShow.map(photo => {
-            const memberOnlyClass = !photo.isPublic ? 'members-only' : '';
+            // Don't show member indicator on adventure detail page since the page itself is member-only
+            const memberOnlyClass = '';
             const memberIndicator = '';
             
             return `
@@ -605,25 +705,57 @@ class AdventuresManager {
             const memberOnlyClass = isMembersOnlyTip ? 'members-only' : '';
             const memberIndicator = isMembersOnlyTip ? '<div class="member-indicator">🔒 Members Only</div>' : '';
             
-            return `
-                <div class="connected-tip ${memberOnlyClass}">
-                    ${memberIndicator}
-                    <div class="tip-header">
-                        <span class="tip-icon">💡</span>
-                        <span class="tip-title">${tip.title}</span>
+            // Get category icon from category counts
+            const category = this.tipsData && this.categoryCounts ? 
+                this.categoryCounts.categories.find(cat => cat.name === tip.category) : null;
+            const categoryIcon = category ? category.icon : '📝';
+            
+            // Check if this is a product (has price and icon properties)
+            const isProduct = tip.price && tip.icon;
+            
+            if (isProduct) {
+                // Render as product card
+                return `
+                    <div class="tip-card product-card ${memberOnlyClass}">
+                        ${memberIndicator}
+                        <div class="product-image">
+                            <div class="product-placeholder">${tip.icon}</div>
+                        </div>
+                        <div class="product-content">
+                            <div class="tip-header">
+                                <div class="tip-category"></div>
+                            </div>
+                            <h3>${tip.title}</h3>
+                            <div class="tip-description">${tip.description}</div>
+                            <div class="product-price">${tip.price}</div>
+                            <div class="tip-tags">
+                                ${tip.tags.map(tag => `<span class="tag tag-filter" data-tag="${tag}">${tag}</span>`).join('')}
+                            </div>
+                        </div>
                     </div>
-                    <p class="tip-description">${tip.description}</p>
-                    <div class="tip-tags">
-                        ${tip.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                `;
+            } else {
+                // Render as regular tip card
+                return `
+                    <div class="tip-card ${memberOnlyClass}">
+                        ${memberIndicator}
+                        <div class="tip-header">
+                            <div class="tip-category"></div>
+                        </div>
+                        <h3>${tip.title}</h3>
+                        <div class="tip-description">${tip.description}</div>
+                        <div class="tip-tags">
+                            ${tip.tags.map(tag => `<span class="tag tag-filter" data-tag="${tag}">${tag}</span>`).join('')}
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
         }).join('');
         
         return `
             <div class="connected-tips">
-                <h4>💡 Related Hints & Tips</h4>
-                <div class="connected-tips-list">
+                <h4>Related Hints & Tips</h4>
+                <div class="tips-grid">
                     ${tipsHtml}
                 </div>
             </div>

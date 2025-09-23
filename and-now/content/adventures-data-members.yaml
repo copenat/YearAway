@@ -1,25 +1,34 @@
 adventures:
-  - id: planning-a-trip-to-asia
-    title: Planning a trip to Asia
-    description: |
-      We are currently planning a trip to Asia, specifically China, Thailand, Laos and finally India. We have been to all of them before but we are, as always, trying to find new places to visit.
-      <div style="display: flex; gap: 20px; align-items: flex-start;">
-        <img src="content/images/members/IMG_20190921_101514.jpg" alt="Travel planning photo" title="Travel planning photo" style="width: 200px; height: auto; flex-shrink: 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <div style="flex: 1;">
-          <p>This is a longer trip than we have been on in a while, so we are looking forward to it. We're excited to explore new destinations and revisit some of our favorite places.</p>
-        </div>
-      </div>
-    date: "2025-09-10"
-    category: Travel
-    tags: [asia, china, thailand, laos, india, travel, culture, food-dining]
-    status: active
+- id: planning-a-trip-to-asia
+  title: YearAway 2.5 Trip
+  description: 'We are currently planning a 6 month trip to Asia, specifically China,
+    Thailand, Laos and finally India. We have been to all of them before but we are,
+    as always, trying to find new places to visit.<br>
 
+    We have the outline flights and some accommodation booked especially around holidays
+    or festivals. But otherwise we are going to book as we go, leaving us open to
+    whimsical, flighty ways :)<br>
 
+    We''ve named this Yearaway 2.5 Trip as this is our second long trip and this one
+    isnt a year but 6 months. Saying that, Yearaway 1.0 was supposed to have been
+    one year but ended up being 18 months.
+
+    '
+  date: '2025-09-22'
+  category: Travel
+  tags:
+  - asia
+  - china
+  - thailand
+  - laos
+  - india
+  - travel
+  - culture
+  status: active
 categories:
-  - id: travel
-    name: Travel
-    icon: ✈️
-    description: Travel experiences and adventures
-    count: 1
-
-lastUpdated: '2025-09-11T15:55:00.000Z'
+- id: travel
+  name: Travel
+  icon: ✈️
+  description: Travel experiences and adventures
+  count: 1
+lastUpdated: '2025-09-23T11:00:05.159497Z'

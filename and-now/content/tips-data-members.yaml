@@ -1,35 +1,16 @@
 tips:
-  - id: hotel-secret
-    title: Exclusive Hotel Booking Secret
-    description: |
-      This is a members-only tip with insider knowledge about getting the best hotel deals and upgrades.
-      Includes personal experiences and specific recommendations.
-    category: Accommodation
-    tags: [hotels, exclusive, deals]
-    rating: 5
-
-  - id: airline-upgrades
-    title: Airline Upgrade Secrets
-    description: |
-      Personal strategies for getting free upgrades and better seats.
-      Includes specific airline policies and timing tips that have worked for us.
-    category: Transport
-    tags: [flights, upgrades, secrets]
-    rating: 5
-
-  - id: hidden-restaurants
-    title: Hidden Restaurant Gems
-    description: |
-      Personal recommendations for amazing local restaurants that tourists rarely find.
-      Includes specific locations, what to order, and best times to visit.
-    category: Food & Dining
-    tags: [restaurants, local, hidden-gems]
-    rating: 5
 
   - id: running-trainers
     title: Running Trainers
     description: |
-      I really like the Brooks Ghost trainers for running. I've had two pairs and both have been great.
+      We first started taking running gear with us on holiday soon after we started the Couch to 5K program. For a few holidays the gear never came out of the bags but slowly we started to run while on holiday.
+      Now it's part of holiday. We often look for parks or track to run on when we are in a new place.
+      For example; 
+      <ul>
+        <li>Lumpini park in Bangkok is great in a morning for a run and a fresh coconut after.</li>
+        <li>Nong Khai in Thailand has a great new Mekong river promenade that we like to take our morning runs along.</li>
+      </ul>
+      We really like the Brooks Ghost trainers for running. I've had two pairs and both have been great.
     category: Running
     tags: [shoes, brooks, ghost, comfort, durability]
     rating: 5
@@ -44,4 +25,16 @@ tips:
       <p>Check which you need at: <a href="https://www.gov.uk/driving-abroad/international-driving-permit" target="_blank">UK Government Driving Abroad Guide</a></p>
     category: Transport
     tags: [driving, licence, international, uk, post office]
+    rating: 5
+
+  - id: travel-insurance
+    title: Travel Insurance
+    description: |
+      Always get travel insurance. Some people get travel insurance with bank accounts which usually suffice for short holidays. If you are travelling for more than 2 months you will mostly
+      need to look for a dedicated travel insurance policy. You also need to have a return ticket booked also.
+      Basically, you need to read the terms and conditions of the policy to see what is covered and what is not. Something that most of us rarely actually do :)
+      If you are over 50 then the price seems to be a lot higher than we expected but not prohibitively so.
+      We have booked a policy allowing us a 6 month trip with <a href="https://www.holidayextras.com/travel-insurance.html" target="_blank">Holiday Extras Travel Insurance</a>
+    category: Products
+    tags: [travel insurance, holiday extras]
     rating: 5

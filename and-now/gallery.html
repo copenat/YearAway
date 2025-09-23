@@ -7,7 +7,7 @@
     <meta name="description" content="Current photos and memories from YearAway adventures">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=17">
+    <link rel="stylesheet" href="css/style.css?v=48">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -228,7 +228,7 @@
                 <div class="cta-content">
                     <h2>Want to See More?</h2>
                     <p>Get access to exclusive photos, high-resolution downloads, and private family memories.</p>
-                    <a href="index.html" class="btn btn-primary">Request Member Access</a>
+                    <a href="#" class="btn btn-primary" id="request-access-btn" onclick="handleRequestMemberAccess(); return false;">Request Member Access</a>
                 </div>
             </div>
         </section>
@@ -269,5 +269,29 @@
     <script src="js/simple-auth-system.js?v=22"></script>
     <script src="js/main.js"></script>
     <script src="js/gallery.js"></script>
+    <script src="js/access-request.js?v=1"></script>
+    
+    <script>
+        // Handle access request section visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            function updateAccessSectionVisibility() {
+                const ctaSection = document.querySelector('.cta-section');
+                if (ctaSection && window.yearawayAuth) {
+                    if (window.yearawayAuth.isMember()) {
+                        ctaSection.style.display = 'none';
+                    } else {
+                        ctaSection.style.display = 'block';
+                    }
+                }
+            }
+
+            // Check on page load
+            setTimeout(updateAccessSectionVisibility, 1000);
+
+            // Listen for auth status changes
+            document.addEventListener('yearaway:login', updateAccessSectionVisibility);
+            document.addEventListener('yearaway:logout', updateAccessSectionVisibility);
+        });
+    </script>
 </body>
 </html>

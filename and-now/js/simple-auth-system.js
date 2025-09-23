@@ -46,6 +46,11 @@ class SimpleYearAwayAuth {
             this.setMemberStatus(true);
             this.showMemberContent();
             this.showNotification('Welcome back, member! 🎉', 'success');
+            
+            // Dispatch login event
+            document.dispatchEvent(new CustomEvent('yearaway:login'));
+            document.dispatchEvent(new CustomEvent('yearaway:authStatusChanged', { detail: { isMember: true } }));
+            
             return true;
         } else {
             this.showNotification('Invalid token. Please check and try again. ❌', 'error');
@@ -61,6 +66,10 @@ class SimpleYearAwayAuth {
         this.setMemberStatus(false);
         this.hideMemberContent();
         this.showNotification('You have been logged out. 👋', 'info');
+        
+        // Dispatch logout event
+        document.dispatchEvent(new CustomEvent('yearaway:logout'));
+        document.dispatchEvent(new CustomEvent('yearaway:authStatusChanged', { detail: { isMember: false } }));
     }
 
     /**

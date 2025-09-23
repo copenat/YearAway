@@ -7,7 +7,7 @@
     <meta name="description" content="Detailed adventure entry from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=17">
+    <link rel="stylesheet" href="css/style.css?v=68">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -126,8 +126,8 @@
     <!-- JavaScript -->
     <script src="js/auth-config.js?v=22"></script>
     <script src="js/simple-auth-system.js?v=22"></script>
-    <script src="js/photos-manager.js?v=37"></script>
-    <script src="js/adventures-manager.js?v=44"></script>
+        <script src="js/photos-manager.js?v=44"></script>
+        <script src="js/adventures-manager.js?v=60"></script>
     <script src="js/main.js"></script>
     <script>
         // Adventure Detail Manager
@@ -290,8 +290,8 @@
                 });
 
                 const adventureHtml = `
-                    <article class="adventure-entry ${!adventure.isPublic ? 'members-only member-visible' : ''}">
-                        ${!adventure.isPublic ? '<div class="member-indicator">🔒 Members Only</div>' : ''}
+                    <article class="adventure-entry">
+                        <!-- Member indicators removed for adventure detail page -->
                         
                         <header class="adventure-header">
                             <h1>${adventure.title}</h1>
@@ -376,19 +376,21 @@
                     // Construct image URL from path and filename
                     const imageUrl = `${photo.path}${photo.filename}`;
                     console.log('📸 Rendering photo:', photo.id, 'URL:', imageUrl);
+                    console.log('📸 Photo tags:', photo.tags);
                     
                     return `
-                        <div class="adventure-photo ${!photo.isPublic ? 'members-only member-visible' : ''}">
-                            ${!photo.isPublic ? '<div class="member-indicator">🔒</div>' : ''}
+                        <div class="adventure-photo">
+                            <!-- Member indicators removed for adventure detail page -->
                             <img src="${imageUrl}" alt="${photo.caption || 'Adventure photo'}" loading="lazy">
                             ${photo.caption ? `<p class="photo-caption">${photo.caption}</p>` : ''}
+                            ${photo.tags && photo.tags.length > 0 ? `<div class="photo-tags">${photo.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` : ''}
                         </div>
                     `;
                 }).join('');
 
                 return `
                     <div class="adventure-photos">
-                        <h3>Photos from this Adventure</h3>
+                        <h3>Some photos to enjoy</h3>
                         <div class="photos-grid">
                             ${photosHtml}
                         </div>

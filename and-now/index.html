@@ -7,7 +7,7 @@
     <meta name="description" content="Current adventures and experiences from YearAway">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=17">
+    <link rel="stylesheet" href="css/style.css?v=68">
     <link rel="stylesheet" href="css/auth-styles.css">
     
     <!-- Favicon -->
@@ -85,7 +85,7 @@
         <section class="recent-adventures">
             <div class="container">
                 <h2>Recent Adventures</h2>
-                <div class="adventures-grid" id="recent-adventures-container">
+                <div id="adventures-timeline">
                     <!-- Dynamic content will be loaded here -->
                 </div>
             </div>
@@ -147,42 +147,250 @@
     </footer>
 
     <!-- JavaScript -->
-    <script src="js/auth-config.js?v=22"></script>
-    <script src="js/simple-auth-system.js?v=22"></script>
-    <script src="js/adventures-manager.js?v=43"></script>
+    <script src="js/auth-config.js?v=23"></script>
+    <script src="js/simple-auth-system.js?v=23"></script>
+    <script src="js/adventures-manager.js?v=61"></script>
+    <script src="js/photos-manager.js?v=44"></script>
     <script src="js/main.js"></script>
     <script>
-        // Load the most recent adventure for the homepage
-        document.addEventListener('DOMContentLoaded', async function() {
+        console.log('🔧 Script loaded - starting debug...');
+        
+        // Test if container exists
+        const testContainer = document.getElementById('adventures-timeline');
+        console.log('🎯 Container test:', !!testContainer);
+        
+        // Function to load and display recent adventures
+        let loadRetryCount = 0;
+        const MAX_RETRIES = 3;
+        let adventuresManager = null;
+        
+        async function loadRecentAdventures() {
+            console.log('🎯 loadRecentAdventures() called');
             try {
-                // Wait for auth system to be ready
-                if (window.yearawayAuth) {
-                    await window.yearawayAuth.ready;
+                if (!window.yearawayAuth) {
+                    console.error('❌ Auth system not available in loadRecentAdventures');
+                    return;
                 }
                 
-                // Load adventures data
-                const adventuresManager = new AdventuresManager();
-                await adventuresManager.loadAdventuresData();
+                console.log('📦 Creating AdventuresManager...');
+                // Check if AdventuresManager class is available
+                if (typeof AdventuresManager === 'undefined') {
+                    throw new Error('AdventuresManager class is not defined. Script may not be loaded.');
+                }
+                
+                // Load adventures data with proper auth system connection
+                adventuresManager = new AdventuresManager();
+                console.log('✅ AdventuresManager created successfully');
+                console.log('🔗 Setting auth system...');
+                await adventuresManager.setAuthSystem(window.yearawayAuth);
+                console.log('✅ Auth system set successfully');
+                
+                // Wait a moment for the auth system to fully initialize
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                console.log('📊 Adventures data:', adventuresManager.adventuresData);
+                
+                // Check if adventures data is properly loaded
+                if (!adventuresManager.adventuresData || !adventuresManager.adventuresData.adventures) {
+                    throw new Error('Adventures data not loaded properly');
+                }
+                
+                console.log('🔐 Auth system status:', {
+                    exists: !!window.yearawayAuth,
+                    isMember: window.yearawayAuth ? window.yearawayAuth.isMember() : 'N/A',
+                    token: window.yearawayAuth ? window.yearawayAuth.getCurrentToken() : 'N/A'
+                });
                 
                 // Get all adventures and sort by date (most recent first)
                 const allAdventures = [...adventuresManager.adventuresData.adventures];
                 allAdventures.sort((a, b) => new Date(b.date) - new Date(a.date));
                 
+                console.log('📈 Recent adventures loading - Total adventures:', allAdventures.length);
+                const isMemberStatus = window.yearawayAuth.isMember();
+                console.log('👤 Recent adventures loading - Is member:', isMemberStatus);
+                console.log('📋 All adventures:', allAdventures.map(a => ({ title: a.title, isPublic: a.isPublic, date: a.date })));
+                
+                // Double-check auth status
+                if (isMemberStatus === null || isMemberStatus === undefined) {
+                    console.log('⚠️ Auth status is null/undefined, showing coming soon message...');
+                    // Instead of retrying immediately, just show the "coming soon" message
+                    const container = document.getElementById('adventures-timeline');
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="adventure-item">
+                                <div class="adventure-content">
+                                    <h3>Adventures Coming Soon</h3>
+                                    <p>We're planning our next adventure. Check back soon for updates!</p>
+                                    <a href="adventures.html" class="btn btn-outline">View All Adventures</a>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+                
+                console.log('✅ Auth status is valid:', isMemberStatus);
+                
                 // Get the most recent adventure
                 const latestAdventure = allAdventures[0];
                 
+                const container = document.getElementById('adventures-timeline');
+                console.log('🎯 Container found:', !!container);
+                console.log('🎯 Container element:', container);
+                console.log('🎯 Container innerHTML before:', container ? container.innerHTML : 'N/A');
+                
                 if (latestAdventure) {
-                    const container = document.getElementById('recent-adventures-container');
-                    const isMember = window.yearawayAuth ? window.yearawayAuth.isMember() : false;
+                    const isMember = window.yearawayAuth.isMember();
+                    
+                    console.log('🏆 Latest adventure:', latestAdventure.title, 'isPublic:', latestAdventure.isPublic, 'isMember:', isMember);
                     
                     // Only show if it's public or user is a member
                     if (latestAdventure.isPublic || isMember) {
-                        const adventureCard = adventuresManager.renderAdventureItem(latestAdventure);
+                        console.log('✅ Showing latest adventure');
+                        
+                        // Create a simpler card structure for the homepage
+                        // Check if this adventure is member-only (not public)
+                        const isMembersOnly = !latestAdventure.isPublic;
+                        const memberOnlyClass = isMembersOnly ? 'members-only member-visible' : '';
+                        const memberIndicator = isMembersOnly ? '<div class="member-indicator">Members Only</div>' : '';
+                        
+                        // Format date
+                        const date = new Date(latestAdventure.date);
+                        const month = date.toLocaleDateString('en-US', { month: 'short' });
+                        const year = date.getFullYear();
+                        
+                        // For the homepage, show full description for member-only content,
+                        // truncate public content to keep it concise
+                        let descriptionHtml = latestAdventure.description;
+                        let showReadMore = false;
+                        
+                        if (isMembersOnly) {
+                            // Show full description for member-only adventures (they have richer content)
+                            descriptionHtml = latestAdventure.description;
+                        } else {
+                            // For public adventures, truncate if too long
+                            const maxDescriptionLength = 200;
+                            if (latestAdventure.description.length > maxDescriptionLength) {
+                                descriptionHtml = latestAdventure.description.substring(0, maxDescriptionLength) + '...';
+                                showReadMore = true;
+                            }
+                        }
+                        
+                        // Get connected photos and tips for this adventure - wait for managers to be ready
+                        let connectedPhotos = [];
+                        let connectedPhotosHtml = '';
+                        let connectedTips = [];
+                        let connectedTipsHtml = '';
+                        
+                        console.log('📸 Checking photos manager status...');
+                        console.log('📸 window.photosManager exists:', !!window.photosManager);
+                        console.log('📸 window.photosManager.photosData exists:', !!(window.photosManager && window.photosManager.photosData));
+                        console.log('📸 window.photosManager.photosData.photos exists:', !!(window.photosManager && window.photosManager.photosData && window.photosManager.photosData.photos));
+                        
+                        if (window.photosManager && window.photosManager.photosData && window.photosManager.photosData.photos) {
+                            console.log('📸 Photos manager is ready, getting connected photos...');
+                            connectedPhotos = adventuresManager.getConnectedPhotos(latestAdventure);
+                            console.log('📸 Connected photos result:', connectedPhotos);
+                            connectedPhotosHtml = adventuresManager.renderConnectedPhotos(connectedPhotos, latestAdventure.id);
+                            
+                            // Ensure photo cards are visible to members by adding member-visible class
+                            if (connectedPhotosHtml && isMember) {
+                                connectedPhotosHtml = connectedPhotosHtml.replace(/class="connected-photo members-only"/g, 'class="connected-photo members-only member-visible"');
+                            }
+                            
+                            console.log('📸 Connected photos HTML:', connectedPhotosHtml);
+                            console.log('📸 Connected photos found:', connectedPhotos.length);
+                        } else {
+                            console.log('📸 Photos manager not ready yet, skipping photo cards');
+                            console.log('📸 Will try to load photos after a delay...');
+                            
+                            // Try to load photos and tips after a short delay
+                            setTimeout(() => {
+                                const container = document.getElementById('adventures-timeline');
+                                if (!container) return;
+                                
+                                const adventureItem = container.querySelector('.adventure-item');
+                                if (!adventureItem) return;
+                                
+                                const adventureContent = adventureItem.querySelector('.adventure-content');
+                                if (!adventureContent) return;
+                                
+                                let hasUpdates = false;
+                                
+                                // Load photos if ready
+                                if (window.photosManager && window.photosManager.photosData && window.photosManager.photosData.photos) {
+                                    console.log('📸 Photos manager ready after delay, updating photos...');
+                                    const delayedPhotos = adventuresManager.getConnectedPhotos(latestAdventure);
+                                    const delayedPhotosHtml = adventuresManager.renderConnectedPhotos(delayedPhotos, latestAdventure.id);
+                                    
+                                    if (delayedPhotos.length > 0) {
+                                        console.log('📸 Adding photos after delay...');
+                                        adventureContent.insertAdjacentHTML('beforeend', delayedPhotosHtml);
+                                        hasUpdates = true;
+                                    }
+                                }
+                                
+                                // Load tips if ready
+                                if (adventuresManager && adventuresManager.tipsData && adventuresManager.tipsData.tips) {
+                                    console.log('💡 Tips manager ready after delay, updating tips...');
+                                    const delayedTips = adventuresManager.getConnectedTips(latestAdventure);
+                                    const delayedTipsHtml = adventuresManager.renderConnectedTips(delayedTips);
+                                    
+                                    if (delayedTips.length > 0) {
+                                        console.log('💡 Adding tips after delay...');
+                                        adventureContent.insertAdjacentHTML('beforeend', delayedTipsHtml);
+                                        hasUpdates = true;
+                                    }
+                                }
+                                
+                                if (hasUpdates) {
+                                    console.log('✅ Delayed content loaded successfully!');
+                                }
+                            }, 1000);
+                        }
+                        
+                        // Get connected tips for this adventure
+                        if (adventuresManager && adventuresManager.tipsData && adventuresManager.tipsData.tips) {
+                            connectedTips = adventuresManager.getConnectedTips(latestAdventure);
+                            connectedTipsHtml = adventuresManager.renderConnectedTips(connectedTips);
+                            console.log('💡 Connected tips found:', connectedTips.length);
+                        }
+                        
+                             const adventureCard = `
+                                 <div class="adventure-item ${memberOnlyClass}" onclick="window.location.href='adventure-detail.html?id=${latestAdventure.id}'" style="cursor: pointer;">
+                                     ${memberIndicator}
+                                     <div class="adventure-date-container">
+                                         <div class="adventure-date">
+                                             <span class="month">${month}</span>
+                                             <span class="year">${year}</span>
+                                         </div>
+                                     </div>
+                                     <div class="adventure-content">
+                                         <h3>${latestAdventure.title}</h3>
+                                         <div class="adventure-description">${descriptionHtml}</div>
+                                         <div class="adventure-tags">
+                                             ${latestAdventure.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                                         </div>
+                                         ${connectedPhotosHtml}
+                                         ${connectedTipsHtml}
+                                         <div class="adventure-read-more">
+                                             <span class="read-more-text">📖 Read the full adventure story with more photos and travel tips →</span>
+                                         </div>
+                                     </div>
+                                 </div>
+                             `;
+                        
+                        console.log('🎨 Generated adventure card HTML:', adventureCard);
                         container.innerHTML = adventureCard;
+                        console.log('📝 Container innerHTML set, checking content:', container.innerHTML.substring(0, 100) + '...');
+                        console.log('🔍 Container children count:', container.children.length);
+                        console.log('🔍 Container first child:', container.firstElementChild);
+                        console.log('🔍 Container classes:', container.className);
                     } else {
+                        console.log('🔒 Showing members only message');
                         // Show a generic "members only" message
                         container.innerHTML = `
-                            <div class="adventure-card members-only">
+                                 <div class="adventure-item members-only">
                                 <div class="member-indicator">🔒 Members Only</div>
                                 <div class="adventure-content">
                                     <h3>Latest Adventure Available</h3>
@@ -192,10 +400,10 @@
                         `;
                     }
                 } else {
+                    console.log('📭 No adventures available');
                     // No adventures available
-                    const container = document.getElementById('recent-adventures-container');
                     container.innerHTML = `
-                        <div class="adventure-card">
+                        <div class="adventure-item">
                             <div class="adventure-content">
                                 <h3>Adventures Coming Soon</h3>
                                 <p>We're planning our next adventure. Check back soon for updates!</p>
@@ -206,9 +414,98 @@
                 }
             } catch (error) {
                 console.error('Error loading recent adventure:', error);
-                const container = document.getElementById('recent-adventures-container');
+                const container = document.getElementById('adventures-timeline');
                 container.innerHTML = `
-                    <div class="adventure-card">
+                    <div class="adventure-item">
+                        <div class="adventure-content">
+                            <h3>Error Loading Adventures</h3>
+                            <p>Sorry, there was an error loading the adventures. Please try refreshing the page.</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Load the most recent adventure for the homepage
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                console.log('🚀 DOMContentLoaded event fired');
+                
+                // Wait for auth system to be ready
+                let attempts = 0;
+                const maxAttempts = 50; // Wait up to 5 seconds
+                
+                console.log('⏳ Waiting for auth system...');
+                while (!window.yearawayAuth && attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                console.log('🔍 Auth system check:', {
+                    authSystemExists: !!window.yearawayAuth,
+                    attempts: attempts,
+                    maxAttempts: maxAttempts
+                });
+                
+                if (!window.yearawayAuth) {
+                    console.error('❌ Auth system not available after waiting');
+                    // Show default content
+                    const container = document.getElementById('adventures-timeline');
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="adventure-card">
+                                <div class="adventure-content">
+                                    <h3>Adventures Coming Soon</h3>
+                                    <p>We're planning our next adventure. Check back soon for updates!</p>
+                                    <a href="adventures.html" class="btn btn-outline">View All Adventures</a>
+                                </div>
+                            </div>
+                        `;
+                        console.log('📝 Set default content - no auth system');
+                    } else {
+                        console.error('❌ Recent adventures container not found');
+                    }
+                    return;
+                }
+                
+                console.log('✅ Auth system found, loading recent adventures...');
+                // Load initial content
+                await loadRecentAdventures();
+                
+                // Listen for authentication status changes and reload content
+                document.addEventListener('yearaway:authStatusChanged', async function() {
+                    console.log('🔔 Auth status changed, reloading recent adventures...');
+                    loadRetryCount = 0; // Reset retry count on auth change
+                    // Add a small delay to ensure auth system is fully updated
+                    setTimeout(async () => {
+                        await loadRecentAdventures();
+                    }, 100);
+                });
+                
+                // Also listen for login/logout events
+                document.addEventListener('yearaway:login', async function() {
+                    console.log('🔔 User logged in, reloading recent adventures...');
+                    loadRetryCount = 0; // Reset retry count on login
+                    // Add a small delay to ensure auth system is fully updated
+                    setTimeout(async () => {
+                        await loadRecentAdventures();
+                    }, 100);
+                });
+                
+                document.addEventListener('yearaway:logout', async function() {
+                    console.log('🔔 User logged out, reloading recent adventures...');
+                    loadRetryCount = 0; // Reset retry count on logout
+                    // Add a small delay to ensure auth system is fully updated
+                    setTimeout(async () => {
+                        await loadRecentAdventures();
+                    }, 100);
+                });
+                
+            } catch (error) {
+            console.error('Error loading recent adventure:', error);
+            const container = document.getElementById('adventures-timeline');
+            container.innerHTML = `
+                <div class="adventure-item">
                         <div class="adventure-content">
                             <h3>Adventures</h3>
                             <p>Explore our travel adventures and experiences.</p>
