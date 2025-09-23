@@ -182,12 +182,14 @@ def process_html_files(directory='.'):
     
     if branch is None:
         print("⚠️  Warning: Could not determine git branch. No branch indicator will be added.")
-        return
+        branch = 'unknown'  # Continue processing with a default value
     
     print(f"🌿 Current branch: {branch}")
     
     if branch == 'develop':
         print("🚧 Adding DEVELOPMENT BRANCH indicator to HTML files...")
+    elif branch == 'unknown':
+        print("❓ Unknown branch detected. No development indicator will be added.")
     else:
         print("✅ Production branch detected. No development indicator needed.")
     
