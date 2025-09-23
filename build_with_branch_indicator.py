@@ -227,15 +227,30 @@ def main():
     print("🔨 YearAway Build Script with Branch Indicator")
     print("=" * 50)
     
+    # Additional debugging for Cloudflare
+    print("🔍 Environment Debug:")
+    print(f"   Current working directory: {os.getcwd()}")
+    print(f"   Python version: {sys.version}")
+    print(f"   Files in current directory: {os.listdir('.')}")
+    
     # Check if we're in a git repository
     if not os.path.exists('.git'):
         print("❌ Error: Not in a git repository.")
+        print("📁 Available directories:")
+        for item in os.listdir('.'):
+            if os.path.isdir(item):
+                print(f"   📂 {item}")
         sys.exit(1)
     
     # Process HTML files
-    process_html_files()
-    
-    print("\n🎉 Build complete!")
+    try:
+        process_html_files()
+        print("\n🎉 Build complete!")
+    except Exception as e:
+        print(f"\n❌ Build failed with error: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
     
     # Show current branch status
     branch = get_current_branch()
