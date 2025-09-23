@@ -1,25 +1,4 @@
 categories:
-- id: accommodation
-  name: Accommodation
-  icon: 🏨
-  description: Accommodation tips and advice
-  publicTips: 0
-  membersOnlyTips: 1
-  totalTips: 1
-- id: budget
-  name: Budget
-  icon: 💰
-  description: Budget tips and advice
-  publicTips: 2
-  membersOnlyTips: 0
-  totalTips: 2
-- id: food-dining
-  name: Food & Dining
-  icon: 🍽️
-  description: Food & Dining tips and advice
-  publicTips: 0
-  membersOnlyTips: 1
-  totalTips: 1
 - id: packing
   name: Packing
   icon: 🎒
@@ -31,9 +10,9 @@ categories:
   name: Products
   icon: 🛍️
   description: Recommended travel products and gear
-  publicTips: 3
-  membersOnlyTips: 0
-  totalTips: 3
+  publicTips: 0
+  membersOnlyTips: 1
+  totalTips: 1
 - id: running
   name: Running
   icon: 🏃
@@ -52,11 +31,11 @@ categories:
   name: Transport
   icon: ✈️
   description: Transport tips and advice
-  publicTips: 1
-  membersOnlyTips: 2
-  totalTips: 3
-lastUpdated: '2025-09-19T14:10:02.130521Z'
+  publicTips: 0
+  membersOnlyTips: 1
+  totalTips: 1
+lastUpdated: '2025-09-23T11:02:51.246235Z'
 totalStats:
-  publicTips: 8
-  membersOnlyTips: 5
-  totalTips: 13
+  publicTips: 2
+  membersOnlyTips: 3
+  totalTips: 5
