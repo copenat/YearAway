@@ -309,9 +309,17 @@ class AdventuresManager {
                         descriptionLines.push(value);
                     }
                 } else if (key === 'tags') {
-                    // Parse tags array
-                    const tagsText = value.replace(/[\[\]]/g, '');
-                    currentItem.tags = tagsText.split(',').map(tag => tag.trim());
+                    // Handle both array format [item1, item2, item3] and YAML list format
+                    if (value.trim() === '') {
+                        // YAML list format - tags will come on subsequent lines
+                        currentItem.tags = [];
+                        currentItem._inTagsList = true; // Flag to indicate we're parsing a tags list
+                        console.log('🏷️ Started parsing tags list for adventure:', currentItem.id);
+                    } else {
+                        // Array format [item1, item2, item3]
+                        const tagsText = value.replace(/[\[\]]/g, '');
+                        currentItem.tags = tagsText.split(',').map(tag => tag.trim());
+                    }
                 } else {
                     // Remove quotes from string values
                     currentItem[key] = value.replace(/^["']|["']$/g, '');
@@ -362,6 +370,16 @@ class AdventuresManager {
             const line = lines[i];
             const trimmed = line.trim();
             
+            // Debug logging for adventures parsing
+            if (currentSection === 'adventures' && currentItem && trimmed.includes('tags')) {
+                console.log('🏷️ Processing line:', i, 'content:', trimmed, 'currentItem:', currentItem.id);
+            }
+            
+            // Special debugging for tags line
+            if (trimmed === 'tags:') {
+                console.log('🏷️ TAGS LINE FOUND - line:', i, 'trimmed:', trimmed, 'inDescription:', inDescription, 'currentItem:', currentItem ? currentItem.id : 'none');
+            }
+            
             // Section headers
             if (trimmed === 'adventures:') {
                 // Save previous item before switching sections
@@ -411,18 +429,72 @@ class AdventuresManager {
             if (currentItem && trimmed.includes(': ') && !inDescription) {
                 const [key, ...valueParts] = trimmed.split(': ');
                 const value = valueParts.join(': ');
+                console.log('🏷️ Main property parsing - key:', key, 'value:', value, 'adventure:', currentItem.id);
+                
+                // Special debugging for key properties
+                if (key === 'title' || key === 'date') {
+                    console.log('🔑 KEY PROPERTY - key:', key, 'value:', value, 'adventure:', currentItem.id);
+                }
+                
+                // Special debugging for tags line
+                if (key === 'tags') {
+                    console.log('🏷️ TAGS LINE DETECTED in main parsing! key:', key, 'value:', value, 'adventure:', currentItem.id);
+                }
+                
+                // Handle description specially for multi-line content
+                if (key === 'description' && value.startsWith("'")) {
+                    // Handle single-quoted multi-line description
+                    inDescription = true;
+                    descriptionLines = [];
+                    // Add the first line (without the opening quote)
+                    descriptionLines.push(value.substring(1)); // Remove the opening quote
+                    console.log('📝 Started parsing multi-line description for adventure:', currentItem.id);
+                    continue;
+                }
+                
+                // Assign the property to currentItem
+                if (key === 'title' || key === 'date' || key === 'category' || key === 'status' || 
+                    key === 'name' || key === 'icon' || key === 'description' || key === 'count') {
+                    // Remove quotes from string values (common in YAML)
+                    currentItem[key] = value.replace(/^["']|["']$/g, '');
+                    console.log('🔑 ASSIGNED PROPERTY - key:', key, 'value:', currentItem[key], 'item:', currentItem.id);
+                }
+            } else if (currentItem && trimmed === 'tags:') {
+                console.log('🏷️ TAGS LINE SKIPPED - currentItem:', currentItem.id, 'inDescription:', inDescription, 'trimmed:', trimmed);
+                
+                // Handle tags line specifically
+                currentItem.tags = [];
+                currentItem._inTagsList = true;
+                console.log('🏷️ Started parsing tags list for adventure:', currentItem.id);
+                continue;
                 
                 if (key === 'description' && value === '|') {
                     inDescription = true;
                     // Initialize description array for this item
                     descriptionLines = [];
                     continue;
+                } else if (key === 'description' && value.startsWith("'")) {
+                    // Handle single-quoted multi-line description
+                    inDescription = true;
+                    descriptionLines = [];
+                    // Add the first line (without the opening quote)
+                    descriptionLines.push(value.substring(1)); // Remove the opening quote
+                    continue;
                 } else if (key === 'description') {
+                    console.log('📝 DESCRIPTION PARSING - key:', key, 'value length:', value.length, 'value preview:', value.substring(0, 100) + '...');
                     currentItem[key] = value;
                     continue;
                 } else if (key === 'tags') {
-                    // Parse array format [item1, item2, item3]
-                    currentItem[key] = value.slice(1, -1).split(', ').map(tag => tag.trim());
+                    // Handle both array format [item1, item2, item3] and YAML list format
+                    if (value.trim() === '') {
+                        // YAML list format - tags will come on subsequent lines
+                        currentItem[key] = [];
+                        currentItem._inTagsList = true; // Flag to indicate we're parsing a tags list
+                        console.log('🏷️ Started parsing tags list for adventure:', currentItem.id);
+                    } else {
+                        // Array format [item1, item2, item3]
+                        currentItem[key] = value.slice(1, -1).split(', ').map(tag => tag.trim());
+                    }
                 } else if (key === 'isPublic') {
                     currentItem[key] = value === 'true';
                 } else {
@@ -438,23 +510,36 @@ class AdventuresManager {
                 if (trimmed && !line.startsWith('      ') && trimmed.includes(': ')) {
                     // This is a new property, end description parsing
                     inDescription = false;
-                    // Process this line as a property
-                    const [key, ...valueParts] = trimmed.split(': ');
-                    const value = valueParts.join(': ');
-                    
-                    if (key === 'tags') {
-                        // Parse array format [item1, item2, item3]
-                        currentItem[key] = value.slice(1, -1).split(', ').map(tag => tag.trim());
-                    } else if (key === 'isPublic') {
-                        currentItem[key] = value === 'true';
-                    } else {
-                        // Remove quotes from string values (common in YAML)
-                        currentItem[key] = value.replace(/^["']|["']$/g, '');
-                    }
+                    // Process this line as a property - but we need to handle it in the main parsing loop
+                    // End description parsing and let the main loop handle this property
+                    inDescription = false;
+                    console.log('🏷️ Ending description parsing, will reprocess line:', trimmed);
+                    // Continue to the next iteration so this line gets processed by the main property parsing logic
+                    i--; // Go back one iteration so this line gets processed again
                     continue;
                 }
                 
                 if (line.trim()) {
+                    // Check if this line ends the single-quoted description
+                    if (line.trim().endsWith("'")) {
+                        // This is the last line of the single-quoted description
+                        let content = line.trim();
+                        // Remove the closing quote
+                        content = content.slice(0, -1);
+                        
+                        // Remove YAML indentation (6 spaces) but preserve HTML formatting
+                        if (content.startsWith('      ')) {
+                            content = content.substring(6);
+                        }
+                        
+                        console.log('📝 Processing final description line:', JSON.stringify(line), '-> processed:', JSON.stringify(content));
+                        descriptionLines.push(content);
+                        
+                        // End description parsing
+                        inDescription = false;
+                        continue;
+                    }
+                    
                     // For HTML content, we need to be more careful about whitespace
                     // The YAML multiline format uses 6 spaces for indentation
                     // We want to preserve the content but remove the YAML indentation
@@ -469,6 +554,20 @@ class AdventuresManager {
                     descriptionLines.push(content);
                 }
                 continue;
+            }
+            
+            // Handle tag list items (lines starting with "- ")
+            if (currentItem && currentItem._inTagsList && trimmed.startsWith('- ')) {
+                const tag = trimmed.substring(2).trim(); // Remove "- " prefix
+                currentItem.tags.push(tag);
+                console.log('🏷️ Added tag:', tag, 'to adventure:', currentItem.id, 'tags now:', currentItem.tags);
+                continue;
+            }
+            
+            // End tag list parsing if we encounter a new property
+            if (currentItem && currentItem._inTagsList && trimmed.includes(': ')) {
+                currentItem._inTagsList = false;
+                console.log('🏷️ Finished parsing tags for adventure:', currentItem.id, 'tags:', currentItem.tags);
             }
         }
         
@@ -568,10 +667,13 @@ class AdventuresManager {
                     <div class="adventure-description">${descriptionHtml}</div>
                     ${showReadMore ? '<div class="adventure-read-more"><span class="read-more-text">Click here to read more →</span></div>' : ''}
                     <div class="adventure-tags">
-                        ${adventure.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        ${(adventure.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
                     </div>
                     ${connectedPhotosHtml}
                     ${connectedTipsHtml}
+                    <div class="adventure-read-more">
+                        <span class="read-more-text">📖 Read the full adventure story with more photos and travel tips →</span>
+                    </div>
                 </div>
             </div>
         `;

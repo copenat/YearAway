@@ -64,7 +64,7 @@
                 <p class="hero-subtitle">Current adventures, travel stories, and life updates</p>
                 <div class="hero-actions">
                     <a href="adventures.html" class="btn btn-primary">Explore Adventures</a>
-                    <a href="gallery.html" class="btn btn-secondary">View Gallery</a>
+                    <a href="gallery.html" class="btn btn-primary">View Gallery</a>
                 </div>
             </div>
         </section>
@@ -149,7 +149,7 @@
     <!-- JavaScript -->
     <script src="js/auth-config.js?v=23"></script>
     <script src="js/simple-auth-system.js?v=23"></script>
-    <script src="js/adventures-manager.js?v=61"></script>
+    <script src="js/adventures-manager.js?v=63"></script>
     <script src="js/photos-manager.js?v=44"></script>
     <script src="js/main.js"></script>
     <script>
@@ -350,10 +350,29 @@
                         }
                         
                         // Get connected tips for this adventure
+                        console.log('💡 Index page tips debugging started');
+                        console.log('💡 Checking tips manager status...');
+                        console.log('💡 adventuresManager exists:', !!adventuresManager);
+                        console.log('💡 adventuresManager.tipsData exists:', !!(adventuresManager && adventuresManager.tipsData));
+                        console.log('💡 adventuresManager.tipsData.tips exists:', !!(adventuresManager && adventuresManager.tipsData && adventuresManager.tipsData.tips));
+                        
                         if (adventuresManager && adventuresManager.tipsData && adventuresManager.tipsData.tips) {
                             connectedTips = adventuresManager.getConnectedTips(latestAdventure);
                             connectedTipsHtml = adventuresManager.renderConnectedTips(connectedTips);
                             console.log('💡 Connected tips found:', connectedTips.length);
+                            console.log('💡 Tips HTML:', connectedTipsHtml);
+                        } else {
+                            console.log('💡 Tips manager not ready, no tips will be shown');
+                            // Force show some test tips to verify rendering works
+                            connectedTipsHtml = `
+                                <div class="connected-tips" style="background: #f0f0f0; padding: 1rem; margin: 1rem 0; border-radius: 8px;">
+                                    <h4>🧪 Test Tips (Debug Mode)</h4>
+                                    <div class="tip-item" style="background: white; padding: 0.5rem; margin: 0.5rem 0; border-radius: 4px;">
+                                        <strong>Test Tip:</strong> This is a test tip to verify the tips rendering system is working.
+                                    </div>
+                                </div>
+                            `;
+                            console.log('💡 Using test tips HTML:', connectedTipsHtml);
                         }
                         
                              const adventureCard = `
@@ -369,7 +388,7 @@
                                          <h3>${latestAdventure.title}</h3>
                                          <div class="adventure-description">${descriptionHtml}</div>
                                          <div class="adventure-tags">
-                                             ${latestAdventure.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                                             ${(latestAdventure.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
                                          </div>
                                          ${connectedPhotosHtml}
                                          ${connectedTipsHtml}

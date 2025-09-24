@@ -9,6 +9,300 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css?v=48">
     <link rel="stylesheet" href="css/auth-styles.css">
+    <style>
+        .loading-message, .empty-gallery, .empty-stories {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .empty-gallery p, .empty-stories p {
+            margin: 0.5rem 0;
+        }
+        
+        .photo-tags {
+            margin-top: 0.5rem;
+        }
+        
+        .photo-tags .tag {
+            display: inline-block;
+            background: var(--light-gray);
+            color: var(--primary-brown);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            margin: 0.125rem;
+        }
+        
+        .adventure-link, .story-link {
+            display: inline-block !important;
+            background: var(--primary-brown) !important;
+            color: white !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 0.25rem !important;
+            text-decoration: none !important;
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            margin-top: 0.5rem !important;
+            transition: none !important; /* Remove all transitions */
+            opacity: 1 !important;
+            visibility: visible !important;
+            position: static !important;
+            z-index: 9999 !important;
+            pointer-events: auto !important;
+            width: auto !important;
+            height: auto !important;
+            min-width: auto !important;
+            min-height: auto !important;
+            max-width: none !important;
+            max-height: none !important;
+            overflow: visible !important;
+            clip: auto !important;
+            clip-path: none !important;
+        }
+        
+        .adventure-link:hover, .story-link:hover,
+        .adventure-link:focus, .story-link:focus,
+        .adventure-link:active, .story-link:active {
+            background: var(--dark-brown) !important;
+            color: white !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: inline-block !important;
+            width: auto !important;
+            height: auto !important;
+            min-width: auto !important;
+            min-height: auto !important;
+            max-width: none !important;
+            max-height: none !important;
+            overflow: visible !important;
+            clip: auto !important;
+            clip-path: none !important;
+        }
+        
+        /* Override any conflicting styles from main CSS */
+        .photo-details .adventure-link {
+            display: inline-block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        .photo-details .adventure-link:hover {
+            display: inline-block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        .photo-date {
+            font-size: 0.875rem;
+            color: #666;
+            margin: 0.25rem 0;
+        }
+        
+        .photo-info h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .story-link {
+            margin-top: 1rem;
+        }
+        
+           /* Ensure gallery grid displays multiple photos */
+           .gallery-grid {
+               display: grid !important;
+               grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+               gap: 1rem !important;
+               margin-top: 1rem !important;
+               width: 100% !important;
+               max-width: 1200px !important;
+               margin-left: auto !important;
+               margin-right: auto !important;
+           }
+        
+        .photo-item {
+            position: relative !important;
+            border-radius: 0.5rem !important;
+            overflow: hidden !important;
+            background: white !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        }
+        
+        .photo-container {
+            position: relative !important;
+            width: 100% !important;
+            overflow: visible !important;
+        }
+        
+        /* Force override any main CSS that might hide buttons */
+        .gallery-grid .photo-container,
+        .gallery-grid .photo-item .photo-container {
+            overflow: visible !important;
+        }
+        
+        /* Fixed button positioning - keep them visible and properly styled */
+        .adventure-link-button {
+            position: relative !important;
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            background: #8B4513 !important; /* Force brown background */
+            border: 2px solid #654321 !important; /* Dark brown border */
+            color: #FFFFFF !important; /* Force white text */
+            padding: 0.5rem 1rem !important;
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            transform: none !important;
+            transition: background-color 0.2s ease !important;
+            border-radius: 0.25rem !important;
+            text-align: center !important;
+            width: 100% !important;
+            margin-top: 0.5rem !important;
+            z-index: 10 !important;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.5) !important; /* Text shadow for visibility */
+        }
+        
+        .adventure-link-button:hover {
+            background: #654321 !important; /* Darker brown on hover */
+            border-color: #8B4513 !important;
+            color: #FFFFFF !important;
+        }
+        
+        /* Ensure photo details container has proper spacing */
+        .photo-details {
+            padding: 1rem !important;
+            position: relative !important;
+            z-index: 10 !important;
+        }
+        
+        /* Photo modal/lightbox styles */
+        .photo-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            cursor: pointer;
+        }
+        
+        .photo-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .photo-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .photo-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10001;
+        }
+        
+        .photo-modal-close:hover {
+            color: #ccc;
+        }
+        
+        /* Make photo images clickable */
+        .photo-container img {
+            cursor: pointer;
+        }
+        
+           .photo-container img {
+               width: 100% !important;
+               height: auto !important;
+               display: block !important;
+               object-fit: cover !important;
+               aspect-ratio: auto !important;
+           }
+           
+           /* Clean photo styling */
+           .photo-item {
+               position: relative !important;
+               border-radius: 0.5rem !important;
+               overflow: visible !important; /* Changed from hidden to visible */
+               background: white !important;
+               box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+               width: 100% !important;
+               display: block !important;
+               transition: none !important; /* Remove transitions that might interfere */
+           }
+           
+           .photo-item:hover {
+               transform: none !important; /* Remove transform */
+               box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
+           }
+           
+           /* Ensure links stay visible on hover */
+           .photo-item:hover .adventure-link {
+               display: inline-block !important;
+               opacity: 1 !important;
+               visibility: visible !important;
+               background: var(--dark-brown) !important;
+           }
+           
+           .photo-container {
+               position: relative !important;
+               width: 100% !important;
+               aspect-ratio: 4/3 !important;
+               overflow: hidden !important;
+           }
+           
+           .photo-container img {
+               width: 100% !important;
+               height: 100% !important;
+               display: block !important;
+               object-fit: cover !important;
+           }
+           
+           .photo-details {
+               padding: 1rem !important;
+           }
+           
+           .photo-title {
+               margin: 0 0 0.5rem 0 !important;
+               font-size: 1.1rem !important;
+               font-weight: 600 !important;
+               color: var(--primary-brown, #8B4513) !important;
+           }
+           
+           .photo-date {
+               margin: 0 0 0.75rem 0 !important;
+               font-size: 0.875rem !important;
+               color: #666 !important;
+           }
+           
+           /* Force grid layout to work */
+           .gallery-grid > * {
+               display: block !important;
+               width: 100% !important;
+           }
+           
+           /* Override any conflicting styles */
+           .gallery-grid .photo-item {
+               position: relative !important;
+               display: block !important;
+               width: 100% !important;
+               height: auto !important;
+           }
+    </style>
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
@@ -65,162 +359,19 @@
             </div>
         </section>
 
-        <!-- Gallery Filters -->
-        <section class="gallery-filters">
-            <div class="container">
-                <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="all">All Photos</button>
-                    <button class="filter-btn" data-filter="public">Public</button>
-                    <button class="filter-btn" data-filter="members">Members Only</button>
-                </div>
-            </div>
-        </section>
 
         <!-- Photo Grid -->
         <section class="photo-gallery">
             <div class="container">
-                <div class="gallery-grid">
-                    <!-- Public Photos -->
-                    <div class="photo-item" data-category="public">
-                        <div class="photo-container">
-                            <img src="images/placeholder-adventure.jpg" alt="Public adventure photo" loading="lazy">
-                            <div class="photo-overlay">
-                                <div class="photo-info">
-                                    <h3>Planning Phase</h3>
-                                    <p>Getting ready for the next adventure</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="photo-item" data-category="public">
-                        <div class="photo-container">
-                            <img src="images/placeholder-adventure.jpg" alt="Public travel photo" loading="lazy">
-                            <div class="photo-overlay">
-                                <div class="photo-info">
-                                    <h3>Travel Preparation</h3>
-                                    <p>Researching destinations and planning routes</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Members-only Photos -->
-                    <div class="photo-item members-only" data-category="members">
-                        <div class="member-indicator">🔒 Members Only</div>
-                        <div class="photo-container">
-                            <img src="images/placeholder-members.jpg" alt="Members-only family photo" loading="lazy">
-                            <div class="photo-overlay">
-                                <div class="photo-info">
-                                    <h3>Family Moments</h3>
-                                    <p>Private family photos and personal memories</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="photo-item members-only" data-category="members">
-                        <div class="member-indicator">🔒 Members Only</div>
-                        <div class="photo-container">
-                            <img src="images/placeholder-members.jpg" alt="Members-only travel photo" loading="lazy">
-                            <div class="photo-overlay">
-                                <div class="photo-info">
-                                    <h3>Exclusive Adventure</h3>
-                                    <p>Detailed photos from private adventures</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="photo-item" data-category="public">
-                        <div class="photo-container">
-                            <img src="images/placeholder-adventure.jpg" alt="Public destination photo" loading="lazy">
-                            <div class="photo-overlay">
-                                <div class="photo-info">
-                                    <h3>Destination Research</h3>
-                                    <p>Exploring new places and cultures</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="photo-item members-only" data-category="members">
-                        <div class="member-indicator">🔒 Members Only</div>
-                        <div class="photo-container">
-                            <img src="images/placeholder-members.jpg" alt="Members-only personal photo" loading="lazy">
-                            <div class="photo-overlay">
-                                <div class="photo-info">
-                                    <h3>Personal Reflections</h3>
-                                    <p>Private moments and personal experiences</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="photo-item" data-category="public">
-                        <div class="photo-container">
-                            <img src="images/placeholder-adventure.jpg" alt="Public travel planning photo" loading="lazy">
-                            <div class="photo-overlay">
-                                <div class="photo-info">
-                                    <h3>Travel Planning</h3>
-                                    <p>Organizing the next big adventure</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="photo-item members-only" data-category="members">
-                        <div class="member-indicator">🔒 Members Only</div>
-                        <div class="photo-container">
-                            <img src="images/placeholder-members.jpg" alt="Members-only exclusive photo" loading="lazy">
-                            <div class="photo-overlay">
-                                <div class="photo-info">
-                                    <h3>Exclusive Content</h3>
-                                    <p>High-resolution photos and exclusive memories</p>
-                                </div>
-                            </div>
-                        </div>
+                <div class="gallery-grid" id="gallery-grid">
+                    <!-- Photos will be loaded dynamically here -->
+                    <div class="loading-message">
+                        <p>Loading photos...</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Photo Stories -->
-        <section class="photo-stories">
-            <div class="container">
-                <h2>Photo Stories</h2>
-                <div class="stories-grid">
-                    <div class="story-card">
-                        <div class="story-image">
-                            <img src="images/placeholder-adventure.jpg" alt="Story image" loading="lazy">
-                        </div>
-                        <div class="story-content">
-                            <h3>Planning the Next Adventure</h3>
-                            <p>A behind-the-scenes look at how we plan our travels, from research to booking.</p>
-                            <div class="story-meta">
-                                <span class="story-date">September 2025</span>
-                                <span class="story-photos">5 Photos</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="story-card members-only">
-                        <div class="member-indicator">🔒 Members Only</div>
-                        <div class="story-image">
-                            <img src="images/placeholder-members.jpg" alt="Members story image" loading="lazy">
-                        </div>
-                        <div class="story-content">
-                            <h3>Private Family Moments</h3>
-                            <p>Exclusive photos and stories from private family adventures and personal experiences.</p>
-                            <div class="story-meta">
-                                <span class="story-date">August 2025</span>
-                                <span class="story-photos">12 Photos</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- Call to Action -->
         <section class="cta-section">
@@ -233,6 +384,12 @@
             </div>
         </section>
     </main>
+
+    <!-- Photo Modal/Lightbox -->
+    <div id="photo-modal" class="photo-modal">
+        <span class="photo-modal-close" onclick="closePhotoModal()">&times;</span>
+        <img id="modal-image" src="" alt="">
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -267,6 +424,8 @@
     <!-- JavaScript -->
     <script src="js/auth-config.js?v=22"></script>
     <script src="js/simple-auth-system.js?v=22"></script>
+    <script src="js/adventures-manager.js?v=63"></script>
+    <script src="js/photos-manager.js?v=45"></script>
     <script src="js/main.js"></script>
     <script src="js/gallery.js"></script>
     <script src="js/access-request.js?v=1"></script>
@@ -291,6 +450,214 @@
             // Listen for auth status changes
             document.addEventListener('yearaway:login', updateAccessSectionVisibility);
             document.addEventListener('yearaway:logout', updateAccessSectionVisibility);
+        });
+
+        // Gallery Photo Loading
+        document.addEventListener('DOMContentLoaded', function() {
+            let loadRetryCount = 0;
+            const MAX_RETRIES = 10;
+
+            function loadGalleryPhotos() {
+                // Wait for both managers to be ready
+                if (!window.photosManager || !window.photosManager.photosData || !window.adventuresManager || !window.adventuresManager.adventuresData) {
+                    loadRetryCount++;
+                    
+                    if (loadRetryCount < MAX_RETRIES) {
+                        setTimeout(loadGalleryPhotos, 500);
+                    } else {
+                        showEmptyGallery();
+                    }
+                    return;
+                }
+
+                const photos = window.photosManager.photosData.photos || [];
+                const isLoggedIn = window.yearawayAuth && window.yearawayAuth.isMember();
+
+                if (photos.length === 0) {
+                    showEmptyGallery();
+                    return;
+                }
+
+                renderGalleryPhotos(photos, isLoggedIn);
+            }
+
+            function showEmptyGallery() {
+                const galleryGrid = document.getElementById('gallery-grid');
+                const storiesGrid = document.getElementById('stories-grid');
+                
+                if (galleryGrid) {
+                    galleryGrid.innerHTML = `
+                        <div class="empty-gallery">
+                            <p>No photos available at the moment.</p>
+                            <p>Check back soon for new content!</p>
+                        </div>
+                    `;
+                }
+                
+                if (storiesGrid) {
+                    storiesGrid.innerHTML = `
+                        <div class="empty-stories">
+                            <p>No photo stories available at the moment.</p>
+                        </div>
+                    `;
+                }
+            }
+
+            function renderGalleryPhotos(photos, isLoggedIn) {
+                const galleryGrid = document.getElementById('gallery-grid');
+                if (!galleryGrid) return;
+
+                // Filter photos based on login status
+                const visiblePhotos = photos.filter(photo => {
+                    if (photo.isPublic) return true; // Always show public photos
+                    return isLoggedIn; // Only show member photos if logged in
+                });
+
+
+                if (visiblePhotos.length === 0) {
+                    showEmptyGallery();
+                    return;
+                }
+
+                // Render individual photos with full details
+                const photoHTML = visiblePhotos.map(photo => {
+                    // Create adventure link if available - use a different approach
+                    let adventureLink = '';
+                    if (photo.adventure_ids && photo.adventure_ids.length > 0) {
+                        const adventureId = photo.adventure_ids[0];
+                        // Get adventure title from adventures data
+                        let adventureTitle = 'this adventure';
+                        if (window.adventuresManager && window.adventuresManager.adventuresData) {
+                            const adventure = window.adventuresManager.adventuresData.adventures.find(a => a.id === adventureId);
+                            if (adventure && adventure.title) {
+                                adventureTitle = adventure.title;
+                            }
+                        }
+                        // Use a button instead of a link to avoid any link-specific CSS issues
+                        adventureLink = `<button onclick="window.open('adventure-detail.html?id=${adventureId}', '_self')" class="adventure-link-button" style="display: inline-block !important; opacity: 1 !important; visibility: visible !important; background: var(--primary-brown) !important; color: white !important; padding: 0.5rem 1rem !important; border-radius: 0.25rem !important; border: none !important; cursor: pointer !important; font-size: 0.875rem !important; font-weight: 600 !important; margin-top: 0.5rem !important;">Read more about this at ${adventureTitle}</button>`;
+                    }
+                    
+                    return `
+                        <div class="photo-item" data-category="${photo.isPublic ? 'public' : 'members'}">
+                            <div class="photo-container">
+                                <img src="${photo.path}${photo.filename}" alt="${photo.caption}" loading="lazy">
+                            </div>
+                            <div class="photo-details">
+                                <h3 class="photo-title">${photo.caption}</h3>
+                                <p class="photo-date">${formatDate(photo.date)}</p>
+                                ${photo.tags && photo.tags.length > 0 ? `<div class="photo-tags">${photo.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` : ''}
+                                ${adventureLink}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                galleryGrid.innerHTML = photoHTML;
+
+                // Set up photo click handlers for modal
+                setupPhotoClickHandlers();
+            }
+
+            function setupPhotoClickHandlers() {
+                const galleryGrid = document.getElementById('gallery-grid');
+                if (!galleryGrid) return;
+                
+                const photoImages = galleryGrid.querySelectorAll('.photo-container img');
+                photoImages.forEach((img) => {
+                    img.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openPhotoModal(img.src, img.alt);
+                    });
+                });
+
+            }
+
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            }
+
+            // Photo modal functions
+            function openPhotoModal(src, alt) {
+                const modal = document.getElementById('photo-modal');
+                const modalImage = document.getElementById('modal-image');
+                
+                if (!modal || !modalImage) {
+                    return;
+                }
+                
+                modalImage.src = src;
+                modalImage.alt = alt;
+                modal.classList.add('active');
+                
+                // Ensure event listeners are set up
+                setupModalListeners();
+                
+                // Prevent body scroll when modal is open
+                document.body.style.overflow = 'hidden';
+                
+            }
+
+            function closePhotoModal() {
+                const modal = document.getElementById('photo-modal');
+                modal.classList.remove('active');
+                
+                // Restore body scroll
+                document.body.style.overflow = 'auto';
+                
+            }
+
+            // Add modal event listeners
+            document.addEventListener('DOMContentLoaded', function() {
+                setupModalListeners();
+            });
+
+            function setupModalListeners() {
+                const modal = document.getElementById('photo-modal');
+                const closeBtn = document.querySelector('.photo-modal-close');
+                
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        closePhotoModal();
+                    });
+                }
+                
+                if (modal) {
+                    modal.addEventListener('click', function(e) {
+                        if (e.target === modal) {
+                            closePhotoModal();
+                        }
+                    });
+                }
+                
+                // Close modal with Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        closePhotoModal();
+                    }
+                });
+            }
+
+            // Start loading photos
+            setTimeout(loadGalleryPhotos, 1000);
+
+            // Listen for auth status changes to reload photos
+            document.addEventListener('yearaway:login', () => {
+                loadRetryCount = 0;
+                setTimeout(loadGalleryPhotos, 500);
+            });
+            
+            document.addEventListener('yearaway:logout', () => {
+                loadRetryCount = 0;
+                setTimeout(loadGalleryPhotos, 500);
+            });
         });
     </script>
 </body>
