@@ -319,7 +319,7 @@ section:nth-child(even) {
 }
 
 .adventure-content {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
     text-align: left;
 }
 
@@ -513,7 +513,7 @@ section:nth-child(even) {
     }
     
     .adventure-item {
-        padding: var(--spacing-md);
+        padding: var(--spacing-sm);
     }
     
     .adventure-item h3 {
@@ -1439,7 +1439,7 @@ input:focus {
     
     /* Adventure cards mobile improvements */
     .adventure-item {
-        padding: var(--spacing-lg);
+        padding: var(--spacing-sm);
         margin-bottom: var(--spacing-md);
     }
     
