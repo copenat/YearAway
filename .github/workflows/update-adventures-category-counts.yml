@@ -72,4 +72,4 @@ jobs:
         - Last updated: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
         
         # Push to the same branch that triggered the workflow
-        git push origin ${{ github.ref_name }}
+        git push origin ${{ github.head_ref || github.ref_name }}
