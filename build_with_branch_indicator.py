@@ -245,6 +245,21 @@ def main():
     # Process HTML files
     try:
         process_html_files()
+        
+        # Inject git hash into HTML files (same as build.sh)
+        print("\n🔧 Injecting git hash into HTML files...")
+        try:
+            import subprocess
+            result = subprocess.run(['python3', 'bin/inject-git-hash.py'], 
+                                  capture_output=True, text=True, check=True)
+            print("✅ Git hash injection completed successfully")
+        except subprocess.CalledProcessError as e:
+            print(f"⚠️  Git hash injection failed: {e}")
+            print(f"   stdout: {e.stdout}")
+            print(f"   stderr: {e.stderr}")
+        except FileNotFoundError:
+            print("⚠️  Git hash injection script not found, skipping...")
+        
         print("\n🎉 Build complete!")
     except Exception as e:
         print(f"\n❌ Build failed with error: {e}")
