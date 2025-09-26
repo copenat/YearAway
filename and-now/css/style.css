@@ -27,12 +27,12 @@
     --font-size-3xl: 48px;
     
     /* Spacing */
-    --spacing-xs: 0.5rem;
-    --spacing-sm: 1rem;
-    --spacing-md: 1.5rem;
-    --spacing-lg: 2rem;
-    --spacing-xl: 3rem;
-    --spacing-2xl: 4rem;
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 0.75rem;
+    --spacing-lg: 1rem;
+    --spacing-xl: 1.5rem;
+    --spacing-2xl: 2rem;
     
     /* Border Radius */
     --radius-sm: 4px;
@@ -66,7 +66,7 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 var(--spacing-md);
+    padding: 0 var(--spacing-sm);
 }
 
 /* Typography */
@@ -227,7 +227,7 @@ a:hover {
 .hero {
     background: linear-gradient(135deg, var(--primary-brown), var(--secondary-brown));
     color: var(--white);
-    padding: var(--spacing-2xl) 0;
+    padding: var(--spacing-lg) 0;
     text-align: center;
 }
 
@@ -251,7 +251,7 @@ a:hover {
 
 /* Sections */
 section {
-    padding: var(--spacing-2xl) 0;
+    padding: var(--spacing-lg) 0;
 }
 
 section:nth-child(even) {
@@ -319,7 +319,7 @@ section:nth-child(even) {
 }
 
 .adventure-content {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
     text-align: left;
 }
 
@@ -342,7 +342,7 @@ section:nth-child(even) {
 
 .link-card {
     background: var(--white);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-lg);
     border-radius: var(--radius-lg);
     text-align: center;
     box-shadow: var(--shadow-sm);
