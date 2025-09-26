@@ -479,7 +479,7 @@ section:nth-child(even) {
 
 @media (max-width: 480px) {
     .container {
-        padding: 0 var(--spacing-sm);
+        padding: 0 var(--spacing-xs);
     }
     
     .nav-container {
@@ -522,6 +522,18 @@ section:nth-child(even) {
     
     .adventure-description {
         font-size: 0.85rem;
+        line-height: 1.4;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    /* Reduce white space in adventure content on mobile */
+    .adventure-content {
+        padding: var(--spacing-sm);
+    }
+    
+    .adventure-content p {
+        margin-bottom: var(--spacing-sm);
+        line-height: 1.5;
     }
     
     /* Navigation for very small screens */
@@ -1491,6 +1503,21 @@ input:focus {
         margin-top: var(--spacing-lg);
     }
     
+    /* Reduce white space in main content sections on mobile */
+    section {
+        padding: var(--spacing-lg) 0;
+    }
+    
+    .hero {
+        padding: var(--spacing-lg) 0;
+    }
+    
+    /* Reduce white space in adventure items on mobile */
+    .adventure-item {
+        padding: var(--spacing-sm);
+        margin-bottom: var(--spacing-sm);
+    }
+    
     .connected-tips-list {
         gap: var(--spacing-sm);
     }
@@ -1832,6 +1859,11 @@ input:focus {
         padding: var(--spacing-sm);
         margin-bottom: var(--spacing-sm);
         gap: var(--spacing-sm);
+    }
+    
+    /* Reduce white space in adventure timeline on mobile */
+    .adventures-timeline {
+        margin-top: var(--spacing-sm);
     }
     
     .adventures-timeline .adventure-item h3 {
