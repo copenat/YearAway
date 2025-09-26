@@ -14,6 +14,10 @@ fi
 # Run the Python build script
 python3 build_with_branch_indicator.py
 
+# Inject git hash into HTML files
+echo "🔧 Injecting git hash into HTML files..."
+python3 bin/inject-git-hash.py
+
 # Show current branch status
 BRANCH=$(git branch --show-current)
 echo ""
