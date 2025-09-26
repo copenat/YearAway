@@ -2,7 +2,7 @@ name: Update Category Counts
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ develop ]
     paths:
       - 'and-now/content/tips-data-public.yaml'
       - 'and-now/content/tips-data-members.yaml'

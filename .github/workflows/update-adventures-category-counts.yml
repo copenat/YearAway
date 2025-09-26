@@ -2,7 +2,7 @@ name: Update Adventures Category Counts
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ develop ]
     paths:
       - 'and-now/content/adventures-data-public.yaml'
       - 'and-now/content/adventures-data-members.yaml'
