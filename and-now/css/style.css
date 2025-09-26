@@ -2122,7 +2122,7 @@ input:focus {
 .adventure-header h1 {
     margin: 0 0 var(--spacing-sm) 0;
     color: var(--primary-brown);
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-2xl);
 }
 
 .adventure-meta {
