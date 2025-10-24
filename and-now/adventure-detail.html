@@ -93,6 +93,12 @@
         </section>
     </main>
 
+    <!-- Photo Modal/Lightbox -->
+    <div id="photo-modal" class="photo-modal">
+        <span class="photo-modal-close" onclick="closePhotoModal()">&times;</span>
+        <img id="modal-image" src="" alt="">
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -476,11 +482,69 @@
             }
         }
 
+        // Photo modal functions
+        function openPhotoModal(src, alt) {
+            const modal = document.getElementById('photo-modal');
+            const modalImage = document.getElementById('modal-image');
+            
+            if (!modal || !modalImage) {
+                console.error('Photo modal elements not found');
+                return;
+            }
+            
+            modalImage.src = src;
+            modalImage.alt = alt;
+            modal.classList.add('active');
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePhotoModal() {
+            const modal = document.getElementById('photo-modal');
+            modal.classList.remove('active');
+            
+            // Restore body scroll
+            document.body.style.overflow = '';
+        }
+
+        // Close modal when clicking outside the image
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('photo-modal');
+            if (e.target === modal) {
+                closePhotoModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePhotoModal();
+            }
+        });
+
         // Initialize when DOM is loaded
         document.addEventListener('DOMContentLoaded', async function() {
             const detailManager = new AdventureDetailManager();
             await detailManager.init();
+            
+            // Set up photo click handlers after content is loaded
+            setTimeout(() => {
+                setupPhotoClickHandlers();
+            }, 1000);
         });
+
+        function setupPhotoClickHandlers() {
+            const photos = document.querySelectorAll('.adventure-photo img, .connected-photo img');
+            photos.forEach(img => {
+                img.style.cursor = 'pointer';
+                img.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openPhotoModal(img.src, img.alt);
+                });
+            });
+        }
     </script>
 </body>
 </html>

@@ -1,27 +1,36 @@
 adventures:
-- id: planning-a-trip-to-asia
-  title: YearAway 2.5 Trip
-  description: 'We are currently planning a 6 month trip to Asia, specifically China,
-    Thailand, Laos and finally India. We have been to all of them before but we are,
-    as always, trying to find new places to visit.<br>
+- id: first-few-weeks-in-china
+  title: YearAway The Return - First few weeks in China
+  description: 'It''s taken rather longer than planned to sit down and write our first diary entry. 
+    When we left the UK just over a fortnight ago, we were utterly knackered – long work hours, 
+    long play hours and catching up on the all the things you need to do before you head off on 
+    a big trip meant we were frazzled. Not so frazzled that we didn’t hit the ground running as 
+    soon as we landed in China, but still way too tired to think about YearAway at the end each day.
 
-    We have the outline flights and some accommodation booked especially around holidays
-    or festivals. But otherwise we are going to book as we go, leaving us open to
-    whimsical, flighty ways :)<br>
+    <br>Right now we are on a high speed train – clocking up about 239km/hr – on our way from Jinan to Datong. 
+    The journey is going to be just over six hours so providing us with the perfect opportunity to get on 
+    with that first diary entry.
 
-    We''ve named this Yearaway 2.5 Trip as this is our second long trip and this one
-    isnt a year but 6 months. Saying that, Yearaway 1.0 was supposed to have been
-    one year but ended up being 18 months.'
-  date: '2025-09-22'
+    <br>Where have we been so far? Shanghai, where the mini-heatwave rather took us by surprise; Nanjing, 
+    a former Chinese capital, where the first Ming Emperor, Zhu Yuanzhang, is entombed;  Qufu, where 
+    Confucius was born and died and they do a very tasty line in smoked tofu; Qingdao, here we checked 
+    out the Chinese seaside and the home of another famous Chinese export, Tsingtao beer; and then to 
+    sleepy relaxed Jinan, famous for its natural bubbling springs and pretty stream-lined avenues and alleyways.
+
+    <br>How does it feel to be away? Not as daunting as either of us were expecting really, but perhaps we 
+    just haven’t had a moment to sit down and contemplate it yet.
+
+    <br>We’ll leave it there for now. Just wanted to get started and let you know that we are on our way...'
+
+  date: '2025-10-03'
   category: Travel
   tags:
-  - asia
   - china
-  - thailand
-  - laos
-  - india
-  - travel
-  - culture
+  - shanghai
+  - nanjing
+  - qufu
+  - qingdao
+  - jinan
   status: active
 categories:
 - id: travel

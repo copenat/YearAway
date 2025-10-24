@@ -1,26 +1,13 @@
 photos:
-- id: nature-mountain-pathway
-  filename: IMG_20191102_084141.jpg
+- id: jingan-temple-in-Shanghai
+  filename: JinganTempleShanghai.jpg
   path: content/images/members/
-  caption: Nature's pathway leading to a picturesque village in the mountains.
-  date: '2019-11-02'
+  caption: Jing'an temple in Shanghai
+  date: '2025-10-04'
   tags:
-  - china
+  - shanghai
   adventure_ids:
-  - planning-a-trip-to-asia
-  isPublic: false
-  featured: false
-
-- id: cycling-along-the-lijiang-river
-  filename: IMG_20191030_133226.jpg
-  path: content/images/members/
-  caption: A serene view cycling alongside the Lijiang River in China
-  date: '2019-10-30'
-  tags:
-  - china
-  - lijiang
-  adventure_ids:
-  - planning-a-trip-to-asia
+  - first-few-weeks-in-china
   isPublic: false
   featured: false
 

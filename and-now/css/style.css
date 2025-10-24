@@ -302,15 +302,15 @@ section:nth-child(even) {
 }
 
 .adventure-image {
-    height: 200px;
     overflow: hidden;
 }
 
 .adventure-image img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+    height: auto;
+    max-width: 100%;
+    max-height: 250px;
+    object-fit: contain;
     transition: transform 0.3s ease;
 }
 
@@ -670,7 +670,6 @@ section:nth-child(even) {
     
     /* Improve photo loading */
     .adventure-photo {
-        object-fit: cover;
         background-color: var(--light-gray);
     }
     
@@ -1235,9 +1234,10 @@ input:focus {
 
 .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, max-content));
     gap: var(--spacing-lg);
     margin-top: var(--spacing-lg);
+    justify-content: start;
 }
 
 .photo-item {
@@ -1255,16 +1255,19 @@ input:focus {
 
 .photo-container {
     position: relative;
-    height: 250px;
     overflow: hidden;
+    display: inline-block;
+    max-width: 400px;
 }
 
 .photo-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+    max-width: 400px;
+    max-height: 400px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
     transition: transform 0.3s ease;
+    display: block;
 }
 
 .photo-item:hover .photo-container img {
@@ -1323,14 +1326,15 @@ input:focus {
 }
 
 .story-image {
-    height: 200px;
     overflow: hidden;
 }
 
 .story-image img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
     transition: transform 0.3s ease;
 }
 
@@ -1373,7 +1377,8 @@ input:focus {
     }
     
     .gallery-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(250px, max-content));
+        justify-content: start;
     }
     
     .stories-grid {
@@ -1495,7 +1500,11 @@ input:focus {
     .adventure-photo {
         width: 100%;
         height: auto;
-        min-height: 200px;
+        min-height: 150px;
+    }
+    
+    .adventure-photo img {
+        max-height: 300px;
     }
     
     /* Connected tips mobile */
@@ -1960,8 +1969,9 @@ input:focus {
 
 .connected-photos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, max-content));
     gap: 1rem;
+    justify-content: start;
 }
 
 .connected-photo {
@@ -1985,17 +1995,13 @@ input:focus {
 .connected-photo .photo-container {
     position: relative;
     width: 100%;
-    height: 150px;
     overflow: hidden;
 }
 
 .connected-photo .photo-container img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+    height: auto;
     transition: transform 0.3s ease;
-    aspect-ratio: 4/3;
 }
 
 .connected-photo:hover .photo-container img {
@@ -2081,6 +2087,48 @@ input:focus {
     z-index: 10;
 }
 
+/* Photo Modal/Lightbox Styles */
+.photo-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10000;
+    cursor: pointer;
+}
+
+.photo-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.photo-modal img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.photo-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10001;
+}
+
+.photo-modal-close:hover {
+    color: #ccc;
+}
+
 /* Adventure Detail Page Styles */
 .adventure-detail {
     padding: var(--spacing-lg) 0;
@@ -2158,8 +2206,9 @@ input:focus {
 
 .photos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, max-content));
     gap: var(--spacing-md);
+    justify-content: start;
 }
 
 .adventure-photo {
@@ -2177,9 +2226,10 @@ input:focus {
 
 .adventure-photo img {
     width: 100%;
-    height: 250px;
-    object-fit: cover;
-    object-position: center;
+    height: auto;
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
     transition: transform 0.3s ease;
 }
 
