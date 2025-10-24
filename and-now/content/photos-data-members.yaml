@@ -11,5 +11,55 @@ photos:
   isPublic: false
   featured: false
 
+- id: morning-run-in-nanjing
+  filename: NathanInNanjing.jpg
+  path: content/images/members/
+  caption: Morning run in Nanjing
+  date: '2025-10-08'
+  tags:
+  - nanjing
+  - running
+  adventure_ids:
+  - first-few-weeks-in-china
+  isPublic: false
+  featured: false
+
+- id: nanjing-train-station
+  filename: NanjingStation.jpg
+  path: content/images/members/
+  caption: Nanjing train station. Now, where is our platform?
+  date: '2025-10-11'
+  tags:
+  - nanjing
+  - trainstation
+  adventure_ids:
+  - first-few-weeks-in-china
+  isPublic: false
+  featured: false
+
+- id: morning-run-in-qingdao
+  filename: QindaoSueRunning.jpg
+  path: content/images/members/
+  caption: Morning run in Qingdao. Amazing shore front with beautiful beach.
+  date: '2025-10-16'
+  tags:
+  - qingdao
+  - running
+  adventure_ids:
+  - first-few-weeks-in-china
+  isPublic: false
+  featured: false
+
+- id: scenic-cable-car-on-laoshan
+  filename: LaoshanCableCar.jpg
+  path: content/images/members/
+  caption: Coming down Laoshan after 5 hours going up steps. Many thanks cablecar for being there!
+  date: '2025-10-18'
+  tags:
+  - laoshan
+  adventure_ids:
+  - first-few-weeks-in-china
+  isPublic: false
+  featured: false
 categories: []
 lastUpdated: '2025-09-22T15:45:00.000Z'

@@ -1500,8 +1500,17 @@ input:focus {
         min-height: 150px;
     }
     
+    .adventure-photo {
+        display: inline-block;
+        max-width: 400px;
+    }
+    
     .adventure-photo img {
-        max-height: 300px;
+        max-width: 400px;
+        max-height: 400px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
     }
     
     /* Connected tips mobile */
@@ -1996,8 +2005,11 @@ input:focus {
 }
 
 .connected-photo .photo-container img {
-    width: 100%;
+    max-width: 400px;
+    max-height: 400px;
+    width: auto;
     height: auto;
+    object-fit: contain;
     transition: transform 0.3s ease;
 }
 
@@ -2221,10 +2233,19 @@ input:focus {
     box-shadow: var(--shadow-md);
 }
 
+.adventure-photo {
+    display: inline-block;
+    max-width: 400px;
+}
+
 .adventure-photo img {
-    width: 100%;
+    max-width: 400px;
+    max-height: 400px;
+    width: auto;
     height: auto;
+    object-fit: contain;
     transition: transform 0.3s ease;
+    display: block;
 }
 
 .adventure-photo:hover img {

@@ -11,7 +11,7 @@ tips:
   - id: offline-maps
     title: Offline Maps for Travel
     description: |
-      In China you cannot access anything Google. So for maps we use maps.me.
+      In China you cannot access anything Google. So for maps we use amap.
     category: Technology
     tags: [china, maps, offline, technology]
     rating: 5
