@@ -8,7 +8,7 @@ class SimpleYearAwayAuth {
         this.tokenKey = 'yearaway_member_token';
         this.memberStatusKey = 'yearaway_member_status';
         this.validTokens = [
-            'YEARAWAY-ULZE-1SVR-Z0JG',
+            'YEARAWAY-ULZE-1SVR-Z0JG', // issued to Sue's FaceBook
             'YEARAWAY-I80B-HJ7Y-FKNO', 
             'YEARAWAY-Q2FZ-KID3-ISML',
             'YEARAWAY-9ND6-6QMU-KYW7',
