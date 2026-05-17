@@ -35,4 +35,27 @@ else
 fi
 
 echo ""
+echo "📦 Copying site files to dist/..."
+mkdir -p dist
+rsync -a --delete \
+  --exclude='.git' \
+  --exclude='.github' \
+  --exclude='dist' \
+  --exclude='venv' \
+  --exclude='venv-cloudflare' \
+  --exclude='legacy' \
+  --exclude='debug-scripts' \
+  --exclude='bin' \
+  --exclude='__pycache__' \
+  --exclude='*.py' \
+  --exclude='*.sh' \
+  --exclude='*.md' \
+  --exclude='requirements.txt' \
+  --exclude='.python-version' \
+  --exclude='pyproject.toml.backup' \
+  --exclude='.DS_Store' \
+  . dist/
+echo "✅ dist/ ready."
+
+echo ""
 echo "🎉 Build complete! Your HTML files are ready."
