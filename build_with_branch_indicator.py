@@ -6,6 +6,7 @@ no indicator when on main branch.
 """
 
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -260,6 +261,34 @@ def main():
         except FileNotFoundError:
             print("⚠️  Git hash injection script not found, skipping...")
         
+        # Copy site files into dist/ (required by Cloudflare Pages output directory setting)
+        print("\n📦 Copying site files to dist/...")
+        dist = Path('dist')
+        if dist.exists():
+            shutil.rmtree(dist)
+        dist.mkdir()
+
+        exclude = {
+            '.git', '.github', 'dist', 'venv', 'venv-cloudflare',
+            'legacy', 'debug-scripts', 'bin', '__pycache__',
+        }
+        exclude_suffixes = {'.py', '.sh', '.md', '.backup', '.bak', '.log', '.tmp'}
+        exclude_names = {'requirements.txt', '.python-version', 'pyproject.toml.backup', '.DS_Store'}
+
+        for item in Path('.').iterdir():
+            if item.name in exclude or item.name in exclude_names:
+                continue
+            if item.suffix in exclude_suffixes:
+                continue
+            dest = dist / item.name
+            if item.is_dir():
+                shutil.copytree(item, dest)
+            else:
+                shutil.copy2(item, dest)
+            print(f"   ✅ {item.name}")
+
+        print("✅ dist/ ready.")
+
         print("\n🎉 Build complete!")
     except Exception as e:
         print(f"\n❌ Build failed with error: {e}")
